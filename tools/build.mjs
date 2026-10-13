@@ -29,7 +29,8 @@ const proprios = ['src/engine.js', 'src/planilha-padrao.js', 'src/leitores.js', 
 
 function seguro(codigo, nome) {
   if (/<\/script/i.test(codigo)) throw new Error(`${nome} contém "</script" e quebraria o HTML.`);
-  return codigo;
+  // U+FFFD literal (tabelas de codepage do SheetJS) vira o escape equivalente \uFFFD
+  return codigo.replace(/\uFFFD/g, '\\uFFFD');
 }
 const script = (p) => `<script>/* ${path.basename(p)} */\n${seguro(lerTxt(p), p)}\n</script>`;
 
