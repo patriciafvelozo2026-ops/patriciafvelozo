@@ -67,6 +67,9 @@
   /** series: [{nome, cor, pontos:[{rodada, rotulo, total, herdada}]}] */
   function svgNegociacao(series, rotulos, opt = {}) {
     const W = opt.largura || 760, H = opt.altura || 300;
+    const k = opt.literal
+      ? { grade: '#e6e8ea', texto2: '#5f6b73', texto: '#1d2327', sup: '#ffffff' }
+      : { grade: 'var(--grade,#e6e8ea)', texto2: 'var(--texto-2,#5f6b73)', texto: 'var(--texto,#1d2327)', sup: 'var(--superficie,#fff)' };
     const m = { t: 18, r: 215, b: 36, l: 84 };
     const vals = series.flatMap((s) => s.pontos.map((p) => p.total)).filter((v) => v != null);
     if (!vals.length) return '';
@@ -79,11 +82,11 @@
     const y = (v) => m.t + (1 - (v - min) / (max - min)) * (H - m.t - m.b);
     let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Evolução do valor equalizado por rodada" style="font-family:inherit;max-width:${W}px">`;
     for (let v = min; v <= max + 1e-6; v += passo) {
-      s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grade,#e6e8ea)" stroke-width="1"/>`;
-      s += `<text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--texto-2,#5f6b73)">${esc(abreviar(v))}</text>`;
+      s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="${k.grade}" stroke-width="1"/>`;
+      s += `<text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="${k.texto2}">${esc(abreviar(v))}</text>`;
     }
     rotulos.forEach((r, i) => {
-      s += `<text x="${x(i)}" y="${H - 12}" text-anchor="middle" font-size="12" fill="var(--texto-2,#5f6b73)">${esc(r)}</text>`;
+      s += `<text x="${x(i)}" y="${H - 12}" text-anchor="middle" font-size="12" fill="${k.texto2}">${esc(r)}</text>`;
     });
     // posições dos rótulos diretos sem sobreposição
     const finais = series.map((se, i) => {
@@ -97,18 +100,18 @@
       if (ps.length > 1) s += `<polyline fill="none" stroke="${se.cor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${ps.map((p) => `${x(p.j)},${y(p.total)}`).join(' ')}"/>`;
       ps.forEach((p) => {
         s += p.herdada
-          ? `<circle cx="${x(p.j)}" cy="${y(p.total)}" r="4" fill="var(--superficie,#fff)" stroke="${se.cor}" stroke-width="2"/>`
-          : `<circle cx="${x(p.j)}" cy="${y(p.total)}" r="4.5" fill="${se.cor}" stroke="var(--superficie,#fff)" stroke-width="2"/>`;
+          ? `<circle cx="${x(p.j)}" cy="${y(p.total)}" r="4" fill="${k.sup}" stroke="${se.cor}" stroke-width="2"/>`
+          : `<circle cx="${x(p.j)}" cy="${y(p.total)}" r="4.5" fill="${se.cor}" stroke="${k.sup}" stroke-width="2"/>`;
       });
     });
     for (const f of finais) {
       s += `<line x1="${W - m.r + 8}" x2="${W - m.r + 20}" y1="${f.y}" y2="${f.y}" stroke="${f.se.cor}" stroke-width="2"/>`;
-      s += `<text x="${W - m.r + 26}" y="${f.y + 4}" font-size="11.5" fill="var(--texto,#1d2327)">${esc(curto(f.se.nome, 17))} · ${esc(abreviar(f.u.total))}</text>`;
+      s += `<text x="${W - m.r + 26}" y="${f.y + 4}" font-size="11.5" fill="${k.texto}">${esc(curto(f.se.nome, 17))} · ${esc(abreviar(f.u.total))}</text>`;
     }
     if (opt.hover) {
       const w = rotulos.length === 1 ? W - m.l - m.r : (W - m.l - m.r) / (rotulos.length - 1);
       rotulos.forEach((_, i) => {
-        s += `<g class="hcol" data-i="${i}"><line class="cross" x1="${x(i)}" x2="${x(i)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--texto-2,#5f6b73)" stroke-dasharray="3 3"/>` +
+        s += `<g class="hcol" data-i="${i}"><line class="cross" x1="${x(i)}" x2="${x(i)}" y1="${m.t}" y2="${H - m.b}" stroke="${k.texto2}" stroke-dasharray="3 3"/>` +
           `<rect x="${x(i) - w / 2}" y="${m.t}" width="${w}" height="${H - m.t - m.b}" fill="transparent"/></g>`;
       });
     }
@@ -142,7 +145,7 @@
     const R = r.ultima ? eq.porRodada[r.ultima] : null;
     const series = seriesNegociacao(st, eq);
     const nomeF = (fid) => E.val(st.fornecedores.find((f) => f.id === fid).nome);
-    const kpi = (rot, v, sub) => `<div class="kpi"><div class="kr">${esc(rot)}</div><div class="kv">${esc(v)}</div>${sub ? `<div class="ks">${esc(sub)}</div>` : ''}</div>`;
+    const kpi = (rot, v, sub) => `<div class="r-kpi"><div class="r-kr">${esc(rot)}</div><div class="r-kv">${esc(v)}</div>${sub ? `<div class="r-ks">${esc(sub)}</div>` : ''}</div>`;
     const linhaId = (k, v) => `<tr><th>${esc(k)}</th><td>${esc(v || '—')}</td></tr>`;
 
     const classif = dados.fornecedores.map((f) => `<tr class="${f.posicao === '1º' ? 'venc' : ''}">
@@ -176,16 +179,16 @@
 
     return `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>RH_FLOW_RC${esc(dados.rc)}</title><style>
 @page{size:A4;margin:14mm 13mm 16mm}
-*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Calibri,Arial,sans-serif;color:#1d2327;font-size:10.5pt;line-height:1.4;background:#fff}
+*{box-sizing:border-box}body{--grade:#e6e8ea;--texto-2:#5f6b73;--texto:#1d2327;--superficie:#fff;margin:0;font-family:"Segoe UI",Calibri,Arial,sans-serif;color:#1d2327;font-size:10.5pt;line-height:1.4;background:#fff}
 .pg{max-width:190mm;margin:0 auto;padding:6mm 0}
 .top{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0e4d64;padding-bottom:8px;margin-bottom:14px}
-.marca{font-weight:800;letter-spacing:.06em;color:#0e4d64;font-size:20pt}.marca span{font-weight:400;color:#5f6b73;font-size:10pt;letter-spacing:0;margin-left:8px}
-.doc{text-align:right;font-size:9pt;color:#5f6b73}.doc b{display:block;font-size:13pt;color:#1d2327}
+.r-marca{font-weight:800;letter-spacing:.06em;color:#0e4d64;font-size:20pt}.r-marca span{font-weight:400;color:#5f6b73;font-size:10pt;letter-spacing:0;margin-left:8px}
+.r-doc{text-align:right;font-size:9pt;color:#5f6b73}.r-doc b{display:block;font-size:13pt;color:#1d2327}
 h2{font-size:11.5pt;color:#0e4d64;margin:18px 0 6px;padding-bottom:3px;border-bottom:1px solid #d5dbdf;break-after:avoid}
 .obj{font-size:11pt;margin:0 0 10px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 4px}
-.kpi{border:1px solid #d5dbdf;border-radius:6px;padding:8px 10px}.kr{font-size:8.5pt;color:#5f6b73}.kv{font-size:13pt;font-weight:700;margin-top:2px}.ks{font-size:8.5pt;color:#5f6b73}
-.kpi.dest{background:#0e4d64;color:#fff;border-color:#0e4d64}.kpi.dest .kr,.kpi.dest .ks{color:#cfe3ea}
+.r-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 4px}
+.r-kpi{border:1px solid #d5dbdf;border-radius:6px;padding:8px 10px}.r-kr{font-size:8.5pt;color:#5f6b73}.r-kv{font-size:13pt;font-weight:700;margin-top:2px}.r-ks{font-size:8.5pt;color:#5f6b73}
+.r-kpi.r-dest{background:#0e4d64;color:#fff;border-color:#0e4d64}.r-kpi.r-dest .r-kr,.r-kpi.r-dest .r-ks{color:#cfe3ea}
 table{border-collapse:collapse;width:100%}
 .id th{text-align:left;width:32%;font-weight:600;color:#5f6b73;padding:3px 8px 3px 0;vertical-align:top;font-size:9.5pt}.id td{padding:3px 0}
 .t{font-size:9pt;margin-top:4px}.t th{background:#eef3f5;text-align:left;padding:5px 6px;border-bottom:1px solid #c9d3d8;font-weight:600}
@@ -204,11 +207,11 @@ ul{margin:4px 0;padding-left:18px}li{margin:2px 0}
 .quebra{break-before:page}
 section{break-inside:avoid}
 </style></head><body><div class="pg">
-<div class="top"><div class="marca">FLOW<span>RH do processo de compra</span></div><div class="doc"><b>RC ${esc(dados.rc || '—')}</b>Emitido em ${esc(dados.dataRH)}</div></div>
+<div class="top"><div class="r-marca">FLOW<span>RH do processo de compra</span></div><div class="r-doc"><b>RC ${esc(dados.rc || '—')}</b>Emitido em ${esc(dados.dataRH)}</div></div>
 <p class="obj"><b>Objeto:</b> ${esc(dados.objeto || '—')}</p>
-<div class="kpis">
+<div class="r-kpis">
 ${kpi('Fornecedor recomendado', dados.vencedor || '—', dados.vencedorCnpj)}
-<div class="kpi dest"><div class="kr">Valor final equalizado</div><div class="kv">${esc(dados.valorFinal || '—')}</div><div class="ks">${esc(dados.rodadaFinal)}</div></div>
+<div class="r-kpi r-dest"><div class="r-kr">Valor final equalizado</div><div class="r-kv">${esc(dados.valorFinal || '—')}</div><div class="r-ks">${esc(dados.rodadaFinal)}</div></div>
 ${kpi('Saving sobre a proposta inicial', dados.savingNegociacao, dados.savingNegociacaoPct)}
 ${kpi('Saving sobre o estimado', dados.savingEstimado, dados.savingEstimadoPct + ' · estimado ' + dados.valorEstimado)}
 </div>
@@ -219,7 +222,7 @@ ${linhaId('Critério de julgamento', dados.criterio)}${linhaId('Fornecedores par
 </table></section>
 <section><h2>2. Classificação final (${esc(dados.rodadaFinal)})</h2><table class="t"><thead><tr><th class="c">Pos.</th><th>Fornecedor</th>${r.usaTec ? '<th class="n">Nota técnica</th><th class="n">Nota comercial</th>' : ''}<th class="n">Nota final</th><th class="n">Valor equalizado</th><th>Homologação</th></tr></thead><tbody>${classif}</tbody></table>
 ${r.usaTec ? `<p class="mini">Nota comercial = 100 × menor preço equalizado ÷ preço do fornecedor. Nota final = ${r.pT}% técnica + ${r.pC}% comercial.</p>` : ''}</section>
-<section><h2>3. Negociação</h2>${svgNegociacao(series, eq.rodadas.map(E.nomeRodada), { largura: 700, altura: 240 })}
+<section><h2>3. Negociação</h2>${svgNegociacao(series, eq.rodadas.map(E.nomeRodada), { largura: 700, altura: 240, literal: true })}
 <table class="t"><thead><tr><th>Fornecedor</th>${eq.rodadas.map((x) => `<th class="n">${esc(E.nomeRodada(x))}</th>`).join('')}<th class="n">Saving</th><th class="n">%</th></tr></thead><tbody>${neg}</tbody></table>
 <p class="mini">"Mantida": o fornecedor não enviou nova proposta na rodada e foi considerada a anterior.</p></section>
 <section><h2>4. Condições comerciais</h2><table class="t"><thead><tr><th>Fornecedor</th><th>Prazo de entrega</th><th>Pagamento</th><th>Frete</th><th>Validade</th></tr></thead><tbody>${cond}</tbody></table></section>
@@ -233,6 +236,73 @@ ${dados.observacoes ? `<p><b>Observações:</b> ${esc(dados.observacoes)}</p>` :
 <div class="ass"><div>${esc(dados.comprador || 'Comprador(a)')}<br><span class="mini">Suprimentos</span></div><div>Aprovação<br><span class="mini">Gerência</span></div></div>
 <div class="rod">Gerado pelo FLOW Express em ${esc(new Date().toLocaleString('pt-BR'))} · documentos processados localmente, sem envio de dados.</div>
 </div></body></html>`;
+  }
+
+  /** Separa CSS e corpo do relatório e prefixa os seletores com .classe (para exibir dentro da página). */
+  function escoparRelatorio(doc, classe) {
+    const css = (doc.match(/<style>([\s\S]*?)<\/style>/) || [, ''])[1];
+    const corpo = (doc.match(/<body>([\s\S]*?)<\/body>/) || [, ''])[1];
+    const escopado = css.replace(/([^{}]+)\{([^{}]*)\}/g, (m, sel, dec) => {
+      sel = sel.trim();
+      if (sel.startsWith('@')) return '';
+      return sel.split(',').map((x) => {
+        x = x.trim();
+        if (x === 'body' || x === 'html') return '.' + classe;
+        if (x === '*') return `.${classe},.${classe} *`;
+        return `.${classe} ${x}`;
+      }).join(',') + '{' + dec + '}';
+    });
+    return { css: escopado, corpo };
+  }
+
+  /** Gera o PDF do RH padrão FLOW direto no navegador (html2canvas + jsPDF), com quebras entre blocos. */
+  async function gerarPdfFLOW(libs, doc) {
+    const LARG = 794, ALT = Math.floor((LARG * 297) / 210), MARG = 34, UTIL = ALT - 2 * MARG, ESC = 2;
+    const { css, corpo } = escoparRelatorio(doc, 'flowpdf');
+    const caixa = document.createElement('div');
+    caixa.style.cssText = `position:fixed;left:-20000px;top:0;width:${LARG}px;background:#fff`;
+    caixa.innerHTML = `<style>${css}.flowpdf .pg{padding:0 12mm;max-width:none}</style><div class="flowpdf">${corpo}</div>`;
+    document.body.appendChild(caixa);
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      const raiz = caixa.querySelector('.flowpdf');
+      const y0 = raiz.getBoundingClientRect().top;
+      const altura = raiz.scrollHeight;
+      const pos = (el, lado) => el.getBoundingClientRect()[lado] - y0;
+      const cortes = new Set();
+      raiz.querySelectorAll('.pg > *, section > *, tr, li, h2').forEach((el) => {
+        cortes.add(Math.round(el.tagName === 'H2' ? pos(el, 'top') - 2 : pos(el, 'bottom') + 1));
+      });
+      const forcados = [...raiz.querySelectorAll('.quebra')].map((el) => Math.round(pos(el, 'top') - 2));
+      const lista = [...cortes].filter((c) => c > 0 && c < altura).sort((a, b) => a - b);
+      const paginas = [];
+      let ini = 0;
+      while (ini < altura - 4) {
+        const lim = ini + UTIL;
+        const f = forcados.find((c) => c > ini + 40 && c <= lim);
+        let fim = f;
+        if (!fim) fim = lim >= altura ? altura : [...lista].reverse().find((c) => c <= lim && c > ini + UTIL * 0.35) || lim;
+        paginas.push([ini, fim]);
+        ini = fim;
+      }
+      const canvas = await libs.html2canvas(raiz, { scale: ESC, backgroundColor: '#ffffff', logging: false, windowWidth: LARG, width: LARG });
+      const pdf = new libs.jsPDF({ unit: 'mm', format: 'a4', compress: true });
+      const mm = 210 / LARG;
+      paginas.forEach(([a, b], i) => {
+        if (i) pdf.addPage();
+        const c = document.createElement('canvas');
+        c.width = LARG * ESC; c.height = Math.ceil((b - a) * ESC);
+        const g = c.getContext('2d');
+        g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+        g.drawImage(canvas, 0, a * ESC, c.width, c.height, 0, 0, c.width, c.height);
+        pdf.addImage(c.toDataURL('image/jpeg', 0.92), 'JPEG', 0, MARG * mm, 210, (b - a) * mm);
+        pdf.setFontSize(7.5); pdf.setTextColor(140, 146, 150);
+        pdf.text(`Página ${i + 1} de ${paginas.length}`, 210 - 12, 297 - 8, { align: 'right' });
+      });
+      return pdf.output('blob');
+    } finally {
+      caixa.remove();
+    }
   }
 
   const rotFlag = (f) => ({ unidade: 'unidade ≠ RC', quantidade: 'qtd ≠ RC', total: 'total ≠ qtd×preço', faltante: 'não cotado' }[f] || f);
@@ -385,5 +455,5 @@ ${dados.observacoes ? `<p><b>Observações:</b> ${esc(dados.observacoes)}</p>` :
     return wb.xlsx.writeBuffer();
   }
 
-  return { gerarDocx, marcacoesDoModelo, MARCACOES, htmlFLOW, gerarExcel, svgNegociacao, seriesNegociacao, corSerie, esc, abreviar };
+  return { gerarDocx, marcacoesDoModelo, escoparRelatorio, gerarPdfFLOW, MARCACOES, htmlFLOW, gerarExcel, svgNegociacao, seriesNegociacao, corSerie, esc, abreviar };
 });

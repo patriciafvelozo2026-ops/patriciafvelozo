@@ -83,7 +83,7 @@ await foto('5-negociacao.png');
 
 // RH
 await page.getByRole('button', { name: /Montar o RH/ }).click();
-await page.locator('iframe.previa').waitFor();
+await page.locator('.previa .flowrel').waitFor();
 await page.waitForTimeout(500);
 await foto('6-rh.png');
 const [dlWord] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /RH no modelo atual/ }).click()]);
@@ -93,12 +93,16 @@ await dlXls.saveAs(path.join(saida, 'e2e_Equalizacao.xlsx'));
 assert.ok(fs.statSync(path.join(saida, 'e2e_RH.docx')).size > 5000);
 assert.ok(fs.statSync(path.join(saida, 'e2e_Equalizacao.xlsx')).size > 5000);
 
-// prévia FLOW em PDF (o botão abre a impressão; aqui geramos o PDF da mesma página)
-const htmlFlow = await page.locator('iframe.previa').getAttribute('srcdoc');
-const p2 = await ctx.newPage();
-await p2.setContent(htmlFlow);
-await p2.pdf({ path: path.join(saida, 'e2e_RH_FLOW.pdf'), format: 'A4', printBackground: true, preferCSSPageSize: true });
-await p2.close();
+// RH padrão FLOW em PDF, gerado direto no navegador
+const [dlPdf] = await Promise.all([page.waitForEvent('download', { timeout: 60000 }), page.getByRole('button', { name: /RH padrão FLOW/ }).click()]);
+await dlPdf.saveAs(path.join(saida, 'e2e_RH_FLOW.pdf'));
+assert.ok(fs.statSync(path.join(saida, 'e2e_RH_FLOW.pdf')).size > 50000);
+
+// diálogo próprio (confirm/prompt não existem na página do claude.ai)
+await page.getByRole('button', { name: /Novo RH/ }).click();
+await page.getByText('Começar um novo RH?').waitFor();
+await page.getByRole('button', { name: 'Cancelar' }).click();
+assert.equal(await page.locator('.dialogo').count(), 0);
 
 // planilha padrão Samarco gerada a partir da RC do processo aberto
 await page.getByRole('button', { name: /Início/ }).click();

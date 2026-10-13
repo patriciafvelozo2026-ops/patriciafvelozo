@@ -22,6 +22,8 @@ const bibliotecas = [
   'node_modules/pizzip/dist/pizzip.min.js',
   'node_modules/docxtemplater/build/docxtemplater.min.js',
   'node_modules/pdfjs-dist/build/pdf.min.js',
+  'node_modules/html2canvas/dist/html2canvas.min.js',
+  'node_modules/jspdf/dist/jspdf.umd.min.js',
 ];
 const proprios = ['src/engine.js', 'src/planilha-padrao.js', 'src/leitores.js', 'src/saidas.js', 'src/app.js'];
 
@@ -33,6 +35,14 @@ const script = (p) => `<script>/* ${path.basename(p)} */\n${seguro(lerTxt(p), p)
 
 const modelo = fs.readFileSync(r('modelos/Modelo_RH_provisorio.docx')).toString('base64');
 const exemplo = fs.readFileSync(r('exemplo/RC-4500012345 Correias e Roletes.zip')).toString('base64');
+
+const corpo = `<div id="app"><p style="padding:40px;font-family:sans-serif">Carregando o FLOW Express…</p></div>
+<noscript><p style="padding:40px">O FLOW Express precisa de JavaScript habilitado (Edge ou Chrome).</p></noscript>
+<script type="text/plain" id="pdf-worker">${seguro(lerTxt('node_modules/pdfjs-dist/build/pdf.worker.min.js'), 'pdf.worker')}</script>
+${bibliotecas.map(script).join('\n')}
+<script>window.FLOW_VERSAO=${JSON.stringify(versao)};window.FLOW_MODELO_RH_B64="${modelo}";window.FLOW_EXEMPLO_B64="${exemplo}";</script>
+${proprios.map(script).join('\n')}
+`;
 
 const html = `<!doctype html>
 <html lang="pt-BR">
@@ -47,16 +57,18 @@ ${lerTxt('src/estilo.css')}
 </style>
 </head>
 <body>
-<div id="app"><p style="padding:40px;font-family:sans-serif">Carregando o FLOW Express…</p></div>
-<noscript><p style="padding:40px">O FLOW Express precisa de JavaScript habilitado (Edge ou Chrome).</p></noscript>
-<script type="text/plain" id="pdf-worker">${seguro(lerTxt('node_modules/pdfjs-dist/build/pdf.worker.min.js'), 'pdf.worker')}</script>
-${bibliotecas.map(script).join('\n')}
-<script>window.FLOW_VERSAO=${JSON.stringify(versao)};window.FLOW_MODELO_RH_B64="${modelo}";window.FLOW_EXEMPLO_B64="${exemplo}";</script>
-${proprios.map(script).join('\n')}
-</body>
+${corpo}</body>
 </html>
 `;
 
-fs.mkdirSync(r('dist'), { recursive: true });
+// Versão para publicar como página no claude.ai (o envoltório <html>/<head> é colocado na publicação)
+const pagina = `<title>FLOW Express</title>
+<style>
+${lerTxt('src/estilo.css')}
+</style>
+${corpo}`;
+
+fs.mkdirSync(r('dist/pagina-claude'), { recursive: true });
 fs.writeFileSync(r('dist/FLOW-Express.html'), html);
+fs.writeFileSync(r('dist/pagina-claude/FLOW-Express.html'), pagina);
 console.log(`dist/FLOW-Express.html gerado (${(html.length / 1024 / 1024).toFixed(2)} MB, versão ${versao})`);

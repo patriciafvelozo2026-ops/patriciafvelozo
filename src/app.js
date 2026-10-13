@@ -3,7 +3,7 @@
   'use strict';
   const { html, render, useState, useEffect, useMemo, useRef } = htmPreact;
   const E = FlowEngine, S = Saidas, L = Leitores;
-  const libs = { XLSX, JSZip, pdfjsLib, ExcelJS, PizZip, Docxtemplater: docxtemplater };
+  const libs = { XLSX, JSZip, pdfjsLib, ExcelJS, PizZip, Docxtemplater: docxtemplater, html2canvas: window.html2canvas, jsPDF: window.jspdf && window.jspdf.jsPDF };
   const val = E.val;
 
   // pdf.js com worker embutido (nada é baixado da internet)
@@ -20,8 +20,16 @@
   const b64bytes = (b64) => { const s = atob(b64); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
   const bytesB64 = (u) => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
   const tick = () => new Promise((r) => setTimeout(r, 0));
-  function baixar(dados, nome, tipo) {
+  // Na página do claude.ai, downloads passam pela confirmação do visualizador;
+  // no arquivo local, um link de download comum.
+  async function baixar(dados, nome, tipo) {
     const blob = dados instanceof Blob ? dados : new Blob([dados], { type: tipo || 'application/octet-stream' });
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
+    if (dl) {
+      try { await dl.save({ filename: nome, data: blob }); }
+      catch (e) { if (e && e.code !== 'declined') informar('Não foi possível baixar o arquivo (' + ((e && e.message) || e) + ').'); }
+      return;
+    }
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = nome;
@@ -93,6 +101,28 @@
     return html`<input class=${'inp ' + cls} value=${t} placeholder=${ph} onInput=${(e) => setT(e.target.value)} onBlur=${() => t !== (v ?? '') && onFim(t)} />`;
   }
 
+  // ------------------------------------------------------------ diálogos
+  let abrirDialogo = () => {};
+  const confirmar = (msg, sim = 'Continuar') => new Promise((res) => abrirDialogo({ tipo: 'confirmar', msg, sim, res }));
+  const pedirTexto = (msg) => new Promise((res) => abrirDialogo({ tipo: 'texto', msg, res }));
+  const informar = (msg) => new Promise((res) => abrirDialogo({ tipo: 'info', msg, res }));
+  function Dialogo() {
+    const [d, setD] = useState(null);
+    const [txt, setTxt] = useState('');
+    abrirDialogo = (x) => { setTxt(''); setD(x); };
+    if (!d) return null;
+    const fim = (v) => { setD(null); d.res(v); };
+    return html`<div class="veu" onClick=${(e) => e.target === e.currentTarget && fim(d.tipo === 'confirmar' ? false : null)}>
+      <form class="modal dialogo" onSubmit=${(e) => { e.preventDefault(); fim(d.tipo === 'texto' ? txt.trim() || null : true); }}>
+        <p>${d.msg}</p>
+        ${d.tipo === 'texto' && html`<input id="dialogo-texto" class="inp" value=${txt} onInput=${(e) => setTxt(e.target.value)} ref=${(el) => el && setTimeout(() => el.focus(), 0)} />`}
+        <div class="modal-acoes">
+          ${d.tipo !== 'info' && html`<button type="button" class="btn sec" onClick=${() => fim(d.tipo === 'confirmar' ? false : null)}>Cancelar</button>`}
+          <button type="submit" class="btn pri">${d.tipo === 'info' ? 'Entendi' : d.tipo === 'texto' ? 'OK' : d.sim}</button>
+        </div>
+      </form></div>`;
+  }
+
   const ETAPAS = [
     ['inicio', 'Início'], ['documentos', 'Documentos'], ['conferencia', 'Conferência'],
     ['equalizacao', 'Equalização'], ['negociacao', 'Negociação'], ['rh', 'RH pronto'],
@@ -146,10 +176,10 @@
       }
     }
 
-    function reclassificar(docId, mud) {
+    async function reclassificar(docId, mud) {
       const ent = entradas.current.find((e) => e.id === docId);
       if (!ent) { avisar('Para reclassificar, abra a pasta do processo novamente (os arquivos não ficam salvos no navegador).', 'erro'); return; }
-      if (st.editadoConf && !confirm('Reclassificar relê todos os documentos e desfaz as correções feitas na Conferência. Continuar?')) return;
+      if (st.editadoConf && !(await confirmar('Reclassificar relê todos os documentos e desfaz as correções feitas na Conferência. Continuar?', 'Reclassificar'))) return;
       Object.assign(ent, mud, { manual: true });
       if (mud.tipo && !E.TIPO_COM_FORNECEDOR[mud.tipo]) ent.fornecedorManual = null;
       const novo = anexarTextos(E.montarEstado(entradas.current, st));
@@ -157,8 +187,8 @@
       setSt(novo); setVer((v) => v + 1);
     }
 
-    function novoRH() {
-      if (st && !confirm('Começar um novo RH? O processo atual continua salvo apenas se você exportá-lo (.json).')) return;
+    async function novoRH() {
+      if (st && !(await confirmar('Começar um novo RH? O processo atual só fica guardado se você clicar antes em Salvar (.json).', 'Começar novo RH'))) return;
       setSt(null); entradas.current = []; gravar(CHAVE, null); setEtapa('inicio');
     }
 
@@ -203,6 +233,7 @@
       ${carregando && html`<div class="veu"><div class="carregando"><div class="giro"></div><b>${carregando.msg}</b>
         ${carregando.total && html`<div class="barra"><i style=${{ width: (100 * carregando.atual) / carregando.total + '%' }} /></div><span>${carregando.atual} de ${carregando.total}</span>`}</div></div>`}
       ${toast && html`<div class=${'toast ' + toast.tipo} role="status">${toast.msg}</div>`}
+      <${Dialogo} />
       ${modal && html`<div class="veu" onClick=${(e) => e.target === e.currentTarget && setModal(null)}><div class="modal">${modal}</div></div>`}
     `;
   }
@@ -343,8 +374,8 @@
     const precisaRod = d.tipo && E.TIPO_COM_RODADA[d.tipo];
     const nomeForn = d.fornecedorId ? (fornNome ? fornNome(d.fornecedorId) : val((st.fornecedores.find((f) => f.id === d.fornecedorId) || {}).nome)) : '';
     const statusIc = { ok: ['ok', 'Lido'], conferir: ['alerta', 'Conferir'], pendente: ['alerta', 'Indicar'], erro: ['x', 'Erro'] }[d.status] || ['alerta', d.status];
-    const escolherForn = (v) => {
-      if (v === '__novo') { const n = prompt('Nome do fornecedor:'); if (n && n.trim()) reclassificar(d.id, { fornecedorManual: n.trim() }); return; }
+    const escolherForn = async (v) => {
+      if (v === '__novo') { const n = await pedirTexto('Nome do fornecedor:'); if (n) reclassificar(d.id, { fornecedorManual: n }); return; }
       const f = st.fornecedores.find((x) => x.id === v);
       if (f) reclassificar(d.id, { fornecedorManual: val(f.nome) });
     };
@@ -394,9 +425,9 @@
         setSel(prop.id);
       });
     }
-    function novoFornecedor() {
-      const n = prompt('Nome do fornecedor:');
-      if (n && n.trim()) mudar((s) => { E.garantirFornecedor(s, n.trim(), 'editado'); });
+    async function novoFornecedor() {
+      const n = await pedirTexto('Nome do fornecedor:');
+      if (n) mudar((s) => { E.garantirFornecedor(s, n, 'editado'); });
     }
 
     return html`
@@ -462,7 +493,7 @@
     const setF = (k) => (v) => mudar((s) => { s.propostas.find((x) => x.id === p.id)[k] = { v, fonte: 'editado' }; });
     const set = (fn) => mudar((s) => fn(s.propostas.find((x) => x.id === p.id)));
     const somaItens = p.itens.reduce((s, it) => s + (it.total ?? (it.preco != null && it.qtd != null ? it.preco * it.qtd : 0)), 0);
-    const remover = () => { if (confirm('Remover esta proposta da equalização?')) { mudar((s) => { s.propostas = s.propostas.filter((x) => x.id !== p.id); }); setSel(null); } };
+    const remover = async () => { if (await confirmar('Remover esta proposta da equalização?', 'Remover')) { mudar((s) => { s.propostas = s.propostas.filter((x) => x.id !== p.id); }); setSel(null); } };
     const conferida = () => mudar((s) => {
       s.propostas.find((x) => x.id === p.id).confianca = 'conferida';
       const d = s.documentos.find((x) => x.id === p.docId);
@@ -524,15 +555,15 @@
     const [colar, setColar] = useState(false);
     const [txt, setTxt] = useState('');
     const edit = (i, k) => (v) => mudar((s) => { const it = lista(s)[i]; it[k] = v; it.fonte = 'editado'; });
-    const aplicarColagem = () => {
+    const aplicarColagem = async () => {
       const r = interpretarColagem(txt);
       if (r.precos) {
-        if (!itens.length) { alert('Cole a tabela completa (item, descrição, un, qtd, preço).'); return; }
+        if (!itens.length) { informar('Cole a tabela completa (item, descrição, un, qtd, preço).'); return; }
         mudar((s) => { lista(s).forEach((it, i) => { if (r.precos[i] != null) { it.preco = r.precos[i]; it.total = null; it.fonte = 'colado pelo comprador'; } }); });
       } else if (r.itens && r.itens.length) {
-        if (itens.length && !confirm(`Substituir os ${itens.length} itens atuais pelos ${r.itens.length} colados?`)) return;
+        if (itens.length && !(await confirmar(`Substituir os ${itens.length} itens atuais pelos ${r.itens.length} colados?`, 'Substituir'))) return;
         mudar((s) => { const l = lista(s); l.splice(0, l.length, ...r.itens.map((it) => (rc ? { ...it, precoEst: it.precoEst ?? it.preco } : it))); });
-      } else { alert('Não reconheci a tabela colada. Copie do Excel/PDF com as colunas: item, descrição, un, qtd, preço unitário.'); return; }
+      } else { informar('Não reconheci a tabela colada. Copie do Excel/PDF com as colunas: item, descrição, un, qtd, preço unitário.'); return; }
       setColar(false); setTxt('');
     };
     const usarRC = () => mudar((s) => { const l = lista(s); l.splice(0, l.length, ...s.itensRC.map((it) => ({ item: it.item, codigo: it.codigo, descricao: it.descricao, un: it.un, qtd: it.qtd, preco: null, total: null, fonte: 'digitado' }))); });
@@ -719,14 +750,14 @@
       try { baixar(await S.gerarExcel(libs, st, eq, dados), `Equalizacao_RC${base}.xlsx`); }
       catch (e) { console.error(e); avisar('Erro ao gerar o Excel: ' + e.message, 'erro'); }
     }
-    function imprimirPDF() {
-      const f = document.createElement('iframe');
-      f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
-      document.body.appendChild(f);
-      f.onload = () => { setTimeout(() => { f.contentWindow.focus(); f.contentWindow.print(); setTimeout(() => f.remove(), 60000); }, 200); };
-      f.srcdoc = htmlFlow;
-      avisar('Na janela de impressão, escolha "Salvar como PDF".');
+    const [gerandoPdf, setGerandoPdf] = useState(false);
+    async function baixarPDF() {
+      setGerandoPdf(true);
+      try { await baixar(await S.gerarPdfFLOW(libs, htmlFlow), `RH_FLOW_RC${base}.pdf`); }
+      catch (e) { console.error(e); avisar('Erro ao gerar o PDF: ' + e.message, 'erro'); }
+      finally { setGerandoPdf(false); }
     }
+    const previa = useMemo(() => { const r = S.escoparRelatorio(htmlFlow, 'flowrel'); return `<style>${r.css}</style><div class="flowrel">${r.corpo}</div>`; }, [htmlFlow]);
     async function carregarModelo(file) {
       try {
         const u = new Uint8Array(await file.arrayBuffer());
@@ -755,7 +786,7 @@
           <section class="painel"><h2>Baixar o RH</h2>
             <div class="saidas">
               <button class="saida" onClick=${baixarWord}><${Icone} n="arquivo" t=${22} /><b>RH no modelo atual (Word)</b><span>${modeloInfo ? `Modelo: ${modeloInfo.nome}` : 'Modelo provisório: troque pelo modelo atual da Samarco'}</span></button>
-              <button class="saida dest" onClick=${imprimirPDF}><${Icone} n="impressora" t=${22} /><b>RH padrão FLOW (PDF)</b><span>Abre a impressão: escolha "Salvar como PDF"</span></button>
+              <button class="saida dest" onClick=${baixarPDF} disabled=${gerandoPdf}><${Icone} n="impressora" t=${22} /><b>RH padrão FLOW (PDF)</b><span>${gerandoPdf ? 'Gerando o PDF…' : 'Relatório completo, pronto para enviar'}</span></button>
               <button class="saida" onClick=${baixarExcel}><${Icone} n="planilha" t=${22} /><b>Planilha de equalização (Excel)</b><span>Resumo, uma aba por rodada, negociação, alertas e fontes</span></button>
             </div>
             <div class="modelo">
@@ -782,7 +813,7 @@
         </div>
         <div class="rh-dir">
           <div class="previa-cab"><b>Prévia: RH padrão FLOW</b><span class="mut">atualiza conforme você edita</span></div>
-          <iframe class="previa" title="Prévia do RH padrão FLOW" srcdoc=${htmlFlow}></iframe>
+          <div class="previa" role="region" aria-label="Prévia do RH padrão FLOW" dangerouslySetInnerHTML=${{ __html: previa }}></div>
         </div>
       </div>`;
   }
