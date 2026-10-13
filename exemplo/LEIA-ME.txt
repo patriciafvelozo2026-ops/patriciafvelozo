@@ -1,0 +1,1 @@
+Processo de compra FICTÍCIO usado na demonstração do FLOW Express. Todos os nomes, CNPJs, códigos e valores são inventados.

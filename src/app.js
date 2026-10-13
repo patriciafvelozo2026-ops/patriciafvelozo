@@ -3,7 +3,12 @@
   'use strict';
   const { html, render, useState, useEffect, useMemo, useRef } = htmPreact;
   const E = FlowEngine, S = Saidas, L = Leitores;
-  const libs = { XLSX, JSZip, pdfjsLib, ExcelJS, PizZip, Docxtemplater: docxtemplater, html2canvas: window.html2canvas, jsPDF: window.jspdf && window.jspdf.jsPDF };
+  let wasm7z = null;
+  const libs = {
+    XLSX, JSZip, pdfjsLib, ExcelJS, PizZip, html2canvas: window.html2canvas, jsPDF: window.jspdf && window.jspdf.jsPDF,
+    SevenZip: window.SevenZip, MsgReader: window.MsgReader, DOMParser: window.DOMParser, XMLSerializer: window.XMLSerializer, RHSamarco: window.RHSamarco,
+    wasm7z: () => (wasm7z = wasm7z || (window.FLOW_7Z_WASM_B64 ? b64bytes(window.FLOW_7Z_WASM_B64) : undefined)),
+  };
   const val = E.val;
 
   // pdf.js com worker embutido (nada é baixado da internet)
@@ -13,7 +18,8 @@
   } catch (e) { console.warn(e); }
 
   const CHAVE = 'flowexpress.processo.v1';
-  const CHAVE_MODELO = 'flowexpress.modeloRH.v1';
+  const CHAVE_MODELO = 'flowexpress.modeloRH.v2';
+  const CHAVE_PADRAO = 'flowexpress.cabPadrao.v1';
   const ler = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
   const gravar = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); return true; } catch { return false; } };
 
@@ -142,7 +148,7 @@
 
     const avisar = (msg, tipo = 'ok') => { setToast({ msg, tipo }); setTimeout(() => setToast(null), 4200); };
     const mudar = (fn, conf = true) => { fn(st); if (conf) st.editadoConf = true; setVer((v) => v + 1); };
-    const eq = useMemo(() => (st && st.propostas.length ? E.equalizar(st) : null), [st, ver]);
+    const eq = useMemo(() => (st && (st.propostas.length || (st.quadroPrecos || []).length) ? E.equalizar(st) : null), [st, ver]);
     useEffect(() => { if (st) gravar(CHAVE, JSON.stringify(st)); }, [st, ver]);
     useEffect(() => { window.scrollTo(0, 0); }, [etapa]);
 
@@ -154,21 +160,31 @@
       return novo;
     }
 
-    async function processar(arquivos, nomeOrigem) {
+    /** Lê arquivos; com `adicionar`, soma ao processo aberto (para pastas grandes enviadas em partes). */
+    async function processar(arquivos, nomeOrigem, adicionar) {
       try {
-        setCarregando({ msg: 'Abrindo os arquivos…' });
+        const totalMB = arquivos.reduce((t, f) => t + (f.size || 0), 0);
+        setCarregando({ msg: `Abrindo ${arquivos.length} arquivo(s) · ${L.MB(totalMB)}…` });
         await tick();
-        const ents = await L.abrirArquivos(libs, arquivos);
+        const { entradas: ents } = await L.lerTudo(libs, arquivos, (p) => setCarregando({ msg: p.msg, sub: `${p.lidos} arquivo(s) · ${L.MB(p.bytes)}` }));
         if (!ents.length) { setCarregando(null); avisar('Não encontrei arquivos nessa pasta/zip.', 'erro'); return; }
-        for (let i = 0; i < ents.length; i++) {
-          setCarregando({ msg: `Lendo ${ents[i].nome}`, atual: i + 1, total: ents.length });
-          Object.assign(ents[i], await L.extrair(libs, ents[i]));
-          await tick();
+        setCarregando({ msg: 'Separando os documentos…' });
+        await tick();
+        const padrao = (() => { try { return JSON.parse(ler(CHAVE_PADRAO) || 'null'); } catch { return null; } })();
+        if (adicionar && st) {
+          const antigos = entradas.current;
+          E.adicionarDocumentos(st, ents, antigos);
+          entradas.current = antigos.concat(ents);
+          anexarTextos(st);
+          setVer((v) => v + 1);
+          avisar(`${ents.length} arquivo(s) somados ao processo.`);
+        } else {
+          entradas.current = ents;
+          const novo = anexarTextos(E.montarEstado(ents, padrao ? { cabPadrao: padrao } : null));
+          if (!novo.nomeProcesso) novo.nomeProcesso = String(nomeOrigem || '').replace(/\.(zip|7z|rar)$/i, '') || 'Processo';
+          setSt(novo); setVer(0); setEtapa('documentos');
         }
-        entradas.current = ents;
-        const novo = anexarTextos(E.montarEstado(ents));
-        novo.nomeProcesso = ents[0].raiz || String(nomeOrigem || '').replace(/\.zip$/i, '') || 'Processo';
-        setSt(novo); setVer(0); setEtapa('documentos'); setCarregando(null);
+        setCarregando(null);
       } catch (err) {
         console.error(err);
         setCarregando(null);
@@ -184,6 +200,7 @@
       if (mud.tipo && !E.TIPO_COM_FORNECEDOR[mud.tipo]) ent.fornecedorManual = null;
       const novo = anexarTextos(E.montarEstado(entradas.current, st));
       novo.nomeProcesso = st.nomeProcesso;
+      if (st.tipoProcesso && st.tipoProcesso.fonte === 'editado') novo.tipoProcesso = st.tipoProcesso;
       setSt(novo); setVer((v) => v + 1);
     }
 
@@ -204,8 +221,8 @@
       } catch (e) { avisar('Não consegui abrir: ' + e.message, 'erro'); }
     }
 
-    const podeIr = (k) => k === 'inicio' || (!!st && (k === 'documentos' || k === 'conferencia' || !!eq));
-    const props = { st, eq, mudar, setEtapa, avisar, reclassificar, setModal, entradas, setSt, setVer };
+    const podeIr = (k) => k === 'inicio' || (!!st && (k === 'documentos' || k === 'conferencia' || k === 'rh' || !!eq));
+    const props = { st, eq, mudar, setEtapa, avisar, reclassificar, setModal, entradas, setSt, setVer, processar };
 
     return html`
       <header class="topo">
@@ -221,16 +238,19 @@
         </div>
       </header>
       <main class="conteudo">
-        ${st && etapa !== 'inicio' && html`<div class="processo-tit"><span class="rc">RC ${val(st.processo.rc) || '—'}</span> <span class="obj">${val(st.processo.objeto) || st.nomeProcesso}</span></div>`}
+        ${st && etapa !== 'inicio' && html`<div class="processo-tit">
+          <span class="rc">${val(st.tipoProcesso) === 'aditivo' ? `Contrato ${val(st.cab.contrato) || '—'}` : `RC ${val(st.cab.numeroRC) || val(st.processo.rc) || '—'}`}</span>
+          <span class="chip">${E.TIPOS_PROCESSO[val(st.tipoProcesso)] || 'Processo'}</span>
+          <span class="obj">${val(st.processo.objeto) || st.nomeProcesso || ''}</span></div>`}
         ${etapa === 'inicio' && html`<${Inicio} processar=${processar} salvo=${salvo} abrirJSON=${abrirJSON} st=${st} setEtapa=${setEtapa}
             continuar=${() => { setSt(salvo); setEtapa('conferencia'); }} setModal=${setModal} />`}
         ${etapa === 'documentos' && st && html`<${Documentos} ...${props} />`}
         ${etapa === 'conferencia' && st && html`<${Conferencia} ...${props} />`}
         ${etapa === 'equalizacao' && eq && html`<${Equalizacao} ...${props} />`}
         ${etapa === 'negociacao' && eq && html`<${Negociacao} ...${props} />`}
-        ${etapa === 'rh' && eq && html`<${RH} ...${props} />`}
+        ${etapa === 'rh' && st && html`<${RH} ...${props} />`}
       </main>
-      ${carregando && html`<div class="veu"><div class="carregando"><div class="giro"></div><b>${carregando.msg}</b>
+      ${carregando && html`<div class="veu"><div class="carregando"><div class="giro"></div><b>${carregando.msg}</b>${carregando.sub && html`<span class="mut">${carregando.sub}</span>`}
         ${carregando.total && html`<div class="barra"><i style=${{ width: (100 * carregando.atual) / carregando.total + '%' }} /></div><span>${carregando.atual} de ${carregando.total}</span>`}</div></div>`}
       ${toast && html`<div class=${'toast ' + toast.tipo} role="status">${toast.msg}</div>`}
       <${Dialogo} />
@@ -248,29 +268,30 @@
       const arqs = await L.lerArrasto(e.dataTransfer);
       processar(arqs, arqs[0] && arqs[0].name);
     };
-    const demo = () => processar([new File([b64bytes(window.FLOW_EXEMPLO_B64)], 'RC-4500012345 Correias e Roletes.zip')], 'RC-4500012345 Correias e Roletes.zip');
+    const demo = () => processar([new File([b64bytes(window.FLOW_EXEMPLO_B64)], window.FLOW_EXEMPLO_NOME || 'exemplo.zip')], window.FLOW_EXEMPLO_NOME);
     return html`
       <section class="hero">
         <div>
           <h1>Da pasta do processo ao RH pronto.</h1>
-          <p class="lead">Arraste a pasta (ou o .zip) do processo. O FLOW Express lê a RC, as propostas, as atas e as homologações, equaliza item a item por rodada e monta o RH nos dois padrões: o modelo atual e o PDF FLOW.</p>
+          <p class="lead">Arraste a pasta do processo (ou o .zip / .7z). O FLOW Express lê RC, vendor list, qualificações, propostas, e-mails e o RH anterior, equaliza por rodada e monta o Relatório de Homologação no formulário da Samarco, mais o PDF FLOW e as tabelas SMIN-IT-GSU-004.</p>
         </div>
       </section>
       <div class=${'drop' + (sobre ? ' sobre' : '')} onDragOver=${(e) => { e.preventDefault(); setSobre(true); }} onDragLeave=${() => setSobre(false)} onDrop=${soltar}>
         <div class="drop-ic"><${Icone} n="pasta" t=${40} /></div>
-        <div class="drop-tit">Novo RH: arraste aqui a pasta do processo ou o arquivo .zip</div>
+        <div class="drop-tit">Novo RH: arraste aqui a pasta do processo, o .zip ou o .7z</div>
         <div class="drop-acoes">
           <button class="btn pri" onClick=${() => refPasta.current.click()}><${Icone} n="pasta" /> Escolher pasta</button>
-          <button class="btn sec" onClick=${() => refZip.current.click()}><${Icone} n="subir" /> Escolher .zip</button>
+          <button class="btn sec" onClick=${() => refZip.current.click()}><${Icone} n="subir" /> Escolher arquivos (.zip, .7z…)</button>
         </div>
         <input ref=${refPasta} type="file" multiple hidden onChange=${(e) => e.target.files.length && processar([...e.target.files])} />
-        <input ref=${refZip} type="file" accept=".zip" hidden onChange=${(e) => e.target.files.length && processar([...e.target.files], e.target.files[0].name)} />
+        <input ref=${refZip} type="file" multiple hidden onChange=${(e) => e.target.files.length && processar([...e.target.files], e.target.files[0].name)} />
         <p class="drop-nota"><${Icone} n="cadeado" t=${13} /> Os arquivos são lidos aqui, neste computador. Nada é instalado e nenhum dado sai da máquina.</p>
+        <p class="drop-nota">Pasta grande? Suba em partes: depois de abrir, use <b>Adicionar mais arquivos</b> na etapa Documentos. Imagens e vídeos não ocupam memória, só são listados.</p>
       </div>
       <div class="cartoes">
         ${st && html`<button class="cartao" onClick=${() => setEtapa('documentos')}><b>Voltar ao processo aberto</b><span>RC ${val(st.processo.rc) || st.nomeProcesso}</span></button>`}
         ${!st && salvo && html`<button class="cartao" onClick=${continuar}><b>Continuar o último processo</b><span>RC ${val(salvo.processo.rc) || salvo.nomeProcesso || '—'} · salvo neste navegador</span></button>`}
-        <button class="cartao" onClick=${demo}><b>Ver demonstração</b><span>Processo fictício com 3 fornecedores, 3 rodadas e situações para conferir</span></button>
+        <button class="cartao" onClick=${demo}><b>Ver demonstração</b><span>Concorrência fictícia com 3 fornecedores, 3 rodadas, e-mails e situações para conferir</span></button>
         <button class="cartao" onClick=${() => setModal(html`<${ModalPlanilha} fechar=${() => setModal(null)} st=${st} />`)}><b>Gerar planilha padrão Samarco</b><span>Para enviar com a carta-convite e equalizar automaticamente</span></button>
         <button class="cartao" onClick=${() => refJson.current.click()}><b>Abrir processo salvo (.json)</b><span>Retomar um RH exportado anteriormente</span></button>
         <input ref=${refJson} type="file" accept=".json" hidden onChange=${(e) => e.target.files.length && abrirJSON(e.target.files[0])} />
@@ -278,15 +299,15 @@
       <section class="como">
         <h2>Como funciona</h2>
         <ol class="fluxo">
-          <li><b>Pasta</b><span>Arraste a pasta ou o .zip do processo.</span></li>
-          <li><b>Documentos</b><span>O FLOW separa RC, propostas por fornecedor e rodada, atas e homologações.</span></li>
-          <li><b>Conferência</b><span>Cada dado mostra o arquivo de onde veio. Você confere e corrige.</span></li>
-          <li><b>Equalização</b><span>Item a item e por rodada, com notas técnica e comercial.</span></li>
-          <li><b>Negociação</b><span>Evolução até o BAFO e saving sobre a proposta inicial.</span></li>
-          <li><b>RH pronto</b><span>Word no modelo atual, PDF FLOW, Excel de equalização e o que falta anexar.</span></li>
+          <li><b>Pasta</b><span>Arraste a pasta, o .zip ou o .7z do processo (pode ser em partes).</span></li>
+          <li><b>Documentos</b><span>O FLOW separa os documentos pelas pastas 1 a 8, lê e-mails e anexos e ignora cópias repetidas.</span></li>
+          <li><b>Conferência</b><span>Cabeçalho do RH, vendor list, qualificações e propostas, cada dado com o arquivo de onde veio.</span></li>
+          <li><b>Equalização</b><span>Item a item e por rodada, com a ponderação técnica e comercial da SMIN-IT-GSU-004.</span></li>
+          <li><b>Negociação</b><span>Evolução das rodadas e custo evitado sobre a proposta inicial.</span></li>
+          <li><b>RH pronto</b><span>Relatório de Homologação no formulário Samarco (ou aditivo), PDF FLOW e Excel das tabelas.</span></li>
         </ol>
-        <details class="padrao"><summary>Padrão de nomes recomendado para a pasta</summary>
-          <p>O FLOW reconhece os documentos pelo nome, pela pasta e pelo conteúdo. Seguindo este padrão, a leitura fica 100% automática:</p>
+        <details class="padrao"><summary>Como o FLOW reconhece os documentos</summary>
+          <p>Pela estrutura de pastas do processo (1 - Requisição de Compra, 2 - Estratégia de Contratação, 3 - Solicitação de Proposta, 4 - Qualificação de Fornecedores, 5 - Proposta Técnica, 6 - Proposta Comercial com 6.1 Inicial / 6.2 Revisão 01…, 7 - Análise Comercial ou 7 - Aditivo, 8 - Contrato), pelo nome e pelo conteúdo. Para aditivos, inclua também o RH do aditivo anterior. Nomes que ajudam:</p>
           <table class="tab"><thead><tr><th>Documento</th><th>Nome do arquivo</th></tr></thead><tbody>
             <tr><td>Requisição de compra</td><td><code>RC_4500012345.xlsx</code></td></tr>
             <tr><td>Carta-convite</td><td><code>CC_4500012345.pdf</code></td></tr>
@@ -309,9 +330,8 @@
     const [msg, setMsg] = useState('');
     const ref = useRef();
     async function lerRC(file) {
-      const ents = await L.abrirArquivos(libs, [file]);
-      for (const e of ents) Object.assign(e, await L.extrair(libs, e));
-      ents.forEach((e) => { e.tipo = 'RC'; e.manual = true; });
+      const { entradas: ents } = await L.lerTudo(libs, [file]);
+      ents.forEach((e) => { e.tipo = 'PQ'; e.manual = true; });
       const s = E.montarEstado(ents);
       if (!s.itensRC.length) { setMsg('Não encontrei a tabela de itens nesse arquivo.'); return; }
       setItens(s.itensRC); setRc(paraTexto(val(s.processo.rc))); setObj(paraTexto(val(s.processo.objeto))); setMsg('');
@@ -339,21 +359,38 @@
   }
 
   // ================================================================== 2. Documentos
-  function Documentos({ st, eq, setEtapa, reclassificar, setModal }) {
-    const docs = st.documentos;
+  function Documentos({ st, eq, setEtapa, reclassificar, setModal, processar }) {
+    const todosDocs = st.documentos;
+    const docs = todosDocs.filter((d) => d.status !== 'duplicado' && d.tipo !== 'IGNORAR');
+    const dup = todosDocs.filter((d) => d.status === 'duplicado');
+    const ign = todosDocs.filter((d) => d.tipo === 'IGNORAR');
     const pend = docs.filter((d) => d.status === 'pendente' || d.status === 'erro');
     const conf = docs.filter((d) => d.status === 'conferir');
     const okN = docs.filter((d) => d.status === 'ok').length;
+    const mb = todosDocs.reduce((t, d) => t + (d.tamanho || 0), 0);
+    const [sobre, setSobre] = useState(false);
+    const refMais = useRef(), refPastaMais = useRef();
+    useEffect(() => { if (refPastaMais.current) refPastaMais.current.setAttribute('webkitdirectory', ''); }, []);
     const fornNome = (id) => val((st.fornecedores.find((f) => f.id === id) || {}).nome);
-    const grupos = Object.keys(E.TIPOS).map((t) => [t, docs.filter((d) => d.tipo === t)]).filter(([, l]) => l.length);
-    const verTexto = (d) => setModal(html`<h2>${d.nome}</h2><pre class="texto-doc">${d.texto || 'Sem texto legível (pode ser imagem ou PDF escaneado).'}</pre>
+    const grupos = Object.keys(E.TIPOS).filter((t) => t !== 'IGNORAR').map((t) => [t, docs.filter((d) => d.tipo === t && d.status !== 'pendente')]).filter(([, l]) => l.length);
+    const verTexto = (d) => setModal(html`<h2>${d.nome}</h2><pre class="texto-doc">${d.texto || 'Sem texto legível (imagem, PDF escaneado ou arquivo não lido).'}</pre>
       <div class="modal-acoes"><button class="btn sec" onClick=${() => setModal(null)}>Fechar</button></div>`);
+    const soltar = async (e) => { e.preventDefault(); setSobre(false); const arqs = await L.lerArrasto(e.dataTransfer); if (arqs.length) processar(arqs, null, true); };
     return html`
       <div class="resumo-docs">
-        <div class="kpi"><b>${docs.length}</b><span>arquivos na pasta</span></div>
+        <div class="kpi"><b>${docs.length}</b><span>documentos · ${L.MB(mb)}</span></div>
         <div class="kpi bom"><b>${okN}</b><span>lidos automaticamente</span></div>
         <div class=${'kpi' + (conf.length ? ' atencao' : '')}><b>${conf.length}</b><span>para conferir</span></div>
         <div class=${'kpi' + (pend.length ? ' ruim' : '')}><b>${pend.length}</b><span>precisam da sua indicação</span></div>
+      </div>
+      <div class=${'drop mini-drop' + (sobre ? ' sobre' : '')} onDragOver=${(e) => { e.preventDefault(); setSobre(true); }} onDragLeave=${() => setSobre(false)} onDrop=${soltar}>
+        <span><${Icone} n="mais" /> <b>Faltou algo ou a pasta é grande?</b> Arraste aqui mais arquivos, pastas ou compactados: eles são somados a este processo.</span>
+        <span class="drop-acoes">
+          <button class="btn sec peq" onClick=${() => refMais.current.click()}><${Icone} n="subir" /> Adicionar mais arquivos</button>
+          <button class="btn sec peq" onClick=${() => refPastaMais.current.click()}><${Icone} n="pasta" /> Adicionar pasta</button>
+        </span>
+        <input ref=${refMais} type="file" multiple hidden onChange=${(e) => e.target.files.length && processar([...e.target.files], null, true)} />
+        <input ref=${refPastaMais} type="file" multiple hidden onChange=${(e) => e.target.files.length && processar([...e.target.files], null, true)} />
       </div>
       ${pend.length > 0 && html`<section class="painel destaque">
         <h2><${Icone} n="alerta" /> Não reconheci estes arquivos. O que é cada um?</h2>
@@ -363,6 +400,8 @@
         <h3>${E.TIPOS[t]} <span class="cont">${lista.length}</span></h3>
         ${lista.map((d) => html`<${LinhaDoc} d=${d} st=${st} reclassificar=${reclassificar} verTexto=${verTexto} fornNome=${fornNome} />`)}
       </section>`)}
+      ${(dup.length > 0 || ign.length > 0) && html`<details class="painel recolhido"><summary>${dup.length} cópia(s) repetida(s) e ${ign.length} imagem(ns) de e-mail não entram no RH</summary>
+        <ul class="lista-simples">${dup.concat(ign).map((d) => html`<li><span class="caminho">${d.caminho}</span></li>`)}</ul></details>`}
       <div class="rodape-acoes">
         <span class="mut">${pend.length ? `${pend.length} arquivo(s) sem classificação. Você pode seguir e voltar depois.` : 'Todos os arquivos classificados.'}</span>
         <button class="btn pri" onClick=${() => setEtapa('conferencia')}>Seguir para a conferência <${Icone} n="seta" /></button>
@@ -382,6 +421,7 @@
     return html`<div class=${'doc ' + d.status + (destaque ? ' dest' : '')}>
       <div class="doc-nome"><span class=${'ext e-' + d.ext}>${d.ext || '?'}</span>
         <div><b>${d.nome}</b><span class="caminho">${d.caminho}</span>
+          ${d.email && html`<span class="caminho">✉ ${d.email.assunto || '(sem assunto)'} · ${d.email.data || ''}${d.email.de ? ' · ' + d.email.de.replace(/<.*?>/g, '').trim() : ''}</span>`}
           ${d.aviso && html`<span class="aviso-doc">${d.aviso}</span>`}${d.erro && html`<span class="aviso-doc erro">${d.erro}</span>`}
           ${d.origem && !destaque && html`<span class="caminho">reconhecido pelo ${d.origem}${d.manual ? ' · indicado por você' : ''}</span>`}
         </div></div>
@@ -430,45 +470,48 @@
       if (n) mudar((s) => { E.garantirFornecedor(s, n, 'editado'); });
     }
 
+    const tipo = val(st.tipoProcesso) || 'concorrencia';
+    const setQ = (f, k) => (v) => mudar((s) => { s.fornecedores.find((x) => x.id === f.id)[k] = { v: v || null, fonte: 'editado' }; });
+    const OPC_Q = ['', 'APROVADO', 'REPROVADO', 'DISPENSADO', 'NÃO APLICÁVEL'];
+    const selQ = (f, k, opc = OPC_Q) => html`<select class="inp mini-sel" onChange=${(e) => setQ(f, k)(e.target.value)}>${opc.map((o) => html`<option value=${o} selected=${String(val(f[k]) || '') === o}>${o || '—'}</option>`)}</select>`;
     return html`
       <p class="intro">Confira os dados abaixo. Cada informação mostra <b>o arquivo de onde veio</b>. Corrija o que for preciso: a equalização e o RH são recalculados na hora.</p>
-      <section class="painel"><h2>Dados do processo</h2>
-        <div class="grade">
-          <${CampoTexto} rotulo="Requisição de compra (RC)" f=${p.rc} onFim=${setP('rc')} />
-          <${CampoTexto} rotulo="Data da RC" f=${p.dataRC} onFim=${setP('dataRC')} />
-          <${CampoTexto} rotulo="Valor estimado (R$)" f=${p.valorEstimado} onFim=${setP('valorEstimado')} num />
-          <${CampoTexto} rotulo="Objeto" f=${p.objeto} onFim=${setP('objeto')} area larg />
-          <${CampoTexto} rotulo="Requisitante" f=${p.requisitante} onFim=${setP('requisitante')} />
-          <${CampoTexto} rotulo="Centro de custo" f=${p.centroCusto} onFim=${setP('centroCusto')} />
-          <${CampoTexto} rotulo="Comprador" f=${p.comprador} onFim=${setP('comprador')} />
-        </div>
+      <section class="painel config"><div class="cfg"><span class="rot">Tipo de processo</span>
+        <select class="inp" onChange=${(e) => mudar((s) => { s.tipoProcesso = { v: e.target.value, fonte: 'editado' }; })}>
+          ${Object.entries(E.TIPOS_PROCESSO).map(([k, n]) => html`<option value=${k} selected=${tipo === k}>${n}</option>`)}</select>
+        <${Fonte} f=${st.tipoProcesso} /></div>
+        <div class="cfg"><span class="rot">Moeda das propostas</span>
+          <select class="inp" onChange=${(e) => mudar((s) => { s.moeda = e.target.value; })}>${['BRL', 'USD', 'EUR', 'AUD'].map((m) => html`<option value=${m} selected=${(st.moeda || 'BRL') === m}>${m}</option>`)}</select></div>
       </section>
 
+      <${PainelCabecalho} st=${st} eq=${eq} mudar=${mudar} avisar=${avisar} />
+
+      ${tipo === 'aditivo' && html`<${PainelAditivo} st=${st} mudar=${mudar} />`}
+
+      ${tipo !== 'aditivo' && html`
       <section class="painel"><h2>Itens da RC <span class="cont">${st.itensRC.length}</span></h2>
         ${st.itensRC.length ? html`<p class="mut">Fonte: ${(st.itensRC[0].fonte || '').split(' › ')[0]}. A equalização compara as propostas com estes itens e quantidades.</p>`
-          : html`<p class="aviso"><${Icone} n="alerta" /> A RC não trouxe tabela de itens. A equalização usará os itens das propostas. Se preferir, cole os itens da RC abaixo.</p>`}
+          : html`<p class="aviso"><${Icone} n="alerta" /> Não encontrei a planilha de quantidades da RC. A equalização usará os itens das propostas. Se preferir, cole os itens abaixo.</p>`}
         <${TabelaItens} itens=${st.itensRC} rc mudar=${mudar} lista=${(s) => s.itensRC} />
       </section>
 
-      <section class="painel"><h2>Fornecedores <span class="cont">${st.fornecedores.length}</span>
+      <${PainelVendorList} st=${st} eq=${eq} mudar=${mudar} />
+
+      <section class="painel"><h2>Fornecedores e qualificações <span class="cont">${st.fornecedores.length}</span>
         <button class="btn sec peq dir" onClick=${novoFornecedor}><${Icone} n="mais" /> Fornecedor</button></h2>
-        <div class="rolagem"><table class="tab forn"><thead><tr><th>Fornecedor</th><th>CNPJ</th><th>Nota técnica</th><th>Resultado técnico</th><th>Homologação</th><th>Validade</th></tr></thead><tbody>
+        <div class="rolagem"><table class="tab forn"><thead><tr><th>Fornecedor</th><th>Código SAP</th><th>Confirmou</th><th>Apresentou</th><th>Técnica</th><th>Segurança</th><th>Financeira</th><th>Compliance</th><th>Resultado</th><th>Nota técnica</th></tr></thead><tbody>
         ${st.fornecedores.map((f) => {
           const set = (k) => (v) => mudar((s) => { s.fornecedores.find((x) => x.id === f.id)[k] = { v, fonte: 'editado' }; });
-          const hom = E.situacaoHomologacao(f);
           return html`<tr>
             <td><${Txt} v=${val(f.nome)} onFim=${set('nome')} /><${Fonte} f=${f.nome} /></td>
-            <td><${Txt} v=${val(f.cnpj)} onFim=${set('cnpj')} ph="00.000.000/0000-00" /><${Fonte} f=${f.cnpj} vazioTxt="não encontrado" /></td>
-            <td><${Num} v=${val(f.nt)} onFim=${set('nt')} ph="0–100" /><${Fonte} f=${f.nt} vazioTxt="informe a nota" /></td>
-            <td><select class="inp" value=${val(f.statusTecnico) || ''} onChange=${(e) => set('statusTecnico')(e.target.value || null)}>
-              <option value="">—</option>${['Aprovado', 'Aprovado com ressalvas', 'Reprovado'].map((o) => html`<option value=${o} selected=${val(f.statusTecnico) === o}>${o}</option>`)}</select><${Fonte} f=${f.statusTecnico} vazioTxt="não informado" /></td>
-            <td><select class="inp" value=${val(f.homStatus) || ''} onChange=${(e) => set('homStatus')(e.target.value || null)}>
-              <option value="">—</option>${['Homologado', 'Vencida', 'Não homologado'].map((o) => html`<option value=${o} selected=${val(f.homStatus) === o}>${o}</option>`)}</select>
-              <span class=${'chip ' + hom.nivel}>${hom.texto}</span></td>
-            <td><${Txt} v=${val(f.homValidade)} onFim=${set('homValidade')} ph="dd/mm/aaaa" cls="curto" /><${Fonte} f=${f.homValidade} vazioTxt="sem data" /></td>
+            <td><${Txt} v=${val(f.codigoSap)} onFim=${set('codigoSap')} cls="cod" /><${Fonte} f=${f.codigoSap} vazioTxt="informe" /></td>
+            <td>${selQ(f, 'confirmou', ['', 'SIM', 'NÃO'])}</td><td>${selQ(f, 'apresentou', ['', 'SIM', 'NÃO'])}</td>
+            <td>${selQ(f, 'qTec')}</td><td>${selQ(f, 'qSeg')}</td><td>${selQ(f, 'qFin')}</td><td>${selQ(f, 'qComp')}</td><td>${selQ(f, 'qResultado')}</td>
+            <td><${Num} v=${val(f.nt)} onFim=${set('nt')} ph="0–100" cls="qtd" /><${Fonte} f=${f.nt} vazioTxt="se houver ponderação" /></td>
           </tr>`;
         })}
         </tbody></table></div>
+        ${st.fornecedores.some((f) => val(f.qTec)) && html`<p class="mut">Qualificações lidas de: ${[...new Set(st.fornecedores.map((f) => f.qTec && f.qTec.fonte).filter(Boolean).map((x) => x.split(' › ')[0]))].join(', ')}.</p>`}
       </section>
 
       <section class="painel"><h2>Propostas comerciais <span class="cont">${st.propostas.length}</span>
@@ -478,13 +521,108 @@
             ${curto(val((st.fornecedores.find((f) => f.id === x.fornecedorId) || {}).nome), 22)} · ${E.nomeRodada(x.rodada)}
             ${x.confianca === 'alta' || x.confianca === 'conferida' ? html`<span class="ok-ic"><${Icone} n="ok" t=${12} /></span>` : html`<span class="at-ic"><${Icone} n="alerta" t=${12} /></span>`}</button>`)}</div>
           ${atual && html`<${EditorProposta} key=${atual.id} st=${st} p=${atual} mudar=${mudar} setSel=${setSel} />`}`
+        : (st.quadroPrecos || []).length ? html`<p class="aviso">Sem arquivos de proposta: a equalização usa os totais do quadro de preço (${st.quadroPrecos[0].fonte.split(' › ')[0]}).</p>`
         : html`<p class="aviso">Nenhuma proposta comercial encontrada. Classifique as propostas na etapa Documentos ou digite uma proposta.</p>`}
-      </section>
+      </section>`}
       <div class="rodape-acoes">
         <button class="btn sec" onClick=${() => setEtapa('documentos')}><${Icone} n="voltar" /> Documentos</button>
-        <button class="btn pri" disabled=${!eq} onClick=${() => setEtapa('equalizacao')}>Ver a equalização <${Icone} n="seta" /></button>
+        ${tipo === 'aditivo' || !eq ? html`<button class="btn pri" onClick=${() => setEtapa('rh')}>Montar o RH <${Icone} n="seta" /></button>`
+          : html`<button class="btn pri" onClick=${() => setEtapa('equalizacao')}>Ver a equalização <${Icone} n="seta" /></button>`}
       </div>`;
   }
+
+  // ------------------------------------------------------------ cabeçalho do RH
+  const ORDEM_CAB = ['contrato', 'gerencia', 'fornecedorRH', 'dataDocumento', 'objeto', 'valorRC', 'numeroRC', 'valorAditivo', 'valorContratado', 'custoEvitado',
+    'vigencia', 'prazo', 'condPagamento', 'regime', 'incoterm', 'reajuste', 'dataBase', 'rescisao', 'multa', 'classificacao', 'gerenciaRequisitante',
+    'unidade', 'gestor', 'responsavel', 'formalizacao', 'rfq', 'explicacaoME', 'sharepoint'];
+  const PADRAO_CAMPOS = ['responsavel', 'gerencia', 'unidade', 'formalizacao'];
+
+  function PainelCabecalho({ st, eq, mudar, avisar }) {
+    const tipo = val(st.tipoProcesso);
+    const cab = E.cabecalhoFinal(st, eq);
+    const [aberto, setAberto] = useState(true);
+    const vazios = ORDEM_CAB.filter((k) => !(k === 'valorAditivo' && tipo !== 'aditivo') && !val(cab[k])).length;
+    const salvarPadrao = () => {
+      const p = {};
+      PADRAO_CAMPOS.forEach((k) => { if (val(cab[k])) p[k] = val(cab[k]); });
+      gravar(CHAVE_PADRAO, JSON.stringify(p));
+      mudar((s) => { s.cabPadrao = p; }, false);
+      avisar('Padrão salvo: responsável, gerência, unidade e formalização entram sozinhos nos próximos RH.');
+    };
+    return html`<section class="painel"><h2>Cabeçalho do RH ${vazios ? html`<span class="cont ruim">${vazios} em branco</span>` : html`<span class="cont bom">completo</span>`}
+      <button class="btn link dir" onClick=${() => setAberto(!aberto)}>${aberto ? 'recolher' : 'mostrar'}</button></h2>
+      ${aberto && html`<div class="grade">
+        ${ORDEM_CAB.filter((k) => !(k === 'valorAditivo' && tipo !== 'aditivo')).map((k) => html`<${CampoTexto} key=${k} rotulo=${k === 'objeto' ? 'OBJETO' : E.ROTULOS_CAB[k]} f=${cab[k] || E.F(null)}
+          area=${k === 'objeto' || k === 'reajuste' || k === 'explicacaoME'} larg=${k === 'objeto'}
+          onFim=${(v) => mudar((s) => { s.cab[k] = { v, fonte: 'editado' }; })} />`)}
+      </div>
+      <p class="mut">Os campos com "calculado" são atualizados pelo FLOW (fornecedor, valor, custo evitado, prazo). Ao editar, vale o que você escreveu.
+        <button class="btn link" onClick=${salvarPadrao}>Guardar responsável, gerência, unidade e formalização como meu padrão</button></p>`}
+    </section>`;
+  }
+
+  // ------------------------------------------------------------ aditivo
+  const CLASSIF_ADITIVO = ['Prazo', 'Valor', 'Reajuste', 'Escopo', 'Valor e Prazo', 'Prazo e Reajuste', 'Valor, Prazo e Reajuste', 'Regularização de Prazo'];
+
+  function PainelAditivo({ st, mudar }) {
+    const a = st.aditivo || {};
+    const ad = E.calcularAditivo(st);
+    const set = (k) => (v) => mudar((s) => { s.aditivo[k] = { v, fonte: 'editado' }; });
+    const ev = (st.evolucao || []).filter((r) => !(ad.substitui && E.parseNum(r.tac) >= ad.numero));
+    const neg = a.negociacao || [];
+    const fmt = (n) => (n == null || !isFinite(n) ? '—' : E.fmtNum(n, 2));
+    return html`<section class="painel"><h2>Novo aditivo — ${ad.numero}º TAC</h2>
+      ${!(st.evolucao || []).length && html`<p class="aviso"><${Icone} n="alerta" /> Não encontrei o RH do aditivo anterior. Suba-o na etapa Documentos ("Adicionar mais arquivos") para trazer o histórico e o cabeçalho do contrato.</p>`}
+      <div class="grade">
+        <label class="campo"><span class="rot">Nº do aditivo</span><${Num} v=${ad.numero} onFim=${set('numero')} /></label>
+        <${CampoTexto} rotulo="Data de emissão do TAC" f=${a.data || E.F(ad.data, 'hoje')} onFim=${set('data')} />
+        <label class="campo"><span class="rot">Classificação do aditivo</span>
+          <select class="inp" onChange=${(e) => set('classificacao')(e.target.value)}>
+            <option value="">—</option>${CLASSIF_ADITIVO.map((c) => html`<option value=${c} selected=${val(a.classificacao) === c}>${c}</option>`)}</select></label>
+        <label class="campo"><span class="rot">Valor a ser aditado (R$)</span><${Num} v=${E.parseNum(val(a.valorAditado))} onFim=${set('valorAditado')} ph="0" /></label>
+        <${CampoTexto} rotulo="Nova data de término" f=${a.novoTermino || E.F(null)} onFim=${set('novoTermino')} />
+        <${CampoTexto} rotulo="Data de início (se mudar)" f=${a.inicio || E.F(null)} onFim=${set('inicio')} />
+        <${CampoTexto} rotulo="Reajuste dos preços unitários" f=${a.reajuste || E.F(null)} onFim=${set('reajuste')} />
+        <${CampoTexto} rotulo="Aplicação do reajuste" f=${a.reajusteAplicacao || E.F(null)} onFim=${set('reajusteAplicacao')} />
+        <${CampoTexto} rotulo="Escopo" f=${a.escopo || E.F(null)} onFim=${set('escopo')} />
+        <${CampoTexto} rotulo="Validade do aditivo" f=${a.validade || E.F(null)} onFim=${set('validade')} />
+      </div>
+      <h3>Resumo de evolução do contrato</h3>
+      <div class="rolagem"><table class="tab"><thead><tr><th>Nº TAC</th><th>Emissão</th><th class="n">Valor aditado</th><th class="n">Valor total</th><th class="n">Variação</th><th class="n">Prazo (meses)</th><th>Início</th><th>Término</th></tr></thead><tbody>
+        ${ev.map((r) => html`<tr><td>${r.tac}</td><td>${r.data}</td><td class="n">${r.aditado ? fmt(r.aditado) : '—'}</td><td class="n">${fmt(r.total)}</td><td class="n">${r.variacao}</td><td class="n">${r.prazo ?? '—'}</td><td>${r.inicio}</td><td>${r.termino}</td></tr>`)}
+        <tr class="venc"><td><b>${ad.numero}º</b></td><td>${ad.data}</td><td class="n">${ad.aditado ? fmt(ad.aditado) : '—'}</td><td class="n"><b>${fmt(ad.total)}</b></td><td class="n">${ad.variacao != null ? E.fmtPct(ad.variacao) : '—'}</td><td class="n"><b>${ad.prazo ?? '—'}</b></td><td>${ad.inicio}</td><td><b>${ad.termino}</b></td></tr>
+      </tbody></table></div>
+      ${(st.evolucao || []).length > 0 && html`<p class="mut">Histórico lido de: ${(st.evolucao[0].fonte || '').split(' › ')[0]}${ad.substitui ? ` · a pasta já tinha o ${ad.numero}º TAC no RH anterior: a linha dele será refeita.` : ''}</p>`}
+      <h3>Resultado da negociação (opcional)</h3>
+      <div class="rolagem"><table class="tab"><thead><tr><th>Cenário</th><th>Resultado</th><th></th></tr></thead><tbody>
+        ${neg.map((r, i) => html`<tr><td><${Txt} v=${r.cenario} onFim=${(v) => mudar((s) => { s.aditivo.negociacao[i].cenario = v; })} /></td>
+          <td><${Txt} v=${r.resultado} onFim=${(v) => mudar((s) => { s.aditivo.negociacao[i].resultado = v; })} cls="cod" /></td>
+          <td><button class="btn ico" onClick=${() => mudar((s) => { s.aditivo.negociacao.splice(i, 1); })}><${Icone} n="x" t=${14} /></button></td></tr>`)}
+      </tbody></table></div>
+      <div class="tab-acoes"><button class="btn sec peq" onClick=${() => mudar((s) => { s.aditivo.negociacao = (s.aditivo.negociacao || []).concat([{ cenario: '', resultado: '' }]); })}><${Icone} n="mais" /> Linha</button></div>
+      <p class="mut">A justificativa e as considerações de Suprimentos são editadas na etapa RH pronto.</p>
+    </section>`;
+  }
+
+  // ------------------------------------------------------------ vendor list
+  function PainelVendorList({ st, eq, mudar }) {
+    const vl = st.vendorList || [];
+    const efetiva = RHSamarco.vendorListEfetiva(st, eq);
+    const usandoParticipantes = vl.length && efetiva !== vl && efetiva.length !== vl.length;
+    const setV = (i, k) => (v) => mudar((s) => { s.vendorList[i][k] = v; });
+    return html`<section class="painel"><h2>Vendor list <span class="cont">${vl.length}</span>
+      <button class="btn sec peq dir" onClick=${() => mudar((s) => { s.vendorList = (s.vendorList || []).concat([{ codigoSap: '', empresa: '', localizacao: '', faturamento: null, relacao: null, clientes: '', participouAnterior: 'Não', fonte: 'editado' }]); })}><${Icone} n="mais" /> Empresa</button></h2>
+      ${vl.length ? html`<p class="mut">Fonte: ${(vl[0].fonte || 'editado').split(' › ')[0]}</p>` : html`<p class="mut">Sem vendor list na pasta. No RH entram os fornecedores do processo.</p>`}
+      ${usandoParticipantes && html`<p class="aviso"><${Icone} n="alerta" /> Nenhuma empresa desta lista aparece nas propostas ou qualificações: parece ser de outro processo (sobra do modelo). No RH entram os participantes. <button class="btn link" onClick=${() => mudar((s) => { s.vendorList = []; })}>Limpar esta lista</button></p>`}
+      ${vl.length > 0 && html`<div class="rolagem"><table class="tab"><thead><tr><th>Código SAP</th><th>Empresa</th><th>Localização</th><th class="n">Faturamento anual (R$)</th><th>Principais clientes</th><th>Participou do anterior</th><th></th></tr></thead><tbody>
+        ${vl.map((v, i) => html`<tr><td><${Txt} v=${v.codigoSap} onFim=${setV(i, 'codigoSap')} cls="cod" /></td><td><${Txt} v=${v.empresa} onFim=${setV(i, 'empresa')} /></td>
+          <td><${Txt} v=${v.localizacao} onFim=${setV(i, 'localizacao')} /></td><td><${Num} v=${v.faturamento} onFim=${setV(i, 'faturamento')} /></td>
+          <td><${Txt} v=${v.clientes} onFim=${setV(i, 'clientes')} /></td><td><${Txt} v=${v.participouAnterior} onFim=${setV(i, 'participouAnterior')} cls="estreito" /></td>
+          <td><button class="btn ico" onClick=${() => mudar((s) => { s.vendorList.splice(i, 1); })}><${Icone} n="x" t=${14} /></button></td></tr>`)}
+      </tbody></table></div>`}
+    </section>`;
+  }
+
   const fornIdx = (st, id) => st.fornecedores.findIndex((f) => f.id === id);
   const curto = (s, n) => (String(s || '').length > n ? String(s).slice(0, n - 1) + '…' : String(s || ''));
 
@@ -693,8 +831,8 @@
         <div class="kpi"><span>Fornecedor recomendado</span><b>${v ? v.nome : '—'}</b></div>
         <div class="kpi"><span>Proposta inicial (${v ? 'do recomendado' : ''})</span><b>${E.fmtBRL(v && v.negociacao.inicial)}</b></div>
         <div class="kpi dest"><span>Valor final · ${E.nomeRodada(r.ultima)}</span><b>${E.fmtBRL(v && v.total)}</b></div>
-        <div class="kpi bom"><span>Saving sobre a proposta inicial</span><b>${E.fmtBRL(r.savingNegociacao)}</b><em>${E.fmtPct(r.savingNegociacaoPct)}</em></div>
-        <div class="kpi"><span>Saving sobre o estimado da RC</span><b>${E.fmtBRL(r.savingEstimado)}</b><em>${E.fmtPct(r.savingEstimadoPct)}</em></div>
+        <div class="kpi bom"><span>Custo evitado</span><b>${E.fmtBRL(r.savingNegociacao)}</b><em>${E.fmtPct(r.savingNegociacaoPct)}</em></div>
+        <div class="kpi"><span>Diferença para o estimado da RC</span><b>${E.fmtBRL(r.savingEstimado)}</b><em>${E.fmtPct(r.savingEstimadoPct)}</em></div>
       </div>
       <section class="painel"><h2>Evolução do valor equalizado por rodada</h2>
         <div class="leg-graf">${series.map((s) => html`<span><i style=${{ background: s.cor }}></i>${s.nome}</span>`)}<span class="mut">○ proposta mantida da rodada anterior</span></div>
@@ -707,7 +845,7 @@
         </div>
       </section>
       <section class="painel"><h2>Valores por rodada</h2>
-        <div class="rolagem"><table class="tab"><thead><tr><th>Fornecedor</th>${rotulos.map((x) => html`<th class="n">${x}</th>`)}<th class="n">Saving</th><th class="n">%</th></tr></thead>
+        <div class="rolagem"><table class="tab"><thead><tr><th>Fornecedor</th>${rotulos.map((x) => html`<th class="n">${x}</th>`)}<th class="n">Custo evitado</th><th class="n">%</th></tr></thead>
         <tbody>${eq.fids.map((fid) => { const n = eq.negociacao[fid]; return html`<tr class=${v && v.fid === fid ? 'venc' : ''}><td><b>${val(st.fornecedores.find((f) => f.id === fid).nome)}</b></td>
           ${n.serie.map((p) => html`<td class="n">${p.total != null ? E.fmtBRL(p.total) : '—'}${p.herdada ? html`<span class="mini">mantida</span>` : ''}</td>`)}
           <td class="n"><b>${E.fmtBRL(n.saving)}</b></td><td class="n">${E.fmtPct(n.savingPct)}</td></tr>`; })}</tbody></table></div>
@@ -724,85 +862,103 @@
   }
 
   // ================================================================== 6. RH pronto
-  function RH({ st, eq, mudar, avisar, setModal }) {
-    const dados = useMemo(() => E.dadosRH(st, eq), [st, eq, st.rh.justificativa, st.rh.observacoes, st.rh.dataRH]);
+  const SECOES_TXT = {
+    contratacao: [
+      ['estrategia', '1. Estratégia de contratação', 5], ['vendorList', '2. Vendor list (texto antes da tabela)', 2], ['cartaConvite', '3. Carta convite (texto antes da tabela)', 2],
+      ['analiseTecnica', '3. Análise técnica', 3], ['sst', '3. Saúde e Segurança do Trabalho', 2], ['financeira', '3. Análise financeira', 2], ['compliance', '3. Análise de compliance', 2],
+      ['apresentacao', '4.1 Apresentação das propostas comerciais', 3], ['negociacao', '4.2 Análise e negociação comercial', 5], ['ponderacao', '4.3 Ponderação técnica e comercial', 2],
+      ['referencial', '5. Referencial comparativo', 2], ['conclusao', '6. Conclusão', 3],
+    ],
+    aditivo: [['justificativaAditivo', 'Justificativa do aditivo', 6], ['consideracoes', 'Considerações de Suprimentos', 8]],
+  };
+
+  function RH({ st, eq, mudar, avisar, entradas }) {
+    const tipo = val(st.tipoProcesso) || 'concorrencia';
+    const dados = useMemo(() => E.dadosRH(st, eq), [st, eq, JSON.stringify(st.textos), JSON.stringify(st.cab), JSON.stringify(st.aditivo), st.rh.dataRH]);
+    const sug = useMemo(() => E.textosSugeridos(st, eq), [st, eq, JSON.stringify(st.aditivo), JSON.stringify(st.cab)]);
     const htmlFlow = useMemo(() => S.htmlFLOW(st, eq, dados), [dados]);
+    const previa = useMemo(() => { const r = S.escoparRelatorio(htmlFlow, 'flowrel'); return `<style>${r.css}</style><div class="flowrel">${r.corpo}</div>`; }, [htmlFlow]);
     const pend = E.pendencias(st, eq);
-    const faltam = pend.filter((p) => !p.ok);
-    const [modeloInfo, setModeloInfo] = useState(() => { const s = ler(CHAVE_MODELO); try { return s ? JSON.parse(s) : null; } catch { return null; } });
+    const faltam = pend.filter((p) => !p.ok && p.obrig);
+    const [modeloSalvo, setModeloSalvo] = useState(() => { const s = ler(CHAVE_MODELO); try { return s ? JSON.parse(s) : null; } catch { return null; } });
+    const [escolha, setEscolha] = useState(null);
+    const [gerando, setGerando] = useState('');
     const refModelo = useRef();
-    const sugestao = E.justificativaSugerida(st, eq);
+    const base = nomeArq((tipo === 'aditivo' ? val(st.cab.contrato) : val(st.cab.numeroRC) || val(st.processo.rc)) || st.nomeProcesso);
     const setRH = (k) => (v) => mudar((s) => { s.rh[k] = v; }, false);
-    const base = nomeArq(val(st.processo.rc) || st.nomeProcesso);
+    const setTxt = (k) => (v) => mudar((s) => { s.textos[k] = v; }, false);
+
+    // modelos disponíveis: formulários / RH anteriores da pasta, modelo carregado, provisório
+    const modelosPasta = (st.modelos || []).filter((m) => entradas.current.some((e) => e.id === m.docId && e.bytes));
+    const auto = RHSamarco.escolherModelo({ ...st, modelos: modelosPasta });
+    const opcoes = [
+      ...modelosPasta.map((m) => ({ id: m.docId, nome: `${m.nome}${m.preenchido ? ` (RH ${m.tipo === 'aditivo' ? 'anterior' : 'preenchido'})` : ' (formulário em branco)'}`, tipo: m.tipo })),
+      ...(modeloSalvo ? [{ id: 'salvo', nome: `${modeloSalvo.nome} (carregado por você)` }] : []),
+      { id: 'provisorio', nome: tipo === 'aditivo' ? 'Modelo provisório FLOW (alteração contratual)' : 'Modelo provisório FLOW (contratação)' },
+    ];
+    const escolhido = escolha || (auto ? auto.docId : modeloSalvo ? 'salvo' : 'provisorio');
+    const bytesModelo = () => {
+      if (escolhido === 'salvo' && modeloSalvo) return b64bytes(modeloSalvo.b64);
+      if (escolhido === 'provisorio') return b64bytes(tipo === 'aditivo' ? window.FLOW_MODELO_ADITIVO_B64 : window.FLOW_MODELO_RH_B64);
+      const e = entradas.current.find((x) => x.id === escolhido);
+      return e && e.bytes ? e.bytes : b64bytes(window.FLOW_MODELO_RH_B64);
+    };
 
     async function baixarWord() {
+      setGerando('word');
       try {
-        const modelo = modeloInfo ? b64bytes(modeloInfo.b64) : b64bytes(window.FLOW_MODELO_RH_B64);
-        const blob = S.gerarDocx(libs, modelo, dados);
-        baixar(blob, `RH_RC${base}.docx`);
-      } catch (e) {
-        console.error(e);
-        const det = e.properties && e.properties.errors ? e.properties.errors.map((x) => x.properties && x.properties.explanation).filter(Boolean).slice(0, 3).join(' | ') : e.message;
-        avisar('Erro ao preencher o modelo: ' + det, 'erro');
-      }
+        const blob = RHSamarco.gerar(libs, bytesModelo(), { st, eq, dados });
+        await baixar(blob, `RH_${tipo === 'aditivo' ? `${base}_${E.calcularAditivo(st).numero}TAC` : base}.docx`);
+      } catch (e) { console.error(e); avisar('Erro ao montar o RH no Word: ' + e.message, 'erro'); }
+      finally { setGerando(''); }
     }
     async function baixarExcel() {
-      try { baixar(await S.gerarExcel(libs, st, eq, dados), `Equalizacao_RC${base}.xlsx`); }
+      setGerando('excel');
+      try { await baixar(await S.gerarExcel(libs, st, eq, dados), `SMIN-IT-GSU-004_Tabelas_RH_${base}.xlsx`); }
       catch (e) { console.error(e); avisar('Erro ao gerar o Excel: ' + e.message, 'erro'); }
+      finally { setGerando(''); }
     }
-    const [gerandoPdf, setGerandoPdf] = useState(false);
     async function baixarPDF() {
-      setGerandoPdf(true);
-      try { await baixar(await S.gerarPdfFLOW(libs, htmlFlow), `RH_FLOW_RC${base}.pdf`); }
+      setGerando('pdf');
+      try { await baixar(await S.gerarPdfFLOW(libs, htmlFlow), `RH_FLOW_${base}.pdf`); }
       catch (e) { console.error(e); avisar('Erro ao gerar o PDF: ' + e.message, 'erro'); }
-      finally { setGerandoPdf(false); }
+      finally { setGerando(''); }
     }
-    const previa = useMemo(() => { const r = S.escoparRelatorio(htmlFlow, 'flowrel'); return `<style>${r.css}</style><div class="flowrel">${r.corpo}</div>`; }, [htmlFlow]);
     async function carregarModelo(file) {
       try {
         const u = new Uint8Array(await file.arrayBuffer());
-        const tags = S.marcacoesDoModelo(libs, u);
-        const info = { nome: file.name, b64: bytesB64(u), tags: tags.length, data: new Date().toLocaleDateString('pt-BR') };
+        const info = { nome: file.name, b64: bytesB64(u), data: new Date().toLocaleDateString('pt-BR') };
         if (!gravar(CHAVE_MODELO, JSON.stringify(info))) avisar('O modelo é grande demais para ficar salvo no navegador; ele vale só nesta sessão.', 'erro');
-        setModeloInfo(info);
-        avisar(tags.length ? `Modelo carregado: ${tags.length} marcações encontradas.` : 'Modelo carregado, mas sem marcações {campo}. Veja "Como marcar o modelo".', tags.length ? 'ok' : 'erro');
+        setModeloSalvo(info); setEscolha('salvo');
+        avisar('Modelo carregado. O FLOW preenche o cabeçalho e as seções 1 a 6 (ou o resumo de aditivos) direto no formulário.');
       } catch (e) { avisar('Não consegui ler o modelo: ' + e.message, 'erro'); }
     }
-    const verMarcacoes = () => setModal(html`<h2>Como marcar o modelo atual do RH</h2>
-      <p>Abra o modelo atual do RH no Word e, onde cada informação deve aparecer, escreva a marcação entre chaves. O FLOW substitui as marcações pelos dados do processo.</p>
-      <div class="rolagem alta"><table class="tab"><thead><tr><th>Marcação</th><th>O que entra</th></tr></thead><tbody>
-        ${S.MARCACOES.simples.map(([k, d]) => html`<tr><td><code>{${k}}</code></td><td>${d}</td></tr>`)}
-      </tbody></table>
-      <h3>Tabelas e listas que repetem</h3>
-      <p>Em uma linha de tabela, coloque <code>{#lista}</code> no início da primeira célula e <code>{/lista}</code> no fim da última. A linha se repete para cada fornecedor ou item.</p>
-      <table class="tab"><thead><tr><th>Lista</th><th>Campos dentro da lista</th></tr></thead><tbody>
-        ${S.MARCACOES.listas.map(([k, d]) => html`<tr><td><code>{#${k}}…{/${k}}</code></td><td>${d}</td></tr>`)}
-      </tbody></table></div>
-      <div class="modal-acoes"><button class="btn sec" onClick=${() => setModal(null)}>Fechar</button></div>`);
 
+    const secoes = SECOES_TXT[tipo === 'aditivo' ? 'aditivo' : 'contratacao'];
     return html`
       <div class="rh-grade">
         <div class="rh-esq">
           <section class="painel"><h2>Baixar o RH</h2>
+            <label class="campo larg"><span class="rot">Modelo do RH (Word)</span>
+              <select class="inp" onChange=${(e) => setEscolha(e.target.value)}>${opcoes.map((o) => html`<option value=${o.id} selected=${o.id === escolhido}>${o.nome}</option>`)}</select>
+              <span class="mut">${escolhido === 'provisorio' ? 'Sem formulário na pasta: usando o modelo provisório no formato Samarco. Para usar o formulário oficial, inclua-o na pasta ou carregue abaixo.' : 'O FLOW escreve direto no formulário: cabeçalho, seções e tabelas.'}</span></label>
             <div class="saidas">
-              <button class="saida" onClick=${baixarWord}><${Icone} n="arquivo" t=${22} /><b>RH no modelo atual (Word)</b><span>${modeloInfo ? `Modelo: ${modeloInfo.nome}` : 'Modelo provisório: troque pelo modelo atual da Samarco'}</span></button>
-              <button class="saida dest" onClick=${baixarPDF} disabled=${gerandoPdf}><${Icone} n="impressora" t=${22} /><b>RH padrão FLOW (PDF)</b><span>${gerandoPdf ? 'Gerando o PDF…' : 'Relatório completo, pronto para enviar'}</span></button>
-              <button class="saida" onClick=${baixarExcel}><${Icone} n="planilha" t=${22} /><b>Planilha de equalização (Excel)</b><span>Resumo, uma aba por rodada, negociação, alertas e fontes</span></button>
+              <button class="saida" onClick=${baixarWord} disabled=${!!gerando}><${Icone} n="arquivo" t=${22} /><b>Relatório de Homologação (Word)</b><span>${gerando === 'word' ? 'Montando…' : tipo === 'aditivo' ? 'RH de alteração contratual com o novo aditivo' : 'Formulário Samarco preenchido'}</span></button>
+              <button class="saida dest" onClick=${baixarPDF} disabled=${!!gerando}><${Icone} n="impressora" t=${22} /><b>RH padrão FLOW (PDF)</b><span>${gerando === 'pdf' ? 'Gerando o PDF…' : 'Resumo visual, pronto para enviar'}</span></button>
+              <button class="saida" onClick=${baixarExcel} disabled=${!!gerando}><${Icone} n="planilha" t=${22} /><b>Tabelas SMIN-IT-GSU-004 (Excel)</b><span>${gerando === 'excel' ? 'Gerando…' : 'Vendor list, qualificações, quadro de preço, TCO, aditivo e detalhe por item'}</span></button>
             </div>
             <div class="modelo">
-              <button class="btn sec peq" onClick=${() => refModelo.current.click()}><${Icone} n="subir" /> ${modeloInfo ? 'Trocar' : 'Carregar'} o modelo atual (.docx)</button>
-              ${modeloInfo && html`<button class="btn link" onClick=${() => { gravar(CHAVE_MODELO, null); setModeloInfo(null); }}>voltar ao provisório</button>`}
-              <button class="btn link" onClick=${verMarcacoes}>Como marcar o modelo</button>
-              <button class="btn link" onClick=${() => baixar(b64bytes(window.FLOW_MODELO_RH_B64), 'Modelo_RH_provisorio_com_marcacoes.docx')}>baixar o modelo provisório</button>
+              <button class="btn sec peq" onClick=${() => refModelo.current.click()}><${Icone} n="subir" /> Carregar formulário de RH (.docx)</button>
+              ${modeloSalvo && html`<button class="btn link" onClick=${() => { gravar(CHAVE_MODELO, null); setModeloSalvo(null); setEscolha(null); }}>esquecer o modelo carregado</button>`}
               <input ref=${refModelo} type="file" accept=".docx" hidden onChange=${(e) => e.target.files.length && carregarModelo(e.target.files[0])} />
             </div>
           </section>
 
-          <section class="painel"><h2>Recomendação</h2>
-            <label class="campo larg"><span class="rot">Justificativa</span>
-              <textarea class="inp" rows="7" value=${st.rh.justificativa || ''} placeholder=${sugestao} onBlur=${(e) => setRH('justificativa')(e.target.value)} /></label>
-            ${!st.rh.justificativa && html`<p class="mut">Em branco, o RH usa o texto sugerido (em cinza). <button class="btn link" onClick=${() => setRH('justificativa')(sugestao)}>Usar a sugestão e editar</button></p>`}
-            <label class="campo larg"><span class="rot">Observações</span><textarea class="inp" rows="3" value=${st.rh.observacoes || ''} onBlur=${(e) => setRH('observacoes')(e.target.value)} /></label>
+          <section class="painel"><h2>Textos do RH</h2>
+            <p class="mut">Em branco, vale o texto sugerido (em cinza), montado a partir dos documentos. Clique em "usar e editar" para ajustar.</p>
+            ${secoes.map(([k, rot, linhas]) => html`<label class="campo larg" key=${k}><span class="rot">${rot}
+                ${!(st.textos[k] || '').trim() && sug[k] ? html` <button class="btn link" onClick=${(e) => { e.preventDefault(); setTxt(k)(sug[k]); }}>usar e editar</button>` : ''}</span>
+              <textarea class="inp" rows=${linhas} value=${st.textos[k] || ''} placeholder=${sug[k] || ''} onBlur=${(e) => setTxt(k)(e.target.value)} /></label>`)}
             <label class="campo"><span class="rot">Data do RH</span><input class="inp" value=${st.rh.dataRH || ''} onBlur=${(e) => setRH('dataRH')(e.target.value)} /></label>
           </section>
 

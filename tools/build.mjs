@@ -20,12 +20,20 @@ const bibliotecas = [
   'node_modules/xlsx/dist/xlsx.full.min.js',
   'node_modules/exceljs/dist/exceljs.min.js',
   'node_modules/pizzip/dist/pizzip.min.js',
-  'node_modules/docxtemplater/build/docxtemplater.min.js',
   'node_modules/pdfjs-dist/build/pdf.min.js',
   'node_modules/html2canvas/dist/html2canvas.min.js',
   'node_modules/jspdf/dist/jspdf.umd.min.js',
+  'node_modules/7z-wasm/7zz.umd.js',
+  'node_modules/.cache/flow/msgreader.min.js',
 ];
-const proprios = ['src/engine.js', 'src/planilha-padrao.js', 'src/leitores.js', 'src/saidas.js', 'src/app.js'];
+const proprios = ['src/engine.js', 'src/planilha-padrao.js', 'src/leitores.js', 'src/rh-samarco.js', 'src/saidas.js', 'src/app.js'];
+
+// leitor de e-mails do Outlook (.msg) empacotado como global do navegador
+fs.mkdirSync(r('node_modules/.cache/flow'), { recursive: true });
+(await import('esbuild')).buildSync({
+  entryPoints: [r('tools/vendor/msgreader-entry.js')], bundle: true, minify: true, format: 'iife', platform: 'browser',
+  outfile: r('node_modules/.cache/flow/msgreader.min.js'), logLevel: 'silent',
+});
 
 function seguro(codigo, nome) {
   if (/<\/script/i.test(codigo)) throw new Error(`${nome} contém "</script" e quebraria o HTML.`);
@@ -35,13 +43,16 @@ function seguro(codigo, nome) {
 const script = (p) => `<script>/* ${path.basename(p)} */\n${seguro(lerTxt(p), p)}\n</script>`;
 
 const modelo = fs.readFileSync(r('modelos/Modelo_RH_provisorio.docx')).toString('base64');
-const exemplo = fs.readFileSync(r('exemplo/RC-4500012345 Correias e Roletes.zip')).toString('base64');
+const modeloAditivo = fs.readFileSync(r('modelos/Modelo_RH_aditivo_provisorio.docx')).toString('base64');
+const zipExemplo = fs.readdirSync(r('exemplo')).find((n) => n.endsWith('.zip'));
+const exemplo = fs.readFileSync(r('exemplo', zipExemplo)).toString('base64');
+const wasm7z = fs.readFileSync(r('node_modules/7z-wasm/7zz.wasm')).toString('base64');
 
 const corpo = `<div id="app"><p style="padding:40px;font-family:sans-serif">Carregando o FLOW Express…</p></div>
 <noscript><p style="padding:40px">O FLOW Express precisa de JavaScript habilitado (Edge ou Chrome).</p></noscript>
 <script type="text/plain" id="pdf-worker">${seguro(lerTxt('node_modules/pdfjs-dist/build/pdf.worker.min.js'), 'pdf.worker')}</script>
 ${bibliotecas.map(script).join('\n')}
-<script>window.FLOW_VERSAO=${JSON.stringify(versao)};window.FLOW_MODELO_RH_B64="${modelo}";window.FLOW_EXEMPLO_B64="${exemplo}";</script>
+<script>window.FLOW_VERSAO=${JSON.stringify(versao)};window.FLOW_MODELO_RH_B64="${modelo}";window.FLOW_MODELO_ADITIVO_B64="${modeloAditivo}";window.FLOW_EXEMPLO_NOME=${JSON.stringify(zipExemplo)};window.FLOW_EXEMPLO_B64="${exemplo}";window.FLOW_7Z_WASM_B64="${wasm7z}";</script>
 ${proprios.map(script).join('\n')}
 `;
 

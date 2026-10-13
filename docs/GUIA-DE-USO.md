@@ -1,26 +1,22 @@
 # Guia rápido do comprador
 
-## Antes do processo
-1. Na tela inicial, clique em **Gerar planilha padrão Samarco**, leia os itens do arquivo da RC e baixe a planilha.
-2. Envie essa planilha junto com a carta-convite. O fornecedor preenche só as células amarelas e devolve, uma planilha por rodada.
-3. Salve os arquivos na pasta do processo seguindo o padrão de nomes (`PC_FORNECEDOR_R1.xlsx`, `ATA_NEGOCIACAO_R2.docx`, `HOM_FORNECEDOR.pdf`…).
-
 ## Montando o RH
-1. Abra o `FLOW-Express.html` e arraste a pasta do processo (ou o `.zip`).
-2. **Documentos**: indique o tipo dos arquivos em destaque. Os demais já foram reconhecidos.
-3. **Conferência**: confira os campos em amarelo, que não foram encontrados, e as propostas com o ícone de alerta.
-   - Proposta em PDF fora do padrão: compare com o texto do documento ao lado e clique em *Marcar como conferida*.
-   - Proposta escaneada: clique em *Digitar proposta* (os itens da RC já vêm preenchidos) ou use *Colar do Excel / PDF*.
-   - Unidade diferente da RC: converta o preço e a quantidade para a unidade da RC.
-4. **Equalização**: revise os pontos de atenção e ajuste os pesos técnico/comercial, se o processo usar outros.
-5. **Negociação**: confira a evolução por rodada e o saving.
-6. **RH pronto**: revise a justificativa sugerida e baixe:
-   - **RH no modelo atual (Word)**
-   - **RH padrão FLOW (PDF)**: na janela de impressão, escolha "Salvar como PDF"
-   - **Planilha de equalização (Excel)**
-7. Veja a lista **O que ainda falta** antes de enviar o RH.
+1. Abra o `FLOW-Express.html` e arraste a pasta do processo (ou o `.zip` / `.7z`).
+   - Pasta muito grande? Suba uma parte e depois use **Adicionar mais arquivos** na etapa Documentos.
+   - **Aditivo**: inclua também o RH do aditivo anterior, que traz o histórico e o cabeçalho do contrato.
+2. **Documentos**: indique o tipo dos arquivos em destaque. Os demais já foram reconhecidos pelas pastas 1 a 8, pelo nome ou pelo conteúdo.
+3. **Conferência**:
+   - Confira o tipo de processo (concorrência, fornecedor pretendido ou aditivo).
+   - Complete o **cabeçalho do RH**: os campos em amarelo não foram encontrados nos documentos. Clique em *Guardar … como meu padrão* para não redigitar responsável, gerência, unidade e formalização.
+   - Confira o **vendor list** e as **qualificações** (vindos da planilha SMIN-IT-GSU-004 da pasta).
+   - Propostas em PDF fora do padrão: compare com o texto do documento ao lado e clique em *Marcar como conferida*.
+   - **Aditivo**: informe a nova data de término, o valor aditado, a classificação e o reajuste. O FLOW calcula o novo prazo, o valor total e a variação.
+4. **Equalização** e **Negociação**: revise os pontos de atenção, a ponderação e o custo evitado.
+5. **RH pronto**: revise os textos sugeridos (seções 1 a 6, ou justificativa e considerações do aditivo) e baixe:
+   - **Relatório de Homologação (Word)**, no formulário Samarco;
+   - **RH padrão FLOW (PDF)**;
+   - **Tabelas SMIN-IT-GSU-004 (Excel)**.
 
 ## Dicas
 - **Salvar** (no topo) baixa um `.json` com todo o trabalho. Com *Abrir processo salvo* você retoma depois.
-- O FLOW lembra o último processo aberto no mesmo navegador.
-- Para reclassificar um documento depois da conferência, abra a pasta de novo.
+- O formulário de RH usado é o que está na pasta. Dá para escolher outro na lista "Modelo do RH" ou carregar um.

@@ -42,10 +42,17 @@ await page.locator('.painel.destaque .doc', { hasText: 'Esclarecimentos_forneced
 await page.locator('.painel.destaque .doc').first().waitFor();
 assert.equal(await page.locator('.painel.destaque .doc').count(), 1);
 
+// subir mais arquivos no mesmo processo (pasta grande em partes)
+const antes = await page.locator('.resumo-docs .kpi b').first().innerText();
+await page.locator('.mini-drop input[type=file]').first().setInputFiles(path.join(raiz, 'exemplo', 'LEIA-ME.txt'));
+await page.getByText('somados ao processo').waitFor();
+assert.notEqual(await page.locator('.resumo-docs .kpi b').first().innerText(), antes);
+
 // conferência
 await page.getByRole('button', { name: /Seguir para a conferência/ }).click();
-await page.getByText('Dados do processo').waitFor();
-assert.equal(await page.locator('.campo input').first().inputValue(), '4500012345');
+await page.getByText('Cabeçalho do RH').waitFor();
+assert.equal(await page.locator('label.campo', { hasText: 'Nº DA REQUISIÇÃO DE COMPRA' }).locator('input').inputValue(), '4100630001');
+assert.equal(await page.locator('label.campo', { hasText: 'FORNECEDOR' }).first().locator('input').inputValue(), '90011 - ALFA EQUIPAMENTOS INDUSTRIAIS LTDA');
 await foto('3-conferencia.png');
 
 // corrigir a unidade da Gama no item 6 (PC → M2, preço convertido): 50 placas de 0,5 m² = 25 m²
@@ -69,7 +76,7 @@ await foto('4-equalizacao.png');
 const total = await page.locator('.matriz tfoot tr.forte').innerText();
 assert.match(total, /272\.550,00/);
 assert.match(total, /283\.400,00/, 'Gama corrigida = 283.400,00');
-await page.locator('.aba', { hasText: '1ª rodada' }).click();
+await page.locator('.aba', { hasText: 'Proposta inicial' }).click();
 await foto('4b-equalizacao-r1.png');
 assert.ok(await page.locator('.tag.laranja').count() >= 1, 'item não cotado equalizado (Beta)');
 
@@ -86,9 +93,9 @@ await page.getByRole('button', { name: /Montar o RH/ }).click();
 await page.locator('.previa .flowrel').waitFor();
 await page.waitForTimeout(500);
 await foto('6-rh.png');
-const [dlWord] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /RH no modelo atual/ }).click()]);
+const [dlWord] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Relatório de Homologação \(Word\)/ }).click()]);
 await dlWord.saveAs(path.join(saida, 'e2e_RH.docx'));
-const [dlXls] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Planilha de equalização/ }).click()]);
+const [dlXls] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Tabelas SMIN-IT-GSU-004/ }).click()]);
 await dlXls.saveAs(path.join(saida, 'e2e_Equalizacao.xlsx'));
 assert.ok(fs.statSync(path.join(saida, 'e2e_RH.docx')).size > 5000);
 assert.ok(fs.statSync(path.join(saida, 'e2e_Equalizacao.xlsx')).size > 5000);

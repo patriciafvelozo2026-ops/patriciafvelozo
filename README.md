@@ -10,28 +10,25 @@ são lidos no próprio computador.
 
 ## Como usar
 
-1. Abra `dist/FLOW-Express.html` (duplo clique). Ele também pode ficar numa pasta do SharePoint, de onde cada comprador baixa e abre.
-2. **Novo RH**: arraste a pasta do processo ou o `.zip`. Também dá para escolher a pasta direto, sem zipar.
-3. **Documentos**: o FLOW separa a RC, as propostas técnicas, as propostas comerciais (por fornecedor e por rodada), o parecer técnico, as atas e as homologações. O que ele não reconhecer aparece em destaque para você indicar o que é.
-4. **Conferência**: cada dado mostra o arquivo (e a célula/linha) de onde veio. Confira e corrija. Propostas fora do padrão podem ser digitadas ou coladas do Excel/PDF.
-5. **Equalização**: feita item a item e por rodada. O FLOW aponta item não cotado, unidade e quantidade diferentes e total que não bate. Também calcula as notas técnica e comercial com os pesos definidos.
-6. **Negociação**: evolução das rodadas até o BAFO e saving sobre a proposta inicial e sobre o estimado da RC.
-7. **RH pronto**: Word no modelo atual, PDF no padrão FLOW, planilha de equalização em Excel e a lista do que ainda falta anexar.
+1. Abra `dist/FLOW-Express.html` no Edge ou no Chrome. Ele também pode ficar numa pasta do SharePoint, de onde cada comprador baixa e abre.
+2. **Novo RH**: arraste a pasta do processo, o `.zip` ou o `.7z`. Pasta grande? Suba em partes com **Adicionar mais arquivos**: tudo se soma no mesmo RH.
+3. **Documentos**: o FLOW separa os documentos pela estrutura de pastas da Samarco (1 - Requisição de Compra … 8 - Contrato), lê e-mails (`.eml` e `.msg`) e seus anexos e ignora cópias repetidas e imagens de assinatura.
+4. **Conferência**: tipo de processo (concorrência, fornecedor pretendido ou aditivo), cabeçalho do RH, vendor list, qualificações e propostas. Cada dado mostra o arquivo de onde veio.
+5. **Equalização**: item a item e por rodada, com a ponderação técnica/comercial da aba "4 - TCO" da SMIN-IT-GSU-004.
+6. **Negociação**: evolução das rodadas e custo evitado sobre a proposta inicial.
+7. **RH pronto**:
+   - **Relatório de Homologação (Word)** escrito direto no formulário Samarco (SMIN-FO-GSU-002/059) encontrado na pasta, ou no RH anterior, no caso de aditivo (SMIN-FO-GSU-004). O FLOW preenche o cabeçalho, as seções 1 a 6 e as tabelas. No aditivo, ele acrescenta a nova linha no "Resumo de evolução" e o bloco do novo aditivo.
+   - **RH padrão FLOW (PDF)** baixado direto.
+   - **Tabelas SMIN-IT-GSU-004 (Excel)**: Vendor List, Carta Convite-Qualificações, Quadro de Preço, TCO (com as fórmulas oficiais), Quadro Comparativo e Aditivo Contratual, mais o detalhe por item.
+   - Lista do que ainda falta.
 
-Para conhecer o fluxo sem arquivos reais, clique em **Ver demonstração** na tela inicial. É um processo fictício com 3 fornecedores e 3 rodadas.
+Para conhecer o fluxo sem arquivos reais, clique em **Ver demonstração** na tela inicial. É uma concorrência fictícia na estrutura de pastas da Samarco.
 
-## O que ele lê, e com que segurança
+### Pastas grandes
 
-| Formato | Leitura |
-|---|---|
-| Excel (`.xlsx`, `.xls`, `.csv`), especialmente a **planilha de preços padrão Samarco** | Total confiança |
-| Word (`.docx`): texto e tabelas | Total confiança |
-| PDF com texto | Razoável: os itens são lidos e marcados "para conferir" |
-| PDF escaneado / proposta "no formato do fornecedor" sem padrão | Não lê sozinho: o comprador digita ou cola na Conferência |
+Nada é enviado para servidor: o limite é a memória do computador. O FLOW só descompacta e lê o que entra no RH (Excel, Word, PDF, e-mails). Imagens, vídeos e desenhos entram só na lista. Arquivos acima de 150 MB são listados sem leitura. Numa pasta real de 48 MB (.7z com .zip dentro), a leitura levou cerca de 6 segundos.
 
-**Recomendação:** mande a planilha de preços padrão junto com a carta-convite. Ela é gerada pelo próprio FLOW, no botão *Gerar planilha padrão Samarco*. Com a planilha preenchida pelo fornecedor, a equalização fica automática.
-
-## Padrão de nomes na pasta
+## Padrão de nomes (opcional)
 
 | Documento | Nome do arquivo |
 |---|---|
@@ -46,12 +43,9 @@ Para conhecer o fluxo sem arquivos reais, clique em **Ver demonstração** na te
 `FORNECEDOR` é um nome curto, sem espaços (ex.: `ALFA`). As subpastas são livres. Fora do padrão, o FLOW
 tenta reconhecer pelo conteúdo e pela pasta, e o que sobrar ele pergunta.
 
-## Modelo atual do RH (Word)
+## Formulário do RH (Word)
 
-Enquanto o modelo atual da Samarco não chega, o FLOW usa um **modelo provisório** (`modelos/Modelo_RH_provisorio.docx`).
-Para usar o modelo real, basta escrever as marcações (`{rc}`, `{objeto}`, `{vencedor}`, `{#fornecedores}…{/fornecedores}` etc.)
-no próprio Word e carregá-lo na etapa *RH pronto*. A lista completa fica em *Como marcar o modelo*. O modelo
-carregado fica salvo naquele navegador.
+O FLOW usa o formulário oficial que estiver na pasta do processo (SMIN-FO-GSU-002, 059 ou 004) ou o RH anterior, no caso de aditivo, sem precisar de marcações. Também é possível carregar o formulário uma vez na etapa *RH pronto*, e ele fica salvo naquele navegador. Sem formulário, entra o **modelo provisório** (`modelos/`), com a mesma estrutura.
 
 ## Regras de equalização (resumo)
 
@@ -60,8 +54,9 @@ carregado fica salvo naquele navegador.
 - **Total que não bate** (qtd × preço ≠ total informado): usa o cálculo e sinaliza.
 - **Unidade ou quantidade diferente da RC**: sinaliza para o comprador converter na Conferência.
 - **Rodadas**: se o fornecedor não manda nova proposta, vale a anterior ("mantida").
-- **Notas**: comercial = 100 × menor valor equalizado ÷ valor do fornecedor. Final = peso técnico × nota técnica + peso comercial × nota comercial (padrão 30/70). Reprovado tecnicamente não é classificado.
-- **Saving**: proposta inicial − valor final do recomendado, e estimado da RC − valor final.
+- **Ponderação (SMIN-IT-GSU-004, aba 4 - TCO)**: nota comercial = (1 − (valor ÷ menor valor − 1)) × 100, e zero se o valor passar do dobro do menor. Final = peso técnico × nota técnica + peso comercial × nota comercial (padrão 30/70). Reprovado na qualificação não é classificado.
+- **Custo evitado**: proposta inicial − proposta final do 1º colocado (em R$ e %).
+- **Rodadas**: Proposta inicial (6.1 Inicial), 1ª rodada (6.2 Revisão 01), 2ª rodada …, Proposta final.
 
 ## Para desenvolvedores
 
@@ -75,8 +70,9 @@ npm run test:e2e    # navegador (Chromium) sem rede, do upload ao RH
 | Pasta | Conteúdo |
 |---|---|
 | `src/engine.js` | Classificação, extração, equalização, notas, saving e pendências (sem interface; testável no Node) |
-| `src/leitores.js` | Abertura de .zip/pasta e leitura de Excel, Word e PDF |
-| `src/saidas.js` | RH em Word (marcações), RH padrão FLOW (HTML → PDF), Excel de equalização, gráfico |
+| `src/leitores.js` | Pasta, .zip, .7z/.rar, e-mails .eml/.msg (com anexos) e leitura de Excel, Word e PDF |
+| `src/rh-samarco.js` | Escreve o Relatório de Homologação no formulário Samarco (cabeçalho, seções, tabelas, aditivo) |
+| `src/saidas.js` | RH padrão FLOW (PDF), Excel no formato SMIN-IT-GSU-004, gráfico |
 | `src/planilha-padrao.js` | Planilha de preços padrão Samarco |
 | `src/app.js`, `src/estilo.css` | Interface |
 | `tools/` | Build, modelo de RH provisório e gerador do processo fictício |

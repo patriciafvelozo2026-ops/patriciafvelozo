@@ -1,119 +1,83 @@
-// Gera o modelo de RH em Word (provisório) com as marcações do FLOW Express.
-// Quando chegar o modelo atual da Samarco, basta inserir as mesmas marcações nele.
+// Gera os modelos de RH provisórios (contratação e aditivo) com a MESMA estrutura
+// do Relatório de Homologação da Samarco (cabeçalho em tabela + seções 1 a 6).
+// O FLOW usa o formulário oficial quando ele está na pasta do processo (ou foi
+// carregado na etapa RH); estes modelos só entram quando não há formulário.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const {
-  Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle,
-  ShadingType, PageOrientation, Footer, PageNumber,
-} = require('docx');
-
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle, ShadingType, Header, Footer, PageNumber } = require('docx');
 const raiz = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const AZUL = '0E4D64';
 
-const t = (text, o = {}) => new TextRun({ text, font: 'Calibri', size: 20, ...o });
-const p = (runs, o = {}) => new Paragraph({ spacing: { after: 80 }, ...o, children: Array.isArray(runs) ? runs : [t(runs)] });
-const titulo = (s) => new Paragraph({
-  spacing: { before: 240, after: 100 },
-  border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: AZUL } },
-  children: [t(s, { bold: true, size: 24, color: AZUL })],
+const t = (text, o = {}) => new TextRun({ text, font: 'Arial', size: 18, ...o });
+const cel = (runs, o = {}) => new TableCell({
+  children: [new Paragraph({ alignment: o.centro ? AlignmentType.CENTER : AlignmentType.LEFT, children: runs })],
+  columnSpan: o.span, margins: { top: 60, bottom: 60, left: 80, right: 80 },
+  shading: o.cinza ? { type: ShadingType.CLEAR, fill: 'D9D9D9', color: 'auto' } : undefined,
 });
-const cel = (text, o = {}) => new TableCell({
-  children: [new Paragraph({ alignment: o.dir ? AlignmentType.RIGHT : AlignmentType.LEFT, children: [t(text, { bold: !!o.cab, color: o.cab ? 'FFFFFF' : undefined, size: 18 })] })],
-  shading: o.cab ? { type: ShadingType.CLEAR, fill: AZUL, color: 'auto' } : o.cinza ? { type: ShadingType.CLEAR, fill: 'EEF3F5', color: 'auto' } : undefined,
-  margins: { top: 50, bottom: 50, left: 80, right: 80 },
-  ...(o.w ? { width: { size: o.w, type: WidthType.PERCENTAGE } } : {}),
-});
-const tabela = (cab, linhaLoop, dir = [], larg = []) => new Table({
-  width: { size: 100, type: WidthType.PERCENTAGE },
-  rows: [
-    new TableRow({ tableHeader: true, children: cab.map((c, i) => cel(c, { cab: true, w: larg[i] })) }),
-    new TableRow({ children: linhaLoop.map((c, i) => cel(c, { dir: dir.includes(i), w: larg[i] })) }),
-  ],
-});
-const pares = (linhas) => new Table({
-  width: { size: 100, type: WidthType.PERCENTAGE },
-  rows: linhas.map(([k, v]) => new TableRow({ children: [cel(k, { cinza: true, w: 32 }), cel(v, { w: 68 })] })),
+const lin = (...cells) => new TableRow({ children: cells });
+const rot = (r, v = '') => [t(r + ' ', { bold: true }), t(v)];
+const secao = (s) => new Paragraph({
+  spacing: { before: 280, after: 120 }, shading: { type: ShadingType.CLEAR, fill: 'D9D9D9', color: 'auto' },
+  border: { top: { style: BorderStyle.SINGLE, size: 4, color: '000000' }, bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' } },
+  children: [t(s, { bold: true, size: 20 })],
 });
 
-const doc = new Document({
+function cabecalho(aditivo) {
+  const linhas = [
+    lin(cel([t(aditivo ? 'RELATÓRIO DE HOMOLOGAÇÃO DE ALTERAÇÃO CONTRATUAL' : 'RELATÓRIO DE HOMOLOGAÇÃO DE CONTRATAÇÃO/AQUISIÇÃO', { bold: true, size: 24 })], { span: 3, centro: true })),
+    lin(cel(rot('CONTRATO/PEDIDO DE COMPRA Nº', 'XXXXXXXXXX'), { span: 2 }), cel(rot('GERÊNCIA:', 'XXXXXXXXXX'))),
+    lin(cel(rot('FORNECEDOR:')), cel([t('XXXXXXXXXXXXX')]), cel(rot('DATA DOCUMENTO:'))),
+    lin(cel(rot('OBJETO:', 'XXXXXXXXXXXXXXXXXX'), { span: 3 })),
+    lin(cel(rot('VALOR DA REQUISIÇÃO DE COMPRA:', 'R$'), { span: 2 }), cel(rot('Nº DA REQUISIÇÃO DE COMPRA:', 'XXXXXXXXXXXXX'))),
+    ...(aditivo ? [lin(cel(rot('VALOR DO ADITIVO:', 'R$XXX.XXX,XX'), { span: 3 })), lin(cel(rot('NOVO VALOR TOTAL DO CONTRATO:', 'R$XXX.XXX,XX'), { span: 2 }), cel(rot('CUSTO EVITADO:', 'R$ XXXX – (XX%)')))]
+      : [lin(cel(rot('VALOR TOTAL CONTRATADO:', 'R$XXX.XXX,XX'), { span: 2 }), cel(rot('CUSTO EVITADO:', 'R$ XXXX – (XX%)')))]),
+    lin(cel(rot('PRAZO DE VIGÊNCIA:', 'Início em  e término em'), { span: 2 }), cel(rot('PRAZO:', 'XX (ano/mês)'))),
+    lin(cel(rot('CONDIÇÃO DE PAGAMENTO:', 'XXXXXX'), { span: 3 })),
+    lin(cel(rot('REGIME DE CONTRATAÇÃO:')), cel([t('XXXXXXX')]), cel(rot('INCOTERM:', 'XXXXXXX'))),
+    lin(cel(rot('FÓRMULA PARAMÉTRICA DE REAJUSTE:')), cel([t('XXXXXXX')]), cel(rot('DATA BASE:', 'XXXXXXX'))),
+    lin(cel(rot('PRAZO PARA RESCISÃO SEM ÔNUS:', 'XXXXX'), { span: 2 }), cel(rot('MULTA POR RESCISÃO:', 'XXXXX'))),
+    lin(cel(rot(aditivo ? 'CLASSIFICAÇÃO DO ADITIVO:' : 'CLASSIFICAÇÃO DO PROCESSO DE COMPRA:')), cel([t('XXXXXXX')], { span: 2 })),
+    lin(cel(rot('GERÊNCIA REQUISITANTE:')), cel([t('XXXXXXXXXXXXXXXXX')]), cel(rot('UNIDADE SAMARCO:', 'XXXXXXX'))),
+    lin(cel(rot('GESTOR DO CONTRATO:', 'XXXXXXXXXXXXX'), { span: 3 })),
+    lin(cel(rot('RESPONSÁVEL PELO PROCESSO:', 'XXXXXXX'), { span: 3 })),
+    lin(cel(rot('FORMALIZAÇÃO DO PROCESSO:', 'XXXXXXX'), { span: 3 })),
+    lin(cel([t('Nº RFQ ', { bold: true }), t('xxxxxxxx '), t('(Nº do ME – Nº SAP)', { bold: true })], { span: 3 })),
+    lin(cel(rot('EXPLICAÇÃO CASO NÃO TENHA SIDO USADO MERCADO ELETRÔNICO:'), { span: 3 })),
+    lin(cel(rot('ARQUIVAMENTO DO PROCESSO NO SHAREPOINT:', 'inserir o link da pasta'), { span: 3 })),
+  ];
+  return new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: linhas });
+}
+
+const comum = (filhos) => new Document({
   creator: 'FLOW Express',
-  title: 'RH – modelo provisório',
+  styles: { default: { document: { run: { font: 'Arial', size: 20 } } }, paragraphStyles: [{ id: 'Default', name: 'Default', run: { font: 'Arial', size: 20 } }] },
   sections: [{
-    properties: { page: { margin: { top: 900, bottom: 900, left: 900, right: 900 } } },
-    footers: {
-      default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [t('RH – RC {rc} · página ', { size: 16, color: '5F6B73' }), new TextRun({ children: [PageNumber.CURRENT], size: 16, color: '5F6B73' })] })] }),
-    },
-    children: [
-      new Paragraph({ children: [t('RH – RELATÓRIO DO PROCESSO DE COMPRA', { bold: true, size: 32, color: AZUL })] }),
-      p([t('RC {rc}', { bold: true, size: 24 }), t('   ·   emitido em {dataRH}', { color: '5F6B73' })]),
-
-      titulo('1. Identificação'),
-      pares([
-        ['Requisição de compra (RC)', '{rc}'], ['Data da RC', '{dataRC}'], ['Objeto', '{objeto}'],
-        ['Requisitante', '{requisitante}'], ['Centro de custo', '{centroCusto}'], ['Comprador', '{comprador}'],
-        ['Valor estimado', '{valorEstimado}'], ['Critério de julgamento', '{criterio}'],
-        ['Fornecedores participantes', '{qtdFornecedores}'], ['Rodadas de negociação', '{qtdRodadas}'],
-      ]),
-
-      titulo('2. Classificação final ({rodadaFinal})'),
-      tabela(['Pos.', 'Fornecedor', 'CNPJ', 'Nota técnica', 'Nota comercial', 'Nota final', 'Valor final', 'Homologação'],
-        ['{#fornecedores}{posicao}', '{nome}', '{cnpj}', '{notaTecnica}', '{notaComercial}', '{notaFinal}', '{valorFinal}', '{homologacao}{/fornecedores}'], [3, 4, 5, 6], [6, 22, 16, 9, 10, 9, 13, 15]),
-      p([t('Pesos: {pesoTecnico}% técnico e {pesoComercial}% comercial. Nota comercial = 100 × menor preço ÷ preço do fornecedor.', { size: 16, color: '5F6B73' })]),
-
-      titulo('3. Condições comerciais'),
-      tabela(['Fornecedor', 'Prazo de entrega', 'Pagamento', 'Frete', 'Validade'],
-        ['{#fornecedores}{nome}', '{prazoEntrega}', '{condPagamento}', '{frete}', '{validade}{/fornecedores}']),
-
-      titulo('4. Negociação'),
-      tabela(['Fornecedor', 'Proposta inicial', 'Proposta final', 'Saving (R$)', 'Saving (%)'],
-        ['{#fornecedores}{nome}', '{valorInicial}', '{valorFinal}', '{saving}', '{savingPct}{/fornecedores}'], [1, 2, 3, 4]),
-      p('{#rodadas}'),
-      p([t('{rodada}: ', { bold: true }), t('{#valores}{fornecedor} {valor}; {/valores}'), t('{#ata} (ata: {ata}){/ata}', { color: '5F6B73' })]),
-      p('{/rodadas}'),
-
-      titulo('5. Recomendação'),
-      pares([
-        ['Fornecedor recomendado', '{vencedor} – CNPJ {vencedorCnpj}'],
-        ['Valor final', '{valorFinal} ({valorFinalExtenso})'],
-        ['Proposta inicial do fornecedor', '{valorInicialVencedor}'],
-        ['Saving sobre a proposta inicial', '{savingNegociacao} ({savingNegociacaoPct})'],
-        ['Saving sobre o valor estimado', '{savingEstimado} ({savingEstimadoPct})'],
-        ['Prazo de entrega / pagamento', '{prazoEntregaVencedor} / {condPagamentoVencedor}'],
-      ]),
-      p([t('Justificativa: ', { bold: true }), t('{justificativa}')], { spacing: { before: 120, after: 80 } }),
-      p([t('Observações: ', { bold: true }), t('{observacoes}')]),
-
-      titulo('6. Itens do fornecedor recomendado'),
-      tabela(['Item', 'Código', 'Descrição', 'Un', 'Qtd', 'Preço unit.', 'Total'],
-        ['{#itensVencedor}{item}', '{codigo}', '{descricao}', '{un}', '{qtd}', '{precoUnit}', '{total}{/itensVencedor}'], [4, 5, 6], [6, 11, 43, 6, 8, 12, 14]),
-
-      titulo('7. Anexos'),
-      p('{#anexos}'), p([t('• {nome} – {tipo}')]), p('{/anexos}'),
-
-      p('{#temPendencias}'),
-      titulo('8. Pendências'),
-      p('{#pendencias}'), p([t('• {grupo}: {desc}{#dica} ({dica}){/dica}', { color: 'B3261E' })]), p('{/pendencias}'),
-      p('{/temPendencias}'),
-
-      new Paragraph({ spacing: { before: 700 }, children: [] }),
-      new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
-        borders: { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE }, insideHorizontal: { style: BorderStyle.NONE }, insideVertical: { style: BorderStyle.NONE } },
-        rows: [new TableRow({ children: [
-          new TableCell({ borders: { top: { style: BorderStyle.SINGLE, size: 6, color: '1D2327' } }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [t('{comprador}'), t(' – Suprimentos', { color: '5F6B73' })] })] }),
-          new TableCell({ children: [new Paragraph('')], width: { size: 10, type: WidthType.PERCENTAGE } }),
-          new TableCell({ borders: { top: { style: BorderStyle.SINGLE, size: 6, color: '1D2327' } }, children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [t('Aprovação – Gerência')] })] }),
-        ] })],
-      }),
-    ],
+    properties: { page: { margin: { top: 900, bottom: 900, left: 1000, right: 1000 } } },
+    headers: { default: new Header({ children: [new Paragraph({ children: [t('GERÊNCIA GERAL DE SUPRIMENTOS', { bold: true })] })] }) },
+    footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [t('Modelo provisório FLOW Express · página ', { size: 14, color: '7F7F7F' }), new TextRun({ children: [PageNumber.CURRENT], size: 14, color: '7F7F7F' })] })] }) },
+    children: filhos,
   }],
 });
 
-const destino = path.join(raiz, 'modelos', 'Modelo_RH_provisorio.docx');
-fs.mkdirSync(path.dirname(destino), { recursive: true });
-fs.writeFileSync(destino, await Packer.toBuffer(doc));
-console.log('Modelo de RH gerado:', path.relative(raiz, destino));
+const contratacao = comum([
+  cabecalho(false),
+  ...['1. ESTRATÉGIA DE CONTRATAÇÃO', '2. VENDOR LIST', '3. CARTA CONVITE E QUALIFICAÇÕES', '4. ANÁLISE E NEGOCIAÇÃO COMERCIAL', '5. REFERENCIAL COMPARATIVO', '6. CONCLUSÃO']
+    .flatMap((s) => [secao(s), new Paragraph({ children: [t('(preenchido pelo FLOW Express)', { italics: true, color: '7F7F7F' })] })]),
+]);
+const aditivo = comum([
+  cabecalho(true),
+  secao('1. RESUMO DE EVOLUÇÃO DO CONTRATO:'),
+  new Paragraph({ children: [t('Exemplo:', { italics: true, color: '7F7F7F' })] }),
+  secao('2. DESCRIÇÃO DOS ADITIVOS:'),
+  new Paragraph({ children: [t('1º Aditivo – Data: XX/XX/XXXX', { bold: true })] }),
+  new Paragraph({ children: [t('Analista de compras/responsável: xxxxxxxxx')] }),
+]);
+
+const dir = path.join(raiz, 'modelos');
+fs.mkdirSync(dir, { recursive: true });
+fs.writeFileSync(path.join(dir, 'Modelo_RH_provisorio.docx'), await Packer.toBuffer(contratacao));
+fs.writeFileSync(path.join(dir, 'Modelo_RH_aditivo_provisorio.docx'), await Packer.toBuffer(aditivo));
+console.log('Modelos de RH provisórios gerados em modelos/');

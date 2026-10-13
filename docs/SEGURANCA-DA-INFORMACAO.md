@@ -1,6 +1,6 @@
 # FLOW Express: nota para "de acordo" da Segurança da Informação
 
-**O que é:** um arquivo HTML estático (`FLOW-Express.html`, ~3,5 MB) usado pelos compradores de Suprimentos
+**O que é:** um arquivo HTML estático (`FLOW-Express.html`, ~7 MB) usado pelos compradores de Suprimentos
 para montar o RH a partir da pasta de um processo de compra.
 
 ## Como funciona, do ponto de vista de segurança
@@ -12,7 +12,7 @@ para montar o RH a partir da pasta de um processo de compra.
 | Acesso à internet | Nenhum. Todas as bibliotecas estão **embutidas** no arquivo, e não há chamadas de rede (verificado em teste automatizado com a rede bloqueada). |
 | Onde os documentos são lidos | Na memória do navegador, no computador do comprador. |
 | O que fica gravado | Os dados extraídos do processo atual (texto e valores, não os arquivos originais) e o modelo de RH carregado ficam no armazenamento local do navegador (`localStorage`) daquele usuário, para retomar o trabalho. O botão *Novo RH* apaga o processo atual. |
-| Saídas | Arquivos baixados pelo próprio usuário: RH (.docx), RH padrão FLOW (PDF via impressão do navegador), equalização (.xlsx) e dados do processo (.json). |
+| Saídas | Arquivos baixados pelo próprio usuário: Relatório de Homologação (.docx), RH padrão FLOW (.pdf), tabelas SMIN-IT-GSU-004 (.xlsx) e dados do processo (.json). |
 | Distribuição | Uma cópia do arquivo numa pasta do SharePoint com acesso restrito a Suprimentos. |
 | Atualização | Uma nova versão do arquivo substitui a anterior no SharePoint. O número da versão aparece na descrição do arquivo. |
 
@@ -24,7 +24,10 @@ para montar o RH a partir da pasta de um processo de compra.
 | ExcelJS | 4.4.0 | MIT | Gerar a planilha de equalização |
 | JSZip | 3.10.2 | MIT | Abrir .zip e .docx |
 | PDF.js (pdfjs-dist) | 3.11.174 | Apache-2.0 | Ler PDF com texto |
-| docxtemplater + PizZip | 3.71.0 / 3.3.0 | MIT | Preencher o modelo de RH em Word |
+| PizZip | 3.3.0 | MIT | Abrir e salvar o formulário de RH em Word |
+| 7-Zip (7z-wasm) | 1.2.0 | LGPL / unRAR | Abrir .7z e .rar |
+| msgreader | 1.28.0 | Apache-2.0 | Ler e-mails do Outlook (.msg) |
+| html2canvas + jsPDF | 1.4.1 / 2.5.1 | MIT | Gerar o PDF do RH padrão FLOW |
 | Preact + htm | 3.1.1 | MIT / Apache-2.0 | Interface |
 
 ## Pontos para avaliação

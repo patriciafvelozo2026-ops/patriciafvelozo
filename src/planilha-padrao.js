@@ -48,7 +48,7 @@
       ['Objeto', dados.objeto, false],
       ['Fornecedor', p.fornecedor, true],
       ['CNPJ', p.cnpj, true],
-      ['Rodada', p.rodada || '1ª rodada', true],
+      ['Rodada', p.rodada || 'Proposta inicial', true],
       ['Data da proposta', p.data, true],
       ['Prazo de entrega (dias)', p.prazoEntrega, true],
       ['Condição de pagamento (dias)', p.condPagamento, true],
@@ -71,7 +71,7 @@
       if (v instanceof Date) c.numFmt = 'dd/mm/yyyy';
     });
     ws.getCell('C8').dataValidation = {
-      type: 'list', allowBlank: false, formulae: ['"1ª rodada,2ª rodada,3ª rodada,4ª rodada,BAFO"'],
+      type: 'list', allowBlank: false, formulae: ['"Proposta inicial,1ª rodada,2ª rodada,3ª rodada,Proposta final"'],
     };
     ws.getCell('C13').dataValidation = { type: 'list', allowBlank: true, formulae: ['"CIF,FOB"'] };
 
