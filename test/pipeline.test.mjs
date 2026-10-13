@@ -88,6 +88,39 @@ assert.deepEqual(E.dadosDoNome('7__TAC_CRT_4500000123-EXEMPLO_CONCRETO_LTDA'), {
 assert.deepEqual(E.itemDeLinha('Licença Server 5000      R$ 39.480,00            2              R$ 78.960,00'), { item: null, descricao: 'Licença Server 5000', un: '', qtd: 2, preco: 39480, total: 78960, desconto: null });
 assert.equal(E.itemDeLinha('Licença Server 5000      R$ 39.480,00    6,00 %     2             R$ 74.222,40').preco, 37111.2);
 
+// tela do SAP lida de um print (texto como sai do OCR, dados fictícios)
+const sap = E.lerTelaSAP(`Exibir Nota cabeçalho: 4100000999 Idioma PT
+7º Aditivo - 15/09/2026 - PRAZO ATÉ 31/12/2027
+Contrato 430000123 - EXEMPLO CONCRETO LTDA
+Gestor: JOANA EXEMPLO LIMA
+Classificação do Aditivo: Prorrogação de Prazo
+Data de término: Alterada de 31/12/2026 para 31/12/2027;
+Justificativa: Prorrogação necessária para a continuidade
+dos serviços em 2027.
+10 U D 245 OBRA 4500000123 - TAC7 - PRAZO 1SV 0,01 BRL 1
+20 U D 245 OBRA REAJUSTE 1SV 0,01 BRL 1
+Grp.compradores 245 | Carlos Ficticio Souza Telefone 31 0000-0000`);
+assert.equal(sap.numeroRC, '4100000999');
+assert.equal(sap.tac, 7);
+assert.equal(sap.novoTermino, '31/12/2027');
+assert.equal(sap.terminoAnt, '31/12/2026');
+assert.equal(sap.gestor, 'Joana Exemplo Lima');
+assert.equal(sap.responsavel, 'Carlos Ficticio Souza');
+assert.ok(Math.abs(sap.valorRC - 0.02) < 1e-9);
+assert.match(sap.justificativa, /^Prorrogação necessária .* em 2027\.$/);
+// cláusulas em texto livre (print de minuta colado no e-mail, escopo)
+const stT = E.estadoVazio();
+const dT = { nome: 'image.png', tipo: 'OUTRO', conteudo: { kind: 'text', ocr: true, lines: [] } };
+E.camposEmTexto(stT, dT, `O presente CONTRATO tem por objeto a prestação de serviços de] Fornecimento de brita
+na região de Exemplo — MG]
+2. Os preços pactuados neste CONTRATO são fixos e irreajustáveis por 12 (doze) meses contados da data base, que é: —Março/2025.
+A partir do 13º mês, as parcelas remanescentes poderão ser reajustadas através da variação média do menor índice entre INPC, IGP-M e IPCA no período
+O prazo de vigência do contrato será de 06 (seis) meses, a contar da emissão do pedido.`);
+assert.equal(E.val(stT.cab.dataBase), 'mar-25');
+assert.equal(E.val(stT.cab.prazo), '6 (meses)');
+assert.equal(E.val(stT.cab.objeto), 'Fornecimento de brita na região de Exemplo - MG');
+assert.match(E.val(stT.cab.reajuste), /menor índice apurado no período entre INPC, IGP-M e IPCA\.$/);
+
 const pend = E.pendencias(st, eq).filter((p) => !p.ok).map((p) => p.desc);
 assert.ok(pend.includes('Nº da RC') === false, 'RC preenchida a partir da planilha');
 assert.ok(pend.includes('Gestor do contrato'));

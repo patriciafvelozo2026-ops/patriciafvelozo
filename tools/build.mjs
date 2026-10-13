@@ -25,8 +25,9 @@ const bibliotecas = [
   'node_modules/jspdf/dist/jspdf.umd.min.js',
   'node_modules/7z-wasm/7zz.umd.js',
   'node_modules/.cache/flow/msgreader.min.js',
+  'node_modules/tesseract.js/dist/tesseract.min.js',
 ];
-const proprios = ['src/engine.js', 'src/planilha-padrao.js', 'src/leitores.js', 'src/rh-samarco.js', 'src/saidas.js', 'src/app.js'];
+const proprios = ['src/engine.js', 'src/planilha-padrao.js', 'src/leitores.js', 'src/ocr.js', 'src/rh-samarco.js', 'src/saidas.js', 'src/app.js'];
 
 // leitor de e-mails do Outlook (.msg) empacotado como global do navegador
 fs.mkdirSync(r('node_modules/.cache/flow'), { recursive: true });
@@ -40,19 +41,24 @@ function seguro(codigo, nome) {
   // U+FFFD literal (tabelas de codepage do SheetJS) vira o escape equivalente \uFFFD
   return codigo.replace(/\uFFFD/g, '\\uFFFD');
 }
-const script = (p) => `<script>/* ${path.basename(p)} */\n${seguro(lerTxt(p), p)}\n</script>`;
+const script = (p) => `<script>/* ${path.basename(p)} */\n${seguro(lerTxt(p).replace(/\/\/# sourceMappingURL=\S+/g, ''), p)}\n</script>`;
 
 const modelo = fs.readFileSync(r('modelos/Modelo_RH_provisorio.docx')).toString('base64');
 const modeloAditivo = fs.readFileSync(r('modelos/Modelo_RH_aditivo_provisorio.docx')).toString('base64');
 const zipExemplo = fs.readdirSync(r('exemplo')).find((n) => n.endsWith('.zip'));
 const exemplo = fs.readFileSync(r('exemplo', zipExemplo)).toString('base64');
 const wasm7z = fs.readFileSync(r('node_modules/7z-wasm/7zz.wasm')).toString('base64');
+// OCR (prints, fotos, PDF escaneado): Tesseract + dicionário de português, sem rede
+const ocrPor = fs.readFileSync(r('node_modules/@tesseract.js-data/por/4.0.0_best_int/por.traineddata.gz')).toString('base64');
+const semMapa = (t) => t.replace(/\/\/# sourceMappingURL=\S+/g, '');
 
 const corpo = `<div id="app"><p style="padding:40px;font-family:sans-serif">Carregando o FLOW Express…</p></div>
 <noscript><p style="padding:40px">O FLOW Express precisa de JavaScript habilitado (Edge ou Chrome).</p></noscript>
 <script type="text/plain" id="pdf-worker">${seguro(lerTxt('node_modules/pdfjs-dist/build/pdf.worker.min.js'), 'pdf.worker')}</script>
+<script type="text/plain" id="ocr-worker">${seguro(semMapa(lerTxt('node_modules/tesseract.js/dist/worker.min.js')), 'tesseract worker')}</script>
+<script type="text/plain" id="ocr-core">${seguro(lerTxt('node_modules/tesseract.js-core/tesseract-core-simd-lstm.wasm.js'), 'tesseract core')}</script>
 ${bibliotecas.map(script).join('\n')}
-<script>window.FLOW_VERSAO=${JSON.stringify(versao)};window.FLOW_MODELO_RH_B64="${modelo}";window.FLOW_MODELO_ADITIVO_B64="${modeloAditivo}";window.FLOW_EXEMPLO_NOME=${JSON.stringify(zipExemplo)};window.FLOW_EXEMPLO_B64="${exemplo}";window.FLOW_7Z_WASM_B64="${wasm7z}";</script>
+<script>window.FLOW_VERSAO=${JSON.stringify(versao)};window.FLOW_MODELO_RH_B64="${modelo}";window.FLOW_MODELO_ADITIVO_B64="${modeloAditivo}";window.FLOW_EXEMPLO_NOME=${JSON.stringify(zipExemplo)};window.FLOW_EXEMPLO_B64="${exemplo}";window.FLOW_7Z_WASM_B64="${wasm7z}";window.FLOW_OCR_POR_B64="${ocrPor}";</script>
 ${proprios.map(script).join('\n')}
 `;
 

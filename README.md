@@ -12,7 +12,7 @@ são lidos no próprio computador.
 
 1. Abra `dist/FLOW-Express.html` no Edge ou no Chrome. Ele também pode ficar numa pasta do SharePoint, de onde cada comprador baixa e abre.
 2. **Novo RH**: arraste a pasta do processo, o `.zip` ou o `.7z`. Pasta grande? Suba em partes com **Adicionar mais arquivos**: tudo se soma no mesmo RH.
-3. **Documentos**: o FLOW separa os documentos pela estrutura de pastas da Samarco (1 - Requisição de Compra … 8 - Contrato), lê e-mails (`.eml` e `.msg`) e seus anexos e ignora cópias repetidas e imagens de assinatura.
+3. **Documentos**: o FLOW separa os documentos pela estrutura de pastas da Samarco (1 - Requisição de Compra … 8 - Contrato), lê e-mails (`.eml` e `.msg`) e seus anexos e ignora cópias repetidas e imagens de assinatura. **Prints, fotos e PDF escaneado** são lidos por reconhecimento de texto (OCR) no próprio navegador.
 4. **Conferência**: tipo de processo (concorrência, fornecedor pretendido ou aditivo), cabeçalho do RH, vendor list, qualificações e propostas. Cada dado mostra o arquivo de onde veio.
 5. **Equalização**: item a item e por rodada, com a ponderação técnica/comercial da aba "4 - TCO" da SMIN-IT-GSU-004.
 6. **Negociação**: evolução das rodadas e custo evitado sobre a proposta inicial.
@@ -26,7 +26,20 @@ Para conhecer o fluxo sem arquivos reais, clique em **Ver demonstração** na te
 
 ### Pastas grandes
 
-Nada é enviado para servidor: o limite é a memória do computador. O FLOW só descompacta e lê o que entra no RH (Excel, Word, PDF, e-mails). Imagens, vídeos e desenhos entram só na lista. Arquivos acima de 150 MB são listados sem leitura. Numa pasta real de 48 MB (.7z com .zip dentro), a leitura levou cerca de 6 segundos.
+Nada é enviado para servidor: o limite é a memória do computador. O FLOW só descompacta e lê o que entra no RH (Excel, Word, PDF, e-mails, prints). Vídeos e desenhos entram só na lista. Arquivos acima de 150 MB são listados sem leitura. Numa pasta real de 48 MB (.7z com .zip dentro e 20 imagens), a leitura levou cerca de 25 segundos, sendo 6 segundos sem as imagens.
+
+### O que o FLOW lê
+
+| Arquivo | Como |
+|---|---|
+| Excel (`.xlsx`, `.xls`, `.xlsm`, `.csv`) | Planilhas de preço, RC, SMIN-IT-GSU-004, evolução de aditivos |
+| Word (`.docx`) | RH anterior, justificativa, ata, minuta, escopo |
+| PDF com texto | Propostas, pedidos, pareceres |
+| E-mail (`.eml`, `.msg`) e anexos | Corpo, data, anexos (inclusive `.zip` dentro do e-mail) |
+| Print, foto e PDF escaneado (`.png`, `.jpg`, `.bmp`, `.tif`…) | OCR em português, feito no navegador: tela de RC do SAP (nº, valor, gestor, comprador, nota de cabeçalho do aditivo), cláusulas coladas no e-mail (objeto, data-base, reajuste). Até 30 imagens por envio; imagens menores que 20 KB (logos, assinaturas) são ignoradas |
+| `.zip`, `.7z`, `.rar` | Abertos inclusive um dentro do outro |
+
+Além dos campos em tabela, o FLOW procura no texto corrido: prazo de vigência do escopo ("será de 03 (três) meses"), data-base e reajuste da minuta, valor estimado da RC citado em e-mail, RFQ e gestor. Cada valor mostra de qual arquivo veio.
 
 ## Padrão de nomes (opcional)
 
@@ -70,7 +83,8 @@ npm run test:e2e    # navegador (Chromium) sem rede, do upload ao RH
 | Pasta | Conteúdo |
 |---|---|
 | `src/engine.js` | Classificação, extração, equalização, notas, saving e pendências (sem interface; testável no Node) |
-| `src/leitores.js` | Pasta, .zip, .7z/.rar, e-mails .eml/.msg (com anexos) e leitura de Excel, Word e PDF |
+| `src/leitores.js` | Pasta, .zip, .7z/.rar, e-mails .eml/.msg (com anexos) e leitura de Excel, Word, PDF e imagens |
+| `src/ocr.js` | OCR local (Tesseract em WebAssembly, dicionário de português embutido) |
 | `src/rh-samarco.js` | Escreve o Relatório de Homologação no formulário Samarco (cabeçalho, seções, tabelas, aditivo) |
 | `src/saidas.js` | RH padrão FLOW (PDF), Excel no formato SMIN-IT-GSU-004, gráfico |
 | `src/planilha-padrao.js` | Planilha de preços padrão Samarco |

@@ -1,6 +1,6 @@
 # FLOW Express: nota para "de acordo" da Segurança da Informação
 
-**O que é:** um arquivo HTML estático (`FLOW-Express.html`, ~7 MB) usado pelos compradores de Suprimentos
+**O que é:** um arquivo HTML estático (`FLOW-Express.html`, ~13 MB) usado pelos compradores de Suprimentos
 para montar o RH a partir da pasta de um processo de compra.
 
 ## Como funciona, do ponto de vista de segurança
@@ -29,8 +29,11 @@ para montar o RH a partir da pasta de um processo de compra.
 | msgreader | 1.28.0 | Apache-2.0 | Ler e-mails do Outlook (.msg) |
 | html2canvas + jsPDF | 1.4.1 / 2.5.1 | MIT | Gerar o PDF do RH padrão FLOW |
 | Preact + htm | 3.1.1 | MIT / Apache-2.0 | Interface |
+| Tesseract.js + tesseract.js-core | 7.0.0 / 6.1.2 | Apache-2.0 | Ler texto de prints, fotos e PDF escaneado (OCR) |
+| Dicionário de português (tessdata `por`, best_int) | 4.0.0 | Apache-2.0 | Idioma do OCR |
 
 ## Pontos para avaliação
 
 - Os documentos tratados são internos (propostas, RC, atas). Eles não saem da máquina, mas o `localStorage` guarda os dados extraídos do processo aberto até o usuário clicar em *Novo RH*. Em computador compartilhado, recomenda-se usar *Novo RH* ao terminar.
+- O OCR roda num *web worker* do próprio navegador. O dicionário de português está embutido no arquivo e o pedido de download que o Tesseract faria é atendido localmente; qualquer outro acesso à rede é recusado dentro do worker.
 - O código-fonte é legível e fica no repositório do projeto (`src/`). O arquivo final é gerado por `npm run build`.

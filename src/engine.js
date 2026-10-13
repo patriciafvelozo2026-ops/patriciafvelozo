@@ -156,6 +156,7 @@
   ];
 
   const CONTEUDO_TIPO = [
+    [/REQUISICAO (DE )?COMPRA:? ?4[12]\d{8}|NOTA CABECALHO:? ?4[12]\d{8}/, 'RC'],
     [/RELATORIO DE HOMOLOGACAO DE (CONTRATACAO|AQUISICAO|ALTERACAO)/, 'RH'],
     [/TERMO ADITIVO AO CONTRATO/, 'TAC'],
     [/PLANILHA DE PRECOS PADRAO SAMARCO/, 'PC'],
@@ -235,21 +236,30 @@
     const nomeN = toks.join(' ');
     const pastas = String(doc.caminho || '').split('/').slice(0, -1).map(norm).filter(Boolean);
     const ini = textoInicio(doc.conteudo);
-    const E = String(doc.ext || '').toUpperCase();
+    const ocr = !!(doc.conteudo && doc.conteudo.ocr);
+    const E = ocr ? 'PDF' : String(doc.ext || '').toUpperCase();
     const ehEmail = !!(doc.conteudo && doc.conteudo.email);
     let tipo = null, origem = null;
 
-    if (doc.anexoDe && /^(PNG|JPG|JPEG|GIF|BMP|EMF|WMF)$/.test(E)) return { tipo: 'IGNORAR', origem: 'imagem de e-mail', rodada: null, fornecedorPista: null };
+    if (doc.anexoDe && /^(PNG|JPG|JPEG|GIF|BMP|EMF|WMF|WEBP)$/i.test(doc.ext) && ini.length < 60) return { tipo: 'IGNORAR', origem: 'imagem de e-mail', rodada: null, fornecedorPista: null };
     if (toks.length && PREFIXOS[toks[0]] && !ehEmail) { tipo = PREFIXOS[toks[0]]; origem = 'nome do arquivo'; }
     if (!tipo && !ehEmail) for (const [re, t] of NOME_FORTE) if (re.test(nomeN)) { tipo = t; origem = 'nome do arquivo'; break; }
     if (!tipo && /^DOC/.test(E) && /^RH\b/.test(nomeN)) { tipo = 'RHA'; origem = 'nome do arquivo'; }
     if (!tipo && EXT_DOC.test(E) && !ehEmail) {
       for (const [re, t] of CONTEUDO_TIPO) if (re.test(ini)) {
+        // em print/foto, "proposta" no meio do texto (ex.: anexos citados num contrato) não basta
+        if (ocr && /^(PC|PT|CC)$/.test(t) && !re.test(ini.slice(0, 200))) continue;
         tipo = t === 'RH' ? (/XXXXXX/.test(ini) || /SMIN FO GSU/.test(nomeN) ? 'RHM' : 'RHA') : t;
         origem = 'conteúdo';
         break;
       }
     }
+    // print colado num e-mail: só vale o que a própria imagem diz logo no início (ou uma tela de RC do SAP)
+    if (ocr && doc.anexoDe && tipo && !(tipo === 'RC' && /4[12]\d{8}/.test(ini))) {
+      const re = (CONTEUDO_TIPO.find(([, t]) => t === tipo || (t === 'RH' && /^RH[MA]$/.test(tipo))) || [])[0];
+      if (!re || !re.test(ini.slice(0, 300))) tipo = null;
+    }
+    if (ocr && doc.anexoDe && !tipo) return { tipo: 'OUTRO', origem: 'imagem de e-mail', rodada: null, fornecedorPista: null };
     if (ehEmail && /DE ACORDO|JUSTIFICATIVA|APROVAC/.test(nomeN)) { tipo = 'JUST'; origem = 'nome do e-mail'; }
     if (!tipo && EXT_DOC.test(E) && !ehEmail) for (const [re, t] of NOME_TIPO) if (re.test(nomeN)) {
       if (t === 'RHA' && !/^DOC/.test(E)) continue;
@@ -914,6 +924,11 @@
     };
     const texto = c && c.kind === 'text' ? c.lines.map((l) => l.t).join('\n') : '';
     const email = c && c.email;
+    if (texto) {
+      const sap = lerTelaSAP(texto);
+      if (sap) aplicarTelaSAP(st, d, sap);
+      camposEmTexto(st, d, texto);
+    }
 
     const vincularFornecedor = (exigeCriar) => {
       let f = null;
@@ -932,6 +947,7 @@
       case 'RC': {
         for (const k of ['rc', 'objeto', 'requisitante', 'centroCusto', 'comprador', 'valorEstimado', 'dataRC']) {
           const v = pegar(k);
+          if (k === 'objeto' && v && /^(NAO HOUVE|SEM ALTERACAO|N\/?A$|-+$)/.test(norm(val(v)))) continue;
           if (v && val(st.processo[k]) == null) st.processo[k] = v;
         }
         const dn = dadosDoNome(d.nome);
@@ -1135,6 +1151,106 @@
     }
   }
 
+  // ------------------------------------------------------------ telas do SAP e campos em texto livre
+
+  const tituloCaso = (s) => String(s).toLowerCase().replace(/(^|\s)([a-zà-ú])/g, (m, a, b) => a + b.toUpperCase()).replace(/\b(De|Da|Do|Dos|Das|E)\b/g, (m) => m.toLowerCase());
+
+  /** Lê a tela "Exibir Requisição compra" / "Nota cabeçalho" do SAP (print ou PDF escaneado). */
+  function lerTelaSAP(texto) {
+    const t = String(texto).replace(/[—–]/g, '-');
+    const out = {};
+    let m = t.match(/Requisi[çc][ãa]o\s*(?:de\s*)?compra[:\s]+(4[12]\d{8})/i) || t.match(/Nota cabe[çc]alho:?\s*(4[12]\d{8})/i);
+    if (!m) return null;
+    out.numeroRC = m[1];
+    m = t.match(/(\d{1,2})\s*[ºo°]\s*Aditivo\s*-\s*(\d{2}\/\d{2}\/\d{4})(?:\s*-\s*PRAZO AT[ÉE]\s*(\d{2}\/\d{2}\/\d{4}))?/i);
+    if (m) { out.tac = parseInt(m[1], 10); out.dataTac = m[2]; if (m[3]) out.novoTermino = m[3]; }
+    m = t.match(/Data de t[ée]rmino:?\s*Alterad[ao] de (\d{2}\/\d{2}\/\d{4}) para (\d{2}\/\d{2}\/\d{4})/i);
+    if (m) { out.terminoAnt = m[1]; out.novoTermino = m[2]; }
+    m = t.match(/\b(4[3-6]\d{8})\b/);
+    if (m) out.contrato = m[1];
+    m = t.match(/Contrato\s+\d{8,10}\s*-\s*([A-ZÀ-Ú0-9][A-ZÀ-Ú0-9 .&/-]{3,80}?)\s*$/im);
+    if (m) out.fornecedor = m[1].trim();
+    m = t.match(/Gestor(?: do contrato)?\s*:\s*([A-ZÀ-Úa-zà-ú][A-ZÀ-Úa-zà-ú .]{4,60}?)\s*(?:["'”]|$)/im);
+    if (m) out.gestor = tituloCaso(m[1].trim());
+    m = t.match(/Classifica[çc][ãa]o do Aditivo\s*:\s*(.+?)\s*$/im);
+    if (m) out.classificacao = m[1].replace(/[.;]$/, '');
+    m = t.match(/^\s*V?alor\s*:\s*(.+?)\s*$/im);
+    if (m) out.valorTexto = m[1];
+    m = t.match(/Escopo\s*:\s*(.+?)\s*$/im);
+    if (m) out.escopo = m[1].replace(/[.;]$/, '');
+    // justificativa: linhas seguidas até fechar a frase (ou até outra informação da tela)
+    const ls = t.split('\n'), ij = ls.findIndex((l) => /Justificativa\s*:/i.test(l));
+    if (ij >= 0) {
+      const partes = [ls[ij].replace(/^.*?Justificativa\s*:\s*/i, '')];
+      for (let i = ij + 1; i < ls.length && !/[.!;]\s*$/.test(partes[partes.length - 1]); i++) {
+        const l = ls[i].trim();
+        if (!l || /^\d{2,5}\s|^[A-ZÀ-Ú][\wÀ-ú. ]{1,30}:|^Grp\.|^\S{0,3}$/.test(l)) break;
+        partes.push(l);
+      }
+      const j = partes.join(' ').replace(/\s+/g, ' ').trim();
+      if (j) out.justificativa = j;
+    }
+    // itens da RC: "... 1 SV 0,01 BRL" -> valor da RC = soma de qtd × preço
+    let soma = 0, achou = false;
+    for (const l of t.split('\n')) {
+      const it = l.match(/^\s*\d{2,5}\s.*?\s(\d+(?:[.,]\d+)?)\s*[A-Za-z]{1,4}\s+([\d.]+,\d{2})\s+(BRL|USD|EUR|AUD)\b/);
+      if (it) { soma += parseNum(it[1]) * parseNum(it[2]); achou = true; out.moeda = it[3]; }
+    }
+    if (achou) out.valorRC = soma;
+    m = t.match(/Grp\.?\s*compradores\s+\d+\s*\|?\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de |da |do |dos )?(?!Telefone|Fone|Tel\b|E-?mail|Ramal)[A-ZÀ-Ú][a-zà-ú]+){1,4})/);
+    if (m) out.responsavel = m[1].trim();
+    return out;
+  }
+
+  /** Campos do cabeçalho que aparecem em texto livre (escopo, minuta, e-mails). */
+  function camposEmTexto(st, d, texto) {
+    const cab = st.cab;
+    const set = (k, v, como) => { if (v && !val(cab[k])) cab[k] = F(v, `${d.nome} (${como})`); };
+    let m = texto.match(/prazo de vig[eê]ncia[^.\n]{0,60}?(?:ser[aá] de|de)\s*0?(\d{1,3})\s*(?:\([^)]*\))?\s*(meses|m[eê]s|dias|anos)/i);
+    if (m) set('prazo', `${parseInt(m[1], 10)} (${/dia/i.test(m[2]) ? 'dias' : /ano/i.test(m[2]) ? 'anos' : 'meses'})`, 'prazo de vigência no texto');
+    // cláusulas de contrato/minuta (também em print colado no e-mail)
+    const corrido = texto.replace(/\s*\n\s*/g, ' ');
+    const clausula = d.tipo === 'CTR' || d.tipo === 'CC' || /data[- ]base,? que [eé]|presente CONTRATO/i.test(corrido);
+    if (clausula) {
+      m = corrido.match(/data[- ]base[^:]{0,25}?(?:que [eé])?\s*:?\s*[-—–]?\s*(\d{1,2})[./](\d{1,2})[./](\d{4})/i);
+      if (m) set('dataBase', `${MESES[parseInt(m[2], 10) - 1]}-${m[3].slice(2)}`, 'data-base da minuta');
+      m = !m && corrido.match(/data[- ]base[^:]{0,25}?(?:que [eé])?\s*:?\s*[-—–]?\s*(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-zç]*\s*(?:\/|de)\s*(\d{4})/i);
+      if (m) set('dataBase', `${m[1].toLowerCase()}-${m[2].slice(2)}`, 'data-base da cláusula');
+      if (/irreajust[aá]ve/i.test(corrido) && /livre negocia/i.test(corrido)) set('reajuste', 'Livre Negociação', 'cláusula de reajuste');
+      m = corrido.match(/reajustad[ao]s?\b.{0,80}?menor [ií]ndice (?:apurado )?(?:no per[ií]odo )?entre ([A-Z][A-Z0-9 ,-]{3,40}? e [A-Z][A-Z0-9-]{2,10})/);
+      if (m) set('reajuste', `O preço será corrigido a cada 12 meses pelo menor índice apurado no período entre ${m[1].replace(/\s+/g, ' ')}.`, 'cláusula de reajuste');
+      m = corrido.match(/tem por objeto (?:a presta[cç][aã]o de servi[cç]os de|o fornecimento de)?\s*\]?\s*([^\[\]]{15,300}?)\s*(?:\]|\.\s|\s\d+\s+Fazem parte)/i);
+      if (m) set('objeto', m[1].replace(/^.{0,80}?\bdenominad[oa]\s+/i, '').replace(/^(a|o)\s+(?=[a-zà-ú])/i, '').replace(/\s*[—–]\s*/g, ' - ').trim(), 'objeto do contrato');
+    }
+    m = texto.match(/valor (?:estimado(?: pela [aá]rea requisitante)?|da RC|da requisi[cç][aã]o(?: de compra)?)[^:\n]{0,40}:\s*R\$\s*([\d.]+,\d{2})/i);
+    if (m) set('valorRC', fmtBRL(parseNum(m[1])), 'valor citado no texto');
+    m = texto.match(/\bRFQ\s*(?:n[º°o.]*)?\s*:?\s*(4\d{9}|\d{8})\b/i);
+    if (m) set('rfq', m[1], 'RFQ citada no texto');
+    m = texto.match(/gestor(?: do contrato)?\s*:\s*([A-ZÀ-Ú][A-Za-zÀ-ú]+(?:\s+(?:de |da |do |dos )?[A-ZÀ-Ú][A-Za-zÀ-ú]+){1,5})/);
+    if (m) set('gestor', tituloCaso(m[1]), 'gestor citado no texto');
+  }
+
+  function aplicarTelaSAP(st, d, sap) {
+    const fonte = `${d.nome} (${d.conteudo && d.conteudo.ocr ? 'leitura da imagem' : 'tela do SAP'})`;
+    const set = (alvo, k, v) => { if (v != null && v !== '' && !val(alvo[k])) alvo[k] = F(v, fonte); };
+    set(st.cab, 'numeroRC', sap.numeroRC);
+    set(st.processo, 'rc', sap.numeroRC);
+    if (sap.valorRC != null) { set(st.cab, 'valorRC', fmtBRL(sap.valorRC, sap.moeda && sap.moeda !== 'BRL' ? sap.moeda : 'BRL')); set(st.processo, 'valorEstimado', sap.valorRC); }
+    set(st.cab, 'gestor', sap.gestor);
+    set(st.cab, 'contrato', sap.contrato);
+    set(st.cab, 'responsavel', sap.responsavel);
+    if (sap.fornecedor && !st.fornecedores.length) garantirFornecedor(st, sap.fornecedor, fonte);
+    if (sap.tac) {
+      st.indicioAditivo = st.indicioAditivo || d.nome;
+      set(st.aditivo, 'numero', sap.tac);
+      set(st.aditivo, 'data', sap.dataTac);
+      set(st.aditivo, 'novoTermino', sap.novoTermino);
+      if (sap.classificacao) set(st.aditivo, 'classificacao', /prorroga/i.test(sap.classificacao) && !/valor|reajuste/i.test(sap.classificacao) ? 'Prazo' : sap.classificacao);
+      if (sap.escopo && !/n[ãa]o houve/i.test(sap.escopo)) set(st.aditivo, 'escopo', sap.escopo);
+      if (sap.justificativa && !st.textos.justificativaAditivo && !st.textos._justSAP) st.textos._justSAP = { v: sap.justificativa, fonte };
+    }
+  }
+
   function lerTCO(conteudo, nome) {
     const out = { pesoT: null, notas: [] };
     for (const sh of conteudo.sheets) {
@@ -1205,6 +1321,7 @@
 
   // ------------------------------------------------------------ tipo de processo e cabeçalho
 
+  const CAMPOS_PADRAO = ['responsavel', 'gerencia', 'unidade', 'formalizacao', 'rescisao', 'multa', 'regime', 'explicacaoME'];
   const TIPOS_PROCESSO = { concorrencia: 'Concorrência', pretendido: 'Fornecedor pretendido', aditivo: 'Aditivo contratual' };
 
   function detectarTipoProcesso(st) {
@@ -1223,8 +1340,9 @@
     const set = (k, v, fonte) => { if (v != null && v !== '' && !val(cab[k])) cab[k] = F(v, fonte); };
     set('numeroRC', val(st.processo.rc), st.processo.rc && st.processo.rc.fonte);
     if (val(st.processo.valorEstimado) != null) set('valorRC', fmtBRL(parseNum(val(st.processo.valorEstimado))), st.processo.valorEstimado.fonte);
+    if (val(cab.rfp)) set('rfq', val(cab.rfp), 'número da RFP (pasta / carta-convite)');
     const p = st.cabPadrao || {};
-    for (const k of ['responsavel', 'gerencia', 'unidade', 'formalizacao']) if (p[k]) set(k, p[k], 'seu padrão salvo');
+    for (const k of CAMPOS_PADRAO) if (p[k]) set(k, p[k], 'seu padrão salvo');
   }
 
   // ------------------------------------------------------------ equalização
@@ -1629,7 +1747,7 @@
     if (tipo === 'aditivo') {
       const ad = calcularAditivo(st);
       const a = st.aditivo;
-      T.justificativaAditivo = just ? resumir(just, 1500) : '';
+      T.justificativaAditivo = st.textos._justSAP ? val(st.textos._justSAP) : just ? resumir(just, 1500) : '';
       const partes = [];
       if (ad.termino && ad.terminoAnt && ad.termino !== ad.terminoAnt) partes.push(`prorroga a vigência do contrato nº ${val(st.cab.contrato) || ''} de ${ad.terminoAnt} para ${ad.termino} (de ${ad.prazoAnt} para ${ad.prazo} meses)`);
       if (ad.aditado) partes.push(`acrescenta ${fmtBRL(ad.aditado)} ao valor do contrato, que passa de ${fmtBRL(ad.totalAnt)} para ${fmtBRL(ad.total)}`);
@@ -1758,7 +1876,7 @@
     classificar, kvPlanilha, kvTexto, itensPlanilha, itensTexto, itemDeLinha, acharCabecalho, itensDeLinhas,
     lerVendorList, lerQualificacoes, lerQuadroPrecos, lerCabecalhoRH, lerEvolucao, dadosDoNome, ROTULOS_CAB,
     estadoVazio, montarEstado, adicionarDocumentos, aplicarDocumento, resumoDoc, acharFornecedor, garantirFornecedor,
-    detectarTipoProcesso, preencherCabecalho, cabecalhoFinal, calcularAditivo, notaComercial, propostasEfetivas,
+    detectarTipoProcesso, preencherCabecalho, cabecalhoFinal, lerTelaSAP, camposEmTexto, CAMPOS_PADRAO, calcularAditivo, notaComercial, propostasEfetivas,
     equalizar, situacaoHomologacao, pendencias, extenso, justificativaSugerida, textosSugeridos, textoRH, dadosRH, normUn, nomeRH,
   };
 });

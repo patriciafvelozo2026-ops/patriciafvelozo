@@ -48,11 +48,30 @@ await page.locator('.mini-drop input[type=file]').first().setInputFiles(path.joi
 await page.getByText('somados ao processo').waitFor();
 assert.notEqual(await page.locator('.resumo-docs .kpi b').first().innerText(), antes);
 
+// print de tela (fictício) lido por OCR, sem rede: nota de cabeçalho da RC com o gestor
+const png = await page.evaluate(async () => {
+  const c = document.createElement('canvas'); c.width = 1300; c.height = 420;
+  const g = c.getContext('2d');
+  g.fillStyle = '#f2f4f7'; g.fillRect(0, 0, c.width, c.height);
+  for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(0,0,0,${Math.random() * 0.05})`; g.fillRect(Math.random() * 1300, Math.random() * 60, 2, 2); }
+  g.fillStyle = '#ffffff'; g.fillRect(30, 80, 1240, 310);
+  g.fillStyle = '#111'; g.font = '26px Arial';
+  ['Exibir Nota cabeçalho: 4100630001 Idioma PT', 'Gestor: JOANA EXEMPLO LIMA', 'Objeto Resumido: Roletes e correia TC-12'].forEach((t, i) => g.fillText(t, 50, 140 + i * 60));
+  const b = await new Promise((r) => c.toBlob(r, 'image/png'));
+  return [...new Uint8Array(await b.arrayBuffer())];
+});
+const arqPng = path.join(saida, 'Captura de tela SAP (ficticio).png');
+fs.writeFileSync(arqPng, Buffer.from(png));
+assert.ok(png.length >= 20 * 1024, 'print com tamanho de captura real: ' + png.length);
+await page.locator('.mini-drop input[type=file]').first().setInputFiles(arqPng);
+await page.locator('.doc', { hasText: 'Captura de tela SAP' }).first().waitFor({ timeout: 120000 });
+
 // conferência
 await page.getByRole('button', { name: /Seguir para a conferência/ }).click();
 await page.getByText('Cabeçalho do RH').waitFor();
 assert.equal(await page.locator('label.campo', { hasText: 'Nº DA REQUISIÇÃO DE COMPRA' }).locator('input').inputValue(), '4100630001');
 assert.equal(await page.locator('label.campo', { hasText: 'FORNECEDOR' }).first().locator('input').inputValue(), '90011 - ALFA EQUIPAMENTOS INDUSTRIAIS LTDA');
+assert.equal(await page.locator('label.campo', { hasText: 'GESTOR' }).first().locator('input').inputValue(), 'Joana Exemplo Lima', 'gestor lido do print');
 await foto('3-conferencia.png');
 
 // corrigir a unidade da Gama no item 6 (PC → M2, preço convertido): 50 placas de 0,5 m² = 25 m²

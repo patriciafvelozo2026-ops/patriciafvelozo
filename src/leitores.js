@@ -15,6 +15,9 @@
   const ext = (n) => (String(n).match(/\.([^.\/]+)$/) || [, ''])[1].toLowerCase();
   const LEGIVEIS = new Set(['xlsx', 'xlsm', 'xls', 'csv', 'ods', 'docx', 'docm', 'pdf', 'txt', 'eml', 'msg']);
   const COMPACTADOS = new Set(['zip', '7z', 'rar']);
+  const IMAGENS = new Set(['png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'tif', 'tiff']);
+  const MAX_OCR = 30; // imagens lidas por OCR em cada envio (as demais só entram na lista)
+  const legivelPara = (libs, x, tam) => (LEGIVEIS.has(x) || (libs.ocr && IMAGENS.has(x) && tam >= 20 * 1024)) && tam <= MAX_LEITURA;
   const MAX_LEITURA = 150 * 1024 * 1024; // arquivo individual acima disso é só listado
   let seq = 0;
   const novoId = () => 'D' + Date.now().toString(36) + (seq++).toString(36);
@@ -54,8 +57,8 @@
         const b = new Uint8Array(await f.arrayBuffer());
         await abrirCompactado(libs, b, x, caminho.replace(/\.(zip|7z|rar)$/i, '') + '/', emitir, avisar, 0, f.name);
       } else {
-        const legivel = LEGIVEIS.has(x) && f.size <= MAX_LEITURA;
-        avisar(`Lendo ${f.name}`);
+        const legivel = legivelPara(libs, x, f.size);
+        avisar(`${IMAGENS.has(x) && libs.ocr ? 'Lendo imagem (OCR)' : 'Lendo'} ${f.name}`);
         await emitir({ id: novoId(), nome: f.name, caminho, ext: x, tamanho: f.size, bytes: legivel ? new Uint8Array(await f.arrayBuffer()) : null });
       }
     }
@@ -80,8 +83,8 @@
           const b = await z.async('uint8array');
           await abrirCompactado(libs, b, x, caminho.replace(/\.(zip|7z|rar)$/i, '') + '/', emitir, avisar, nivel + 1, n);
         } else {
-          const legivel = LEGIVEIS.has(x) && tam <= MAX_LEITURA;
-          if (legivel) avisar(`Lendo ${n.split('/').pop()}`);
+          const legivel = legivelPara(libs, x, tam);
+          if (legivel) avisar(`${IMAGENS.has(x) ? 'Lendo imagem (OCR)' : 'Lendo'} ${n.split('/').pop()}`);
           const b = legivel ? await z.async('uint8array') : null;
           await emitir({ id: novoId(), nome: n.split('/').pop(), caminho, ext: x, tamanho: b ? b.length : tam, bytes: b });
         }
@@ -125,8 +128,8 @@
           sz.FS.unlink(p);
           await abrirCompactado(libs, b, x, caminho.replace(/\.(zip|7z|rar)$/i, '') + '/', emitir, avisar, nivel + 1, n);
         } else {
-          const legivel = LEGIVEIS.has(x) && st.size <= MAX_LEITURA;
-          if (legivel) avisar(`Lendo ${n}`);
+          const legivel = legivelPara(libs, x, st.size);
+          if (legivel) avisar(`${IMAGENS.has(x) ? 'Lendo imagem (OCR)' : 'Lendo'} ${n}`);
           const b = legivel ? sz.FS.readFile(p) : null;
           sz.FS.unlink(p);
           await emitir({ id: novoId(), nome: n, caminho, ext: x, tamanho: st.size, bytes: b });
@@ -266,8 +269,18 @@
       pg.cleanup();
     }
     const n = pdf.numPages;
+    let ocr = false;
+    // PDF escaneado (só imagem): lê as primeiras páginas por OCR
+    if (!lines.length && libs.ocr && libs.ocr.paginaParaCanvas && podeOcr(libs)) {
+      for (let p = 1; p <= Math.min(n, 3); p++) {
+        const canvas = await libs.ocr.paginaParaCanvas(await pdf.getPage(p));
+        const txt = await libs.ocr.reconhecer(canvas);
+        txt.split(/\r?\n/).map((t) => t.trim()).filter(Boolean).forEach((t) => lines.push({ t, p }));
+        ocr = true;
+      }
+    }
     await pdf.destroy();
-    return { kind: 'text', lines, tables: [], paginas: n, paginasLidas: paginas };
+    return { kind: 'text', lines, tables: [], paginas: n, paginasLidas: paginas, ocr };
   }
 
   // ------------------------------------------------------------ Excel
@@ -289,6 +302,34 @@
       return { name: n, rows: pre.concat(rows.map((r) => colPre.concat(r.map((c) => (typeof c === 'string' ? c.trim() || null : c))))) };
     });
     return { kind: 'sheets', sheets };
+  }
+
+  function podeOcr(libs) {
+    libs._ocrFeitos = libs._ocrFeitos || 0;
+    if (libs._ocrFeitos >= MAX_OCR) return false;
+    libs._ocrFeitos++;
+    return true;
+  }
+
+  // a mesma imagem costuma vir repetida (zip dentro de zip, assinatura de e-mail): lê uma vez só
+  function digital(bytes) {
+    let h = 2166136261;
+    const passo = Math.max(1, Math.floor(bytes.length / 4096));
+    for (let i = 0; i < bytes.length; i += passo) h = Math.imul(h ^ bytes[i], 16777619);
+    return bytes.length + ':' + (h >>> 0);
+  }
+
+  async function lerImagem(libs, bytes) {
+    const chave = digital(bytes);
+    libs._ocrCache = libs._ocrCache || new Map();
+    let txt = libs._ocrCache.get(chave);
+    if (txt == null) {
+      if (!podeOcr(libs)) return { conteudo: null, aviso: `Imagem não lida: limite de ${MAX_OCR} imagens por envio.` };
+      txt = await libs.ocr.reconhecer(bytes);
+      libs._ocrCache.set(chave, txt);
+    }
+    const lines = txt.split(/\r?\n/).map((t) => t.trim()).filter(Boolean).map((t) => ({ t, p: 1 }));
+    return { conteudo: { kind: 'text', lines, tables: [], ocr: true } };
   }
 
   function lerTxt(bytes) {
@@ -419,6 +460,7 @@
       if (e === 'txt') return { conteudo: lerTxt(entrada.bytes) };
       if (e === 'eml') return lerEml(entrada.bytes);
       if (e === 'msg') return lerMsg(libs, entrada.bytes);
+      if (IMAGENS.has(e) && libs.ocr) return await lerImagem(libs, entrada.bytes);
       return { conteudo: null };
     } catch (err) {
       return { conteudo: null, erro: `Não consegui ler o arquivo (${err && err.message ? err.message : err}).` };
@@ -444,12 +486,13 @@
         if (COMPACTADOS.has(x)) {
           await abrirCompactado(libs, a.bytes, x, filho.caminho.replace(/\.(zip|7z|rar)$/i, '') + '/', processar, () => {}, 1, a.nome);
         } else {
-          if (!LEGIVEIS.has(x)) filho.bytes = null;
+          if (!legivelPara(libs, x, filho.tamanho) || (IMAGENS.has(x) && filho.tamanho < 40 * 1024)) filho.bytes = null;
           await processar(filho);
         }
       }
       if (aoProgresso && saida.length % 3 === 0) await new Promise((ok) => setTimeout(ok, 0));
     };
+    libs._ocrFeitos = 0;
     const prog = await percorrer(libs, arquivos, processar, aoProgresso);
     // remove a pasta raiz comum (ex.: "RC-123 Objeto/…") para caminhos mais limpos
     for (let volta = 0; volta < 3; volta++) {
@@ -469,5 +512,5 @@
       .map((r) => r.map((c) => (c instanceof Date ? c.toLocaleDateString('pt-BR') : c == null ? '' : c)).join('\t')).join('\n')).join('\n\n').slice(0, max);
   }
 
-  return { lerTudo, lerArrasto, extrair, textoPlano, ext, decodificarNome, lerEml, MB, LEGIVEIS };
+  return { lerTudo, lerArrasto, extrair, textoPlano, ext, decodificarNome, lerEml, MB, LEGIVEIS, IMAGENS };
 });

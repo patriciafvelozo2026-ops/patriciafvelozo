@@ -3,9 +3,9 @@ To: Suprimentos <suprimentos@exemplo.com>
 Date: Tue, 18 Aug 2026 09:12:00 -0300
 Subject: =?UTF-8?B?UkU6IFJDIDQxMDA2MzAwMDEgLSByb2xldGVzIGUgY29ycmVpYSBUQy0xMiB8IERlIGFjb3Jkbw==?=
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="FLOW-limite-s73nz0v0lo"
+Content-Type: multipart/mixed; boundary="FLOW-limite-oq5ywewgzp"
 
---FLOW-limite-s73nz0v0lo
+--FLOW-limite-oq5ywewgzp
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 
@@ -16,4 +16,4 @@ cmVpYSBhdHVhbCBlc3TDoSBubyBmaW0gZGEgdmlkYSDDunRpbCBlIGEgcGFyYWRhIHByb2dyYW1h
 ZGEgZGUgbm92ZW1icm8gZXhpZ2UgbyBtYXRlcmlhbCBlbSBjYW1wbyBhdMOpIDMwLzEwLgoKQXRl
 bmNpb3NhbWVudGUsCkNhcmxvcyBNZW5lemVzCkdlcsOqbmNpYSBkZSBNYW51dGVuw6fDo28gZGUg
 Q29ycmVpYXMgKGZpY3TDrWNpbyk=
---FLOW-limite-s73nz0v0lo--
+--FLOW-limite-oq5ywewgzp--

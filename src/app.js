@@ -8,6 +8,7 @@
     XLSX, JSZip, pdfjsLib, ExcelJS, PizZip, html2canvas: window.html2canvas, jsPDF: window.jspdf && window.jspdf.jsPDF,
     SevenZip: window.SevenZip, MsgReader: window.MsgReader, DOMParser: window.DOMParser, XMLSerializer: window.XMLSerializer, RHSamarco: window.RHSamarco,
     wasm7z: () => (wasm7z = wasm7z || (window.FLOW_7Z_WASM_B64 ? b64bytes(window.FLOW_7Z_WASM_B64) : undefined)),
+    ocr: window.FlowOCR && window.FlowOCR.disponivel() ? window.FlowOCR : null,
   };
   const val = E.val;
 
@@ -286,7 +287,8 @@
         <input ref=${refPasta} type="file" multiple hidden onChange=${(e) => e.target.files.length && processar([...e.target.files])} />
         <input ref=${refZip} type="file" multiple hidden onChange=${(e) => e.target.files.length && processar([...e.target.files], e.target.files[0].name)} />
         <p class="drop-nota"><${Icone} n="cadeado" t=${13} /> Os arquivos são lidos aqui, neste computador. Nada é instalado e nenhum dado sai da máquina.</p>
-        <p class="drop-nota">Pasta grande? Suba em partes: depois de abrir, use <b>Adicionar mais arquivos</b> na etapa Documentos. Imagens e vídeos não ocupam memória, só são listados.</p>
+        <p class="drop-nota">Pasta grande? Suba em partes: depois de abrir, use <b>Adicionar mais arquivos</b> na etapa Documentos. Vídeos só são listados.</p>
+        <p class="drop-nota">${libs.ocr ? html`<b>Lê também prints e fotos</b> (telas do SAP, cláusulas coladas no e-mail, PDF escaneado) por reconhecimento de texto feito aqui mesmo, até ${30} imagens por envio.` : 'Prints e fotos são listados, mas não lidos neste navegador.'}</p>
       </div>
       <div class="cartoes">
         ${st && html`<button class="cartao" onClick=${() => setEtapa('documentos')}><b>Voltar ao processo aberto</b><span>RC ${val(st.processo.rc) || st.nomeProcesso}</span></button>`}
@@ -535,7 +537,7 @@
   const ORDEM_CAB = ['contrato', 'gerencia', 'fornecedorRH', 'dataDocumento', 'objeto', 'valorRC', 'numeroRC', 'valorAditivo', 'valorContratado', 'custoEvitado',
     'vigencia', 'prazo', 'condPagamento', 'regime', 'incoterm', 'reajuste', 'dataBase', 'rescisao', 'multa', 'classificacao', 'gerenciaRequisitante',
     'unidade', 'gestor', 'responsavel', 'formalizacao', 'rfq', 'explicacaoME', 'sharepoint'];
-  const PADRAO_CAMPOS = ['responsavel', 'gerencia', 'unidade', 'formalizacao'];
+  const PADRAO_CAMPOS = E.CAMPOS_PADRAO;
 
   function PainelCabecalho({ st, eq, mudar, avisar }) {
     const tipo = val(st.tipoProcesso);
@@ -547,7 +549,7 @@
       PADRAO_CAMPOS.forEach((k) => { if (val(cab[k])) p[k] = val(cab[k]); });
       gravar(CHAVE_PADRAO, JSON.stringify(p));
       mudar((s) => { s.cabPadrao = p; }, false);
-      avisar('Padrão salvo: responsável, gerência, unidade e formalização entram sozinhos nos próximos RH.');
+      avisar('Padrão salvo: responsável, gerência, unidade, formalização, rescisão, multa, regime e explicação do ME entram sozinhos nos próximos RH (só onde o processo não trouxer outro valor).');
     };
     return html`<section class="painel"><h2>Cabeçalho do RH ${vazios ? html`<span class="cont ruim">${vazios} em branco</span>` : html`<span class="cont bom">completo</span>`}
       <button class="btn link dir" onClick=${() => setAberto(!aberto)}>${aberto ? 'recolher' : 'mostrar'}</button></h2>
@@ -557,7 +559,7 @@
           onFim=${(v) => mudar((s) => { s.cab[k] = { v, fonte: 'editado' }; })} />`)}
       </div>
       <p class="mut">Os campos com "calculado" são atualizados pelo FLOW (fornecedor, valor, custo evitado, prazo). Ao editar, vale o que você escreveu.
-        <button class="btn link" onClick=${salvarPadrao}>Guardar responsável, gerência, unidade e formalização como meu padrão</button></p>`}
+        <button class="btn link" onClick=${salvarPadrao}>Guardar responsável, gerência, unidade, formalização, rescisão, multa e regime como meu padrão</button></p>`}
     </section>`;
   }
 
