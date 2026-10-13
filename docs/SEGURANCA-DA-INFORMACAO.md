@@ -1,0 +1,33 @@
+# FLOW Express: nota para "de acordo" da Segurança da Informação
+
+**O que é:** um arquivo HTML estático (`FLOW-Express.html`, ~3,5 MB) usado pelos compradores de Suprimentos
+para montar o RH a partir da pasta de um processo de compra.
+
+## Como funciona, do ponto de vista de segurança
+
+| Ponto | Situação |
+|---|---|
+| Instalação | Nenhuma. O arquivo é aberto no Edge ou no Chrome. |
+| Servidor / API / nuvem | Nenhum. Não há backend nem chamadas a APIs. |
+| Acesso à internet | Nenhum. Todas as bibliotecas estão **embutidas** no arquivo, e não há chamadas de rede (verificado em teste automatizado com a rede bloqueada). |
+| Onde os documentos são lidos | Na memória do navegador, no computador do comprador. |
+| O que fica gravado | Os dados extraídos do processo atual (texto e valores, não os arquivos originais) e o modelo de RH carregado ficam no armazenamento local do navegador (`localStorage`) daquele usuário, para retomar o trabalho. O botão *Novo RH* apaga o processo atual. |
+| Saídas | Arquivos baixados pelo próprio usuário: RH (.docx), RH padrão FLOW (PDF via impressão do navegador), equalização (.xlsx) e dados do processo (.json). |
+| Distribuição | Uma cópia do arquivo numa pasta do SharePoint com acesso restrito a Suprimentos. |
+| Atualização | Uma nova versão do arquivo substitui a anterior no SharePoint. O número da versão aparece na descrição do arquivo. |
+
+## Bibliotecas embutidas (código aberto, versões fixas)
+
+| Biblioteca | Versão | Licença | Uso |
+|---|---|---|---|
+| SheetJS (xlsx) | 0.18.5 | Apache-2.0 | Ler planilhas |
+| ExcelJS | 4.4.0 | MIT | Gerar a planilha de equalização |
+| JSZip | 3.10.2 | MIT | Abrir .zip e .docx |
+| PDF.js (pdfjs-dist) | 3.11.174 | Apache-2.0 | Ler PDF com texto |
+| docxtemplater + PizZip | 3.71.0 / 3.3.0 | MIT | Preencher o modelo de RH em Word |
+| Preact + htm | 3.1.1 | MIT / Apache-2.0 | Interface |
+
+## Pontos para avaliação
+
+- Os documentos tratados são internos (propostas, RC, atas). Eles não saem da máquina, mas o `localStorage` guarda os dados extraídos do processo aberto até o usuário clicar em *Novo RH*. Em computador compartilhado, recomenda-se usar *Novo RH* ao terminar.
+- O código-fonte é legível e fica no repositório do projeto (`src/`). O arquivo final é gerado por `npm run build`.
