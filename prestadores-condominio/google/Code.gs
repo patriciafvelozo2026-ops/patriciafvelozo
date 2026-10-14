@@ -19,9 +19,20 @@ var MAX_HISTORICO = 100;
 var TAMANHO_PEDACO = 3000; // cada propriedade aceita até 9 KB
 
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
+  return HtmlService.createTemplateFromFile('Index').evaluate()
     .setTitle(TITULO)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+/** A logomarca fica no arquivo Logo.html; se ele faltar, a página abre sem logo. */
+function logo() {
+  try {
+    var html = HtmlService.createHtmlOutputFromFile('Logo').getContent().trim();
+    // Logo colada pela metade quebraria a página inteira: nesse caso, fica sem logo.
+    return /^<div class="marca"><img src="data:image\/webp;base64,[A-Za-z0-9+\/=]+"[^<>]*><\/div>$/.test(html) ? html : '';
+  } catch (e) {
+    return '';
+  }
 }
 
 /** Chamado pela página ao abrir e ao voltar para ela. */
