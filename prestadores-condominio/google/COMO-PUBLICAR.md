@@ -9,7 +9,7 @@ Faça uma vez só, de preferência no computador, logada na sua conta Google.
    Apague o que vier e cole o conteúdo de `Index.html`.
 5. Repita o passo 4 criando um arquivo HTML chamado **Logo** com o conteúdo de `Logo.html`.
    Salve (ícone de disquete ou Ctrl+S). Confira o fim de cada arquivo: `Code.gs` termina com `];`,
-   `Index.html` com `</html>` e `Logo.html` com `</div>`.
+   `Index.html` com `</html>`. O `Logo.html` é só um texto longo com o código da imagem.
 6. Clique em **Implantar** → **Nova implantação** → engrenagem → **App da Web**.
    - Executar como: **Eu**
    - Quem pode acessar: **Qualquer pessoa**
