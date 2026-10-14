@@ -5,6 +5,8 @@ Faça uma vez só, de preferência no computador, logada na sua conta Google.
 1. Entre em https://script.google.com e clique em **Novo projeto**.
 2. Dê o nome **Prestadores Villagio** (clique em "Projeto sem título", no alto).
 3. No arquivo **Código.gs** que já aparece, apague tudo e cole o conteúdo de `Code.gs`.
+   Clique no **+** → **Script**, dê o nome **Dados** e cole o conteúdo de `Dados.gs`.
+   A última linha de cada um diz "FIM DO ARQUIVO": se ela não aparecer, a cópia veio cortada.
 4. Clique no **+** ao lado de "Arquivos", escolha **HTML** e dê o nome **Index** (sem ".html").
    Apague o que vier e cole o conteúdo de `Index.html`.
 5. Repita o passo 4 criando um arquivo HTML chamado **Logo** com o conteúdo de `Logo.html`.
