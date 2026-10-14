@@ -1,4 +1,4 @@
-<title>Prestadores do Condomínio</title>
+<title>Prestadores Villagio Campo Grande</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;display=swap">
 <style id="estilo">
 /* Layout: cabeçalho com busca fixa no topo, lista agrupada por categoria, botão de adicionar flutuante. */
@@ -32,6 +32,8 @@ button, input, select { font: inherit; color: inherit; }
 .cabeca { padding-block: 22px 6px; }
 h1 { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(26px, 7vw, 36px); line-height: 1.05;
   letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.selo { margin: 0 0 6px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--acento); }
 .linha-fina { color: var(--suave); margin: 6px 0 0; font-size: 15px; }
 .barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--fundo);
   padding-block: 10px 8px; border-bottom: 1px solid var(--linha); }
@@ -101,7 +103,8 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
 <template id="molde">
   <div class="pagina">
     <header class="cabeca">
-      <h1>Prestadores do Condomínio</h1>
+      <p class="selo">Villagio Campo Grande Residencial</p>
+      <h1>Prestadores de serviço</h1>
       <p class="linha-fina" id="resumo">Indicações dos vizinhos, num lugar só.</p>
     </header>
     <div class="barra">
@@ -354,7 +357,7 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
   }
 
   function prepararSugestao(v) {
-    var linhas = [editando ? "*Correção* para a lista de prestadores do condomínio:" : "*Sugestão* para a lista de prestadores do condomínio:"];
+    var linhas = [editando ? "*Correção* para a lista de prestadores do Villagio Campo Grande:" : "*Sugestão* para a lista de prestadores do Villagio Campo Grande:"];
     if (editando) linhas.push("Antes: " + editando.servico + " – " + editando.nome + " – " + formatarTel(editando.tel));
     linhas.push("Serviço: " + v.servico, "Nome: " + v.nome, "Telefone: " + formatarTel(v.tel), "Categoria: " + v.cat);
     if (v.insta) linhas.push("Instagram: @" + v.insta);
@@ -406,7 +409,7 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
   function documento(d) {
     var json = JSON.stringify(d).replace(/</g, "\\u003c");
     return INICIO_DOC +
-      "<title>Prestadores do Condomínio</title>\n" +
+      "<title>Prestadores Villagio Campo Grande</title>\n" +
       document.querySelector('link[href*="fonts.googleapis.com"]').outerHTML + "\n" +
       $("estilo").outerHTML + "\n" +
       $("molde").outerHTML + "\n" +
