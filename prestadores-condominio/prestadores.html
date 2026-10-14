@@ -1,0 +1,495 @@
+<title>Prestadores do Condomínio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;display=swap">
+<style id="estilo">
+/* Layout: cabeçalho com busca fixa no topo, lista agrupada por categoria, botão de adicionar flutuante. */
+:root {
+  --fundo: #eef2f4; --cartao: #ffffff; --tinta: #142128; --suave: #55666f; --linha: #d5dde1;
+  --acento: #1d5c8c; --acento-tinta: #ffffff; --acento-claro: #dce8f2;
+  --zap: #12804a; --zap-tinta: #ffffff; --perigo: #b42318; --aviso: #fbefcf; --sombra: rgba(20, 33, 40, .18);
+  --f-titulo: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #0f171c; --cartao: #172229; --tinta: #e6edf0; --suave: #9fb1ba; --linha: #28363e;
+    --acento: #82b8e4; --acento-tinta: #0b1419; --acento-claro: #1c3447;
+    --zap: #34c172; --zap-tinta: #04210f; --perigo: #f4978e; --aviso: #3a3116; --sombra: rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #0f171c; --cartao: #172229; --tinta: #e6edf0; --suave: #9fb1ba; --linha: #28363e;
+  --acento: #82b8e4; --acento-tinta: #0b1419; --acento-claro: #1c3447;
+  --zap: #34c172; --zap-tinta: #04210f; --perigo: #f4978e; --aviso: #3a3116; --sombra: rgba(0, 0, 0, .5);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--fundo); color: var(--tinta); font: 16px/1.45 var(--f-texto); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.pagina { max-width: 760px; margin: 0 auto; padding: 0 16px 120px; }
+.cabeca { padding-block: 22px 6px; }
+h1 { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(26px, 7vw, 36px); line-height: 1.05;
+  letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.linha-fina { color: var(--suave); margin: 6px 0 0; font-size: 15px; }
+.barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--fundo);
+  padding-block: 10px 8px; border-bottom: 1px solid var(--linha); }
+.busca { width: 100%; padding: 12px 14px; border: 1px solid var(--linha); border-radius: 12px;
+  background: var(--cartao); font-size: 17px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-top: 10px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: flex; gap: 6px; align-items: baseline; border: 1px solid var(--linha);
+  background: var(--cartao); border-radius: 999px; padding: 6px 12px; font-size: 14px; cursor: pointer; }
+.chip span { color: var(--suave); font-variant-numeric: tabular-nums; font-size: 13px; }
+.chip[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--acento-tinta); }
+.chip[aria-pressed="true"] span { color: inherit; opacity: .8; }
+.aviso-leitura { background: var(--acento-claro); border-radius: 12px; padding: 10px 14px; margin-top: 14px;
+  font-size: 15px; }
+h2 { font-family: var(--f-titulo); font-weight: 600; font-size: 19px; margin: 26px 0 10px;
+  display: flex; gap: 8px; align-items: baseline; }
+h2 small { font-family: var(--f-texto); font-weight: 400; font-size: 14px; color: var(--suave); }
+.grupo { display: grid; gap: 10px; }
+.item { background: var(--cartao); border: 1px solid var(--linha); border-radius: 14px; padding: 14px;
+  display: grid; gap: 10px; }
+.item-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.item-topo > div { min-width: 0; }
+.servico { font-weight: 700; font-size: 17px; overflow-wrap: anywhere; }
+.nome { overflow-wrap: anywhere; }
+.numero { font-variant-numeric: tabular-nums; color: var(--suave); white-space: nowrap; user-select: all; }
+.extra { color: var(--suave); font-size: 14px; overflow-wrap: anywhere; }
+.corrigir { flex: none; border: 0; background: none; color: var(--suave); text-decoration: underline;
+  font-size: 14px; padding: 2px 4px; cursor: pointer; }
+.acoes { display: flex; gap: 8px; }
+.acoes > * { flex: 1; text-align: center; border-radius: 10px; padding: 10px 8px; font-weight: 700;
+  font-size: 15px; text-decoration: none; cursor: pointer; border: 0; }
+.zap { background: var(--zap); color: var(--zap-tinta); }
+.copiar { background: var(--acento-claro); color: var(--tinta); }
+.vazio { text-align: center; color: var(--suave); padding: 40px 10px; }
+.historico { margin-top: 34px; color: var(--suave); font-size: 14px; }
+.historico summary { cursor: pointer; }
+.historico ol { padding-left: 18px; margin: 8px 0 0; display: grid; gap: 4px; }
+.rodape { margin-top: 18px; color: var(--suave); font-size: 13px; }
+.novo { position: fixed; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 3;
+  border: 0; border-radius: 999px; background: var(--acento); color: var(--acento-tinta);
+  padding: 15px 22px; font-weight: 700; font-size: 17px; box-shadow: 0 6px 18px var(--sombra); cursor: pointer; }
+dialog { width: min(560px, calc(100% - 24px)); max-height: calc(100% - 24px); border: 0; padding: 0;
+  border-radius: 18px; background: var(--cartao); color: var(--tinta); }
+dialog::backdrop { background: rgba(8, 14, 18, .5); }
+form { padding: 20px 18px 16px; display: grid; gap: 4px; }
+form h3 { font-family: var(--f-titulo); font-weight: 800; font-size: 22px; margin: 0 0 8px; }
+label { font-weight: 700; font-size: 14px; margin-top: 8px; }
+label small { font-weight: 400; color: var(--suave); }
+input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha); border-radius: 10px;
+  background: var(--fundo); font-size: 16px; }
+.nota { border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 14px; background: var(--aviso); }
+.nota button { margin-top: 8px; margin-right: 6px; border: 1px solid var(--linha); background: var(--cartao);
+  border-radius: 8px; padding: 7px 10px; font-size: 14px; cursor: pointer; }
+.erro { color: var(--perigo); font-size: 14px; margin: 8px 0 0; }
+.botoes { display: flex; gap: 8px; margin-top: 14px; }
+.botoes > * { flex: 1; border-radius: 10px; padding: 12px; font-weight: 700; border: 0; cursor: pointer;
+  text-align: center; text-decoration: none; }
+.principal { background: var(--acento); color: var(--acento-tinta); }
+.secundario { background: var(--fundo); border: 1px solid var(--linha) !important; }
+.remover { border: 0; background: none; color: var(--perigo); padding: 10px; margin-top: 4px; cursor: pointer; }
+.toast { position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); z-index: 4;
+  transform: translateX(-50%); background: var(--tinta); color: var(--fundo); border-radius: 10px;
+  padding: 10px 16px; max-width: calc(100% - 32px); opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+<template id="molde">
+  <div class="pagina">
+    <header class="cabeca">
+      <h1>Prestadores do Condomínio</h1>
+      <p class="linha-fina" id="resumo">Indicações dos vizinhos, num lugar só.</p>
+    </header>
+    <div class="barra">
+      <input class="busca" id="busca" type="search" placeholder="Buscar: eletricista, salgado, Salomão…" autocomplete="off" aria-label="Buscar prestador">
+      <div class="chips" id="chips" role="toolbar" aria-label="Categorias"></div>
+    </div>
+    <p class="aviso-leitura" id="aviso-leitura" hidden>Para incluir alguém ou corrigir um número, toque em <b>Sugerir</b>. A sugestão vai pelo WhatsApp para quem cuida da lista.</p>
+    <main id="lista"></main>
+    <details class="historico" id="historico" hidden>
+      <summary>Últimas alterações</summary>
+      <ol id="historico-lista"></ol>
+    </details>
+    <p class="rodape" id="rodape"></p>
+  </div>
+  <button class="novo" id="novo" type="button">+ Adicionar</button>
+  <dialog id="dialogo" aria-labelledby="form-titulo">
+    <form id="form" novalidate>
+      <h3 id="form-titulo">Adicionar prestador</h3>
+      <label for="f-servico">Serviço</label>
+      <input id="f-servico" name="servico" list="f-servicos" placeholder="Ex.: Eletricista" maxlength="120">
+      <datalist id="f-servicos"></datalist>
+      <label for="f-nome">Nome</label>
+      <input id="f-nome" name="nome" placeholder="Pessoa ou empresa" maxlength="80">
+      <label for="f-tel">Telefone / WhatsApp</label>
+      <input id="f-tel" name="tel" type="tel" inputmode="tel" placeholder="27 99999-9999" maxlength="25">
+      <label for="f-cat">Categoria</label>
+      <select id="f-cat" name="cat"></select>
+      <label for="f-insta">Instagram <small>(opcional)</small></label>
+      <input id="f-insta" name="insta" placeholder="@perfil" maxlength="60">
+      <label for="f-obs">Observação <small>(opcional)</small></label>
+      <input id="f-obs" name="obs" placeholder="Ex.: por encomenda, atende 24h" maxlength="160">
+      <label for="f-indicado">Indicado por <small>(opcional, só a torre e o apartamento)</small></label>
+      <input id="f-indicado" name="indicado" placeholder="Ex.: Esmeralda 1001" maxlength="40">
+      <div class="nota" id="f-nota" hidden></div>
+      <p class="erro" id="f-erro" role="alert" hidden></p>
+      <div class="botoes" id="f-botoes">
+        <button type="button" class="secundario" id="f-cancelar">Cancelar</button>
+        <button type="submit" class="principal" id="f-salvar">Salvar</button>
+      </div>
+      <div class="botoes" id="f-enviar" hidden>
+        <button type="button" class="secundario" id="f-voltar">Voltar</button>
+        <a class="zap" id="f-link" target="_blank" rel="noopener" href="https://wa.me/">Abrir no WhatsApp</a>
+      </div>
+      <button type="button" class="remover" id="f-remover" hidden>Remover da lista</button>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status"></div>
+</template>
+<div id="raiz"></div>
+<script type="application/json" id="dados">{"rev":1,"atualizada":"2026-10-14T21:30:00.000Z","ultimaEdicao":"","categorias":["Reparos e obras","Eletrodomésticos","Casa e decoração","Comida","Beleza e bem-estar","Carro e moto","Outros serviços"],"prestadores":[{"id":"lfxctnc","cat":"Reparos e obras","servico":"Marido de aluguel","nome":"Edilson","tel":"27992477907","insta":"","obs":"","indicado":""},{"id":"sbpcdp3","cat":"Reparos e obras","servico":"Marido de aluguel e eletricista","nome":"Salomão","tel":"27999135343","insta":"","obs":"","indicado":""},{"id":"eiw8uo9","cat":"Reparos e obras","servico":"Pedreiro","nome":"Devalcy","tel":"27999665049","insta":"","obs":"","indicado":""},{"id":"b4kfel3","cat":"Reparos e obras","servico":"Pedreiro","nome":"Natalino","tel":"27998054227","insta":"","obs":"","indicado":""},{"id":"guxntcc","cat":"Reparos e obras","servico":"Pedreiro","nome":"Pablo","tel":"27988864245","insta":"","obs":"","indicado":""},{"id":"hyplvqk","cat":"Reparos e obras","servico":"Eletricista","nome":"Baiano","tel":"27998493600","insta":"","obs":"","indicado":""},{"id":"2zius50","cat":"Reparos e obras","servico":"Eletricista","nome":"Starley","tel":"27996232605","insta":"","obs":"","indicado":""},{"id":"k9ep1fr","cat":"Reparos e obras","servico":"Engenheiro eletricista","nome":"Roger","tel":"27999896475","insta":"","obs":"","indicado":""},{"id":"by1u5lz","cat":"Reparos e obras","servico":"Pintor","nome":"Bruno","tel":"27999657313","insta":"","obs":"","indicado":""},{"id":"vuq48rx","cat":"Reparos e obras","servico":"Varal, rede e olho mágico","nome":"Emerson","tel":"27995787511","insta":"","obs":"","indicado":""},{"id":"czx93kn","cat":"Reparos e obras","servico":"Papel de parede","nome":"Hugou","tel":"27997906401","insta":"","obs":"","indicado":""},{"id":"yaqgec1","cat":"Eletrodomésticos","servico":"Conserto de geladeira","nome":"Junior","tel":"27997415439","insta":"","obs":"","indicado":""},{"id":"eio5cqt","cat":"Eletrodomésticos","servico":"Conserto de geladeira","nome":"Edgar","tel":"27998270313","insta":"","obs":"","indicado":""},{"id":"535kom5","cat":"Eletrodomésticos","servico":"Conserto de geladeira","nome":"Paulo","tel":"27999146416","insta":"","obs":"","indicado":""},{"id":"8fgiirv","cat":"Eletrodomésticos","servico":"Conserto de máquina de lavar","nome":"Marcos","tel":"27992918762","insta":"","obs":"","indicado":""},{"id":"japnu8y","cat":"Eletrodomésticos","servico":"Conserto de fogão","nome":"Dênio","tel":"27999574498","insta":"","obs":"","indicado":""},{"id":"swyb625","cat":"Eletrodomésticos","servico":"Conserto de ar-condicionado","nome":"Rodrigo","tel":"27998879427","insta":"","obs":"","indicado":""},{"id":"2oodwcc","cat":"Eletrodomésticos","servico":"Conserto de ar-condicionado","nome":"Marcelo","tel":"27999821700","insta":"","obs":"","indicado":""},{"id":"hfmbafd","cat":"Casa e decoração","servico":"Cortinas e persianas","nome":"Volkers Cortinas","tel":"27998167466","insta":"","obs":"","indicado":""},{"id":"na5wfjm","cat":"Casa e decoração","servico":"Loja de tintas","nome":"Espaço das Tintas","tel":"27998866243","insta":"","obs":"Contato: Rogério, Esmeralda 1001","indicado":""},{"id":"ne49qrd","cat":"Casa e decoração","servico":"Lavagem de sofá a seco","nome":"Deu Service","tel":"27995794538","insta":"","obs":"","indicado":""},{"id":"dmj3fa8","cat":"Casa e decoração","servico":"Gás do condomínio","nome":"Geraldo","tel":"27995047579","insta":"","obs":"","indicado":""},{"id":"tftat95","cat":"Comida","servico":"Restaurante marmitex","nome":"JC Restaurante","tel":"27996281561","insta":"","obs":"","indicado":""},{"id":"zjng1t2","cat":"Comida","servico":"Marmita fitness e salgados fitness","nome":"Marilia","tel":"27997839720","insta":"","obs":"","indicado":""},{"id":"li39433","cat":"Comida","servico":"Salgadinho de festa","nome":"Elda","tel":"27998374867","insta":"","obs":"","indicado":""},{"id":"0ismbbk","cat":"Comida","servico":"Salgadinho de festa","nome":"Márcia","tel":"27999767008","insta":"","obs":"","indicado":""},{"id":"jy8q798","cat":"Comida","servico":"Salgadinho de festa","nome":"Gleydi","tel":"27998247191","insta":"","obs":"","indicado":""},{"id":"nhihhw6","cat":"Comida","servico":"Feijão tropeiro, salpicão e torta salgada","nome":"Amanda","tel":"27997144152","insta":"","obs":"Por encomenda, para aniversários","indicado":""},{"id":"4rx2dx6","cat":"Beleza e bem-estar","servico":"Personal trainer","nome":"Wagner Neres","tel":"27996896093","insta":"","obs":"","indicado":""},{"id":"21rg2l2","cat":"Beleza e bem-estar","servico":"Personal trainer","nome":"Lorena","tel":"27988880735","insta":"","obs":"","indicado":""},{"id":"8oo80ge","cat":"Beleza e bem-estar","servico":"Personal trainer","nome":"Júlia","tel":"27995126230","insta":"","obs":"","indicado":""},{"id":"f63f39x","cat":"Beleza e bem-estar","servico":"Personal trainer","nome":"Victor","tel":"27999494948","insta":"","obs":"","indicado":""},{"id":"mtea8xs","cat":"Beleza e bem-estar","servico":"Cabeleireira domiciliar","nome":"Roseane Zanque","tel":"27988288229","insta":"","obs":"","indicado":""},{"id":"7p53hjk","cat":"Beleza e bem-estar","servico":"Maquiadora","nome":"Jenifer","tel":"27996324412","insta":"","obs":"","indicado":""},{"id":"ivjpe6m","cat":"Beleza e bem-estar","servico":"Estética e cosmetologia","nome":"Elizângela Caldeira","tel":"27999223494","insta":"","obs":"","indicado":""},{"id":"qv6p7st","cat":"Carro e moto","servico":"Baterias de carro e moto 24h","nome":"Thiago","tel":"27996060888","insta":"","obs":"","indicado":""},{"id":"sapga2g","cat":"Carro e moto","servico":"Borracheiro","nome":"Betho","tel":"27998792618","insta":"","obs":"","indicado":""},{"id":"r0ulst2","cat":"Outros serviços","servico":"Comunicação visual e gráfica rápida","nome":"Wendênnis","tel":"27999256616","insta":"","obs":"Adesivos, papel de parede, placas, lona e mais","indicado":""},{"id":"duij1su","cat":"Outros serviços","servico":"Planos de saúde, seguros, odontológicos e consórcios","nome":"Ingrid Rossin","tel":"27998098339","insta":"rmscorretorasaude","obs":"","indicado":""},{"id":"16pwssy","cat":"Outros serviços","servico":"Corretor(a) de imóveis","nome":"Kelli Leal","tel":"27999436125","insta":"","obs":"","indicado":""},{"id":"qtr7z57","cat":"Outros serviços","servico":"Corretor(a) de imóveis","nome":"Andrea Anholete","tel":"27997991412","insta":"","obs":"","indicado":""}],"historico":[]}</script>
+<script id="app">
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var CHAVE_RASCUNHO = "prestadores-rascunho";
+  var INICIO_DOC = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>';
+  var FIM_DOC = "</body></html>";
+
+  var dados = JSON.parse($("dados").textContent);
+  var estado = { filtro: "Todos", busca: "" };
+  var editando = null, confirmarRemocao = false, repetidoAceito = false;
+  var ns = null, podeSalvar = null; // null: ainda não sabemos
+
+  $("raiz").appendChild($("molde").content.cloneNode(true));
+
+  function sessao(chave, valor) {
+    try {
+      if (valor === undefined) return sessionStorage.getItem(chave);
+      if (valor === null) sessionStorage.removeItem(chave); else sessionStorage.setItem(chave, valor);
+    } catch (e) {}
+    return null;
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function semAcento(s) { return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+  function novoId() { return Math.random().toString(36).slice(2, 9); }
+  function limparTel(t) {
+    t = String(t || "").replace(/\D/g, "");
+    if (t.length > 11 && t.indexOf("55") === 0) t = t.slice(2);
+    if (t.length === 8 || t.length === 9) t = "27" + t;
+    return t;
+  }
+  function formatarTel(t) {
+    if (t.length === 11) return "(" + t.slice(0, 2) + ") " + t.slice(2, 7) + "-" + t.slice(7);
+    if (t.length === 10) return "(" + t.slice(0, 2) + ") " + t.slice(2, 6) + "-" + t.slice(6);
+    return t;
+  }
+  function dataCurta(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg; t.classList.add("on");
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { t.classList.remove("on"); }, 3000);
+  }
+  var temViewer = !!(window.claude && window.claude.use);
+  function modoSugestao() { return !temViewer || podeSalvar === false; }
+
+  // ---------- lista ----------
+  function desenharChips() {
+    var cont = {};
+    dados.prestadores.forEach(function (p) { cont[p.cat] = (cont[p.cat] || 0) + 1; });
+    var cats = ["Todos"].concat(dados.categorias.filter(function (c) { return cont[c]; }));
+    if (cats.indexOf(estado.filtro) < 0) estado.filtro = "Todos";
+    $("chips").innerHTML = cats.map(function (c) {
+      var n = c === "Todos" ? dados.prestadores.length : cont[c];
+      return '<button type="button" class="chip" aria-pressed="' + (c === estado.filtro) + '" data-cat="' + esc(c) + '">' +
+        esc(c) + " <span>" + n + "</span></button>";
+    }).join("");
+  }
+
+  function desenharLista() {
+    var termos = semAcento(estado.busca).split(/\s+/).filter(Boolean);
+    var buscaTel = estado.busca.replace(/\D/g, "");
+    var itens = dados.prestadores.filter(function (p) {
+      if (estado.filtro !== "Todos" && p.cat !== estado.filtro) return false;
+      var texto = semAcento([p.servico, p.nome, p.cat, p.obs, p.insta, p.indicado].join(" "));
+      return termos.every(function (t) { return texto.indexOf(t) >= 0 || (buscaTel.length >= 4 && p.tel.indexOf(buscaTel) >= 0); });
+    });
+    if (!itens.length) {
+      $("lista").innerHTML = '<p class="vazio">' + (dados.prestadores.length
+        ? "Ninguém encontrado com essa busca.<br>Conhece alguém bom? Toque em <b>" + (modoSugestao() ? "+ Sugerir" : "+ Adicionar") + "</b>."
+        : "A lista ainda está vazia. Toque em <b>+ Adicionar</b> para incluir o primeiro prestador.") + "</p>";
+      return;
+    }
+    var ordem = dados.categorias;
+    itens.sort(function (a, b) {
+      return (ordem.indexOf(a.cat) - ordem.indexOf(b.cat)) || a.servico.localeCompare(b.servico, "pt") ||
+        a.nome.localeCompare(b.nome, "pt");
+    });
+    var grupos = [];
+    itens.forEach(function (p) {
+      var g = grupos[grupos.length - 1];
+      if (!g || g.cat !== p.cat) grupos.push(g = { cat: p.cat, itens: [] });
+      g.itens.push(p);
+    });
+    $("lista").innerHTML = grupos.map(function (g) {
+      return "<h2>" + esc(g.cat) + " <small>" + g.itens.length + "</small></h2><div class=\"grupo\">" +
+        g.itens.map(cartao).join("") + "</div>";
+    }).join("");
+  }
+
+  function cartao(p) {
+    var extras = [];
+    if (p.obs) extras.push(esc(p.obs));
+    if (p.insta) extras.push("Instagram @" + esc(p.insta));
+    if (p.indicado) extras.push("Indicado por " + esc(p.indicado));
+    return '<article class="item"><div class="item-topo"><div>' +
+      '<div class="servico">' + esc(p.servico) + "</div>" +
+      '<div class="nome">' + esc(p.nome) + ' · <span class="numero">' + esc(formatarTel(p.tel)) + "</span></div>" +
+      (extras.length ? '<div class="extra">' + extras.join(" · ") + "</div>" : "") +
+      '</div><button type="button" class="corrigir" data-id="' + esc(p.id) + '">Corrigir</button></div>' +
+      '<div class="acoes"><a class="zap" target="_blank" rel="noopener" href="https://wa.me/55' + esc(p.tel) + '">WhatsApp</a>' +
+      '<button type="button" class="copiar" data-tel="' + esc(p.tel) + '">Copiar número</button></div></article>';
+  }
+
+  function desenharResto() {
+    var n = dados.prestadores.length;
+    $("resumo").textContent = n + (n === 1 ? " contato indicado" : " contatos indicados") + " pelos vizinhos.";
+    $("rodape").textContent = "Lista atualizada em " + dataCurta(dados.atualizada) + ".";
+    $("novo").textContent = modoSugestao() ? "+ Sugerir" : "+ Adicionar";
+    $("aviso-leitura").hidden = !modoSugestao();
+    $("historico").hidden = !dados.historico.length;
+    $("historico-lista").innerHTML = dados.historico.map(function (h) {
+      return "<li>" + esc(dataCurta(h.quando)) + ": " + esc(h.acao) + " " + esc(h.resumo) + "</li>";
+    }).join("");
+  }
+
+  function desenhar() { desenharChips(); desenharLista(); desenharResto(); }
+
+  // ---------- formulário ----------
+  var CAMPOS = ["servico", "nome", "tel", "cat", "insta", "obs", "indicado"];
+
+  function abrirForm(p, rascunho) {
+    editando = p || null; confirmarRemocao = false; repetidoAceito = false;
+    var f = $("form");
+    f.reset();
+    $("form-titulo").textContent = modoSugestao()
+      ? (p ? "Sugerir correção" : "Sugerir prestador")
+      : (p ? "Corrigir contato" : "Adicionar prestador");
+    $("f-cat").innerHTML = dados.categorias.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("");
+    var servicos = {};
+    dados.prestadores.forEach(function (x) { servicos[x.servico] = 1; });
+    $("f-servicos").innerHTML = Object.keys(servicos).sort().map(function (s) {
+      return '<option value="' + esc(s) + '"></option>';
+    }).join("");
+    var base = rascunho || p;
+    if (base) {
+      CAMPOS.forEach(function (c) { f.elements[c].value = base[c] || ""; });
+      if (!rascunho) f.elements.tel.value = formatarTel(p.tel);
+    }
+    if (!base) f.elements.cat.value = estado.filtro !== "Todos" ? estado.filtro : "Outros serviços";
+    $("f-salvar").textContent = modoSugestao() ? "Preparar sugestão" : "Salvar";
+    $("f-remover").hidden = !p || modoSugestao();
+    $("f-remover").textContent = "Remover da lista";
+    $("f-nota").hidden = true;
+    $("f-erro").hidden = true;
+    $("f-botoes").hidden = false;
+    $("f-enviar").hidden = true;
+    $("dialogo").showModal();
+  }
+
+  function lerForm() {
+    var f = $("form"), v = {};
+    CAMPOS.forEach(function (c) { v[c] = f.elements[c].value.replace(/\s+/g, " ").trim(); });
+    v.insta = v.insta.replace(/^@/, "");
+    v.tel = limparTel(v.tel);
+    if (!v.servico) return { erro: "Escreva o serviço, por exemplo Eletricista." };
+    if (!v.nome) return { erro: "Escreva o nome da pessoa ou da empresa." };
+    if (v.tel.length < 10 || v.tel.length > 11) return { erro: "Confira o telefone: use DDD e número, como 27 99999-9999." };
+    return { valor: v };
+  }
+
+  function erroForm(msg) { $("f-erro").textContent = msg; $("f-erro").hidden = !msg; }
+
+  function nota(html) { $("f-nota").innerHTML = html; $("f-nota").hidden = false; }
+
+  function enviarForm() {
+    erroForm("");
+    var r = lerForm();
+    if (r.erro) return erroForm(r.erro);
+    var v = r.valor;
+    var repetido = dados.prestadores.filter(function (p) {
+      return p.tel === v.tel && (!editando || p.id !== editando.id);
+    })[0];
+    if (repetido && !repetidoAceito) {
+      nota("Esse telefone já está na lista: <b>" + esc(repetido.nome) + "</b> (" + esc(repetido.servico) + ").<br>" +
+        '<button type="button" id="n-abrir">Corrigir o que já existe</button><button type="button" id="n-seguir">Continuar mesmo assim</button>');
+      $("n-abrir").onclick = function () { $("dialogo").close(); abrirForm(repetido); };
+      $("n-seguir").onclick = function () { repetidoAceito = true; enviarForm(); };
+      return;
+    }
+    if (modoSugestao()) return prepararSugestao(v);
+    if (!ns) return erroForm("A página ainda está carregando. Espere um instante e toque em Salvar de novo.");
+    var lista;
+    if (editando) {
+      lista = dados.prestadores.map(function (p) {
+        return p.id === editando.id ? Object.assign({ id: p.id }, v) : p;
+      });
+      salvar(lista, "corrigiu", v.servico + " – " + v.nome, { id: editando.id, campos: v });
+    } else {
+      lista = dados.prestadores.concat([Object.assign({ id: novoId() }, v)]);
+      salvar(lista, "adicionou", v.servico + " – " + v.nome, { campos: v });
+    }
+  }
+
+  function prepararSugestao(v) {
+    var linhas = [editando ? "*Correção* para a lista de prestadores do condomínio:" : "*Sugestão* para a lista de prestadores do condomínio:"];
+    if (editando) linhas.push("Antes: " + editando.servico + " – " + editando.nome + " – " + formatarTel(editando.tel));
+    linhas.push("Serviço: " + v.servico, "Nome: " + v.nome, "Telefone: " + formatarTel(v.tel), "Categoria: " + v.cat);
+    if (v.insta) linhas.push("Instagram: @" + v.insta);
+    if (v.obs) linhas.push("Observação: " + v.obs);
+    if (v.indicado) linhas.push("Indicado por: " + v.indicado);
+    $("f-link").href = "https://wa.me/?text=" + encodeURIComponent(linhas.join("\n"));
+    nota("Pronto. Toque em <b>Abrir no WhatsApp</b> e envie a mensagem no grupo do condomínio. Quem cuida da lista atualiza para todos.");
+    $("f-botoes").hidden = true;
+    $("f-enviar").hidden = false;
+  }
+
+  function salvar(lista, acao, resumo, rascunho) {
+    var token = novoId() + novoId();
+    var agora = new Date().toISOString();
+    var proximo = {
+      rev: (dados.rev || 0) + 1, atualizada: agora, ultimaEdicao: token,
+      categorias: dados.categorias, prestadores: lista,
+      historico: [{ quando: agora, acao: acao, resumo: resumo }].concat(dados.historico).slice(0, 30)
+    };
+    sessao(CHAVE_RASCUNHO, JSON.stringify({ token: token, rascunho: rascunho }));
+    $("f-salvar").disabled = true; $("f-remover").disabled = true;
+    $("f-salvar").textContent = "Salvando…";
+    ns.publish(documento(proximo)).catch(function (e) {
+      var code = e && e.code;
+      $("f-salvar").disabled = false; $("f-remover").disabled = false;
+      $("f-salvar").textContent = "Salvar";
+      if (code === "conflict") {
+        nota("Outra pessoa salvou a lista agora mesmo. A página vai recarregar com a versão nova e o que você escreveu volta para você salvar de novo.");
+        return;
+      }
+      sessao(CHAVE_RASCUNHO, null);
+      if (["not_writer", "not_granted", "not_declared", "consent_required", "capability_disabled", "capability_removed"].indexOf(code) >= 0) {
+        podeSalvar = false;
+        desenharResto();
+        $("f-salvar").textContent = "Preparar sugestão";
+        $("f-remover").hidden = true;
+        nota("Você pode ver a lista, mas não pode salvar alterações daqui. Toque em <b>Preparar sugestão</b> para mandar pelo WhatsApp.");
+      } else if (code === "rate_limited") {
+        erroForm("Muitas alterações seguidas. Espere um minuto e toque em Salvar de novo.");
+      } else if (code === "too_large") {
+        erroForm("A lista ficou grande demais para salvar. Avise quem cuida da lista.");
+      } else {
+        erroForm("Não foi possível salvar agora. Confira a internet e toque em Salvar de novo.");
+      }
+    });
+  }
+
+  // Monta a página inteira de novo, com a lista nova embutida.
+  function documento(d) {
+    var json = JSON.stringify(d).replace(/</g, "\\u003c");
+    return INICIO_DOC +
+      "<title>Prestadores do Condomínio</title>\n" +
+      document.querySelector('link[href*="fonts.googleapis.com"]').outerHTML + "\n" +
+      $("estilo").outerHTML + "\n" +
+      $("molde").outerHTML + "\n" +
+      '<div id="raiz"></div>\n' +
+      '<script type="application/json" id="dados">' + json + "<\/script>\n" +
+      $("app").outerHTML + FIM_DOC;
+  }
+
+  // ---------- eventos ----------
+  $("busca").addEventListener("input", function (e) { estado.busca = e.target.value; desenharLista(); });
+  $("chips").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    estado.filtro = b.getAttribute("data-cat");
+    desenharChips(); desenharLista();
+  });
+  $("lista").addEventListener("click", function (e) {
+    var c = e.target.closest(".corrigir");
+    if (c) {
+      var id = c.getAttribute("data-id");
+      return abrirForm(dados.prestadores.filter(function (p) { return p.id === id; })[0]);
+    }
+    var b = e.target.closest(".copiar");
+    if (!b) return;
+    var tel = b.getAttribute("data-tel");
+    var ok = function () { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar número"; }, 1800); };
+    var manual = function () {
+      var n = b.closest(".item").querySelector(".numero");
+      var sel = window.getSelection(), r = document.createRange();
+      r.selectNodeContents(n); sel.removeAllRanges(); sel.addRange(r);
+      toast("Número selecionado. Use Copiar do seu celular.");
+    };
+    try { navigator.clipboard.writeText(tel).then(ok, manual); } catch (err) { manual(); }
+  });
+  $("novo").addEventListener("click", function () { abrirForm(null); });
+  $("f-cancelar").addEventListener("click", function () { $("dialogo").close(); });
+  $("f-voltar").addEventListener("click", function () {
+    $("f-botoes").hidden = false; $("f-enviar").hidden = true; $("f-nota").hidden = true;
+  });
+  $("f-link").addEventListener("click", function () {
+    setTimeout(function () { $("dialogo").close(); toast("Obrigado! Agora é só enviar no grupo."); }, 300);
+  });
+  $("form").addEventListener("submit", function (e) { e.preventDefault(); enviarForm(); });
+  $("f-remover").addEventListener("click", function () {
+    if (!confirmarRemocao) {
+      confirmarRemocao = true;
+      $("f-remover").textContent = "Toque de novo para confirmar a remoção";
+      return;
+    }
+    var alvo = editando;
+    salvar(dados.prestadores.filter(function (p) { return p.id !== alvo.id; }),
+      "removeu", alvo.servico + " – " + alvo.nome, { id: alvo.id, remover: true });
+  });
+
+  // ---------- início ----------
+  desenhar();
+
+  var guardado = sessao(CHAVE_RASCUNHO);
+  if (guardado) {
+    sessao(CHAVE_RASCUNHO, null);
+    try {
+      var r = JSON.parse(guardado);
+      if (r.token === dados.ultimaEdicao) {
+        toast("Salvo. Obrigado por ajudar!");
+      } else if (r.rascunho && !r.rascunho.remover) {
+        var alvo = dados.prestadores.filter(function (p) { return p.id === r.rascunho.id; })[0];
+        if (!r.rascunho.id || alvo) {
+          abrirForm(alvo || null, r.rascunho.campos);
+          nota("Outra pessoa salvou a lista enquanto você editava. Confira os dados e toque em Salvar de novo.");
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (temViewer) {
+    claude.use("artifact").then(function (a) {
+      ns = a;
+      if (!a) { podeSalvar = false; desenharResto(); return; }
+      return claude.use("user").then(function (u) {
+        if (!u) return;
+        return u.canEdit().then(function (v) { podeSalvar = v; desenharResto(); });
+      });
+    }).catch(function () { podeSalvar = false; desenharResto(); });
+  }
+})();
+</script>
