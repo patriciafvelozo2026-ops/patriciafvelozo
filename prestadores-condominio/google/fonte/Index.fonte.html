@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prestadores Villagio Campo Grande</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;display=swap">
+<style>
+/* Layout: cabeçalho, busca fixa, categorias em blocos com serviços agrupados; no computador, blocos em 2 colunas. */
+:root {
+  --fundo: #eef2f4; --cartao: #ffffff; --tinta: #142128; --suave: #55666f; --linha: #dfe5e8;
+  --acento: #1d5c8c; --acento-tinta: #ffffff; --acento-claro: #dce8f2;
+  --zap: #12804a; --zap-tinta: #ffffff; --perigo: #b42318; --aviso: #fbefcf; --sombra: rgba(20, 33, 40, .16);
+  --f-titulo: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-texto: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0f171c; --cartao: #172229; --tinta: #e6edf0; --suave: #9fb1ba; --linha: #26333a;
+    --acento: #82b8e4; --acento-tinta: #0b1419; --acento-claro: #1c3447;
+    --zap: #34c172; --zap-tinta: #04210f; --perigo: #f4978e; --aviso: #3a3116; --sombra: rgba(0, 0, 0, .5);
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--fundo); color: var(--tinta); font: 16px/1.4 var(--f-texto); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.pagina { max-width: 1100px; margin: 0 auto; padding: 0 16px 110px; }
+
+.cabeca { display: flex; align-items: center; gap: 14px; padding-block: 18px 4px; }
+.cabeca-texto { min-width: 0; }
+.marca { flex: none; order: 2; margin-left: auto; background: #fffdf8; border: 1px solid var(--linha);
+  border-radius: 12px; padding: 4px 8px; }
+.marca img { display: block; height: 46px; width: auto; }
+.selo { margin: 0 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--acento); }
+h1 { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(24px, 6.4vw, 36px); line-height: 1.05; margin: 0; text-wrap: balance; }
+.linha-fina { color: var(--suave); margin: 6px 0 0; font-size: 14px; }
+
+.barra { position: sticky; top: 0; z-index: 2; background: var(--fundo); padding-block: 10px 8px;
+  border-bottom: 1px solid var(--linha); }
+.busca { width: 100%; padding: 12px 14px; border: 1px solid var(--linha); border-radius: 12px; background: var(--cartao); font-size: 16px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-top: 8px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: flex; gap: 5px; align-items: baseline; border: 1px solid var(--linha); background: var(--cartao);
+  border-radius: 999px; padding: 6px 11px; font-size: 14px; cursor: pointer; }
+.chip span { color: var(--suave); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--acento); border-color: var(--acento); color: var(--acento-tinta); }
+.chip[aria-pressed="true"] span { color: inherit; opacity: .8; }
+
+#lista { display: grid; gap: 0 24px; align-items: start; }
+.categoria h2 { font-family: var(--f-titulo); font-weight: 600; font-size: 18px; margin: 20px 0 8px;
+  display: flex; gap: 8px; align-items: baseline; }
+.categoria h2 small { font-family: var(--f-texto); font-weight: 400; font-size: 13px; color: var(--suave); }
+.bloco { background: var(--cartao); border: 1px solid var(--linha); border-radius: 14px; overflow: hidden; }
+.grupo + .grupo { border-top: 6px solid var(--fundo); }
+.grupo h3 { margin: 0; padding: 10px 14px 4px; font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--acento); }
+.pessoa { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 14px; }
+.pessoa + .pessoa { border-top: 1px solid var(--linha); }
+.pessoa-info { flex: 1; min-width: 0; }
+.nome { font-weight: 700; overflow-wrap: anywhere; }
+.numero { color: var(--suave); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.extra { color: var(--suave); font-size: 13px; overflow-wrap: anywhere; }
+.zap { flex: none; background: var(--zap); color: var(--zap-tinta); text-decoration: none; font-weight: 700;
+  font-size: 14px; border-radius: 999px; padding: 9px 14px; }
+.mais { flex: none; width: 40px; height: 40px; border: 0; border-radius: 999px; background: none; color: var(--suave);
+  font-size: 22px; line-height: 1; cursor: pointer; }
+.mais:hover { background: var(--fundo); }
+.vazio { text-align: center; color: var(--suave); padding: 40px 10px; }
+
+.historico { margin-top: 30px; color: var(--suave); font-size: 14px; }
+.historico summary { cursor: pointer; }
+.historico ol { padding-left: 18px; margin: 8px 0 0; display: grid; gap: 4px; }
+.desfazer { margin-left: 6px; border: 1px solid var(--linha); background: var(--cartao); border-radius: 8px;
+  padding: 2px 8px; font-size: 13px; cursor: pointer; }
+.rodape { margin-top: 16px; color: var(--suave); font-size: 13px; }
+.novo { position: fixed; right: 16px; bottom: 18px; z-index: 3; border: 0; border-radius: 999px; background: var(--acento);
+  color: var(--acento-tinta); padding: 14px 20px; font-weight: 700; font-size: 16px; box-shadow: 0 6px 18px var(--sombra); cursor: pointer; }
+
+dialog { width: min(520px, calc(100% - 24px)); max-height: calc(100% - 24px); border: 0; padding: 0; border-radius: 18px;
+  background: var(--cartao); color: var(--tinta); }
+dialog::backdrop { background: rgba(8, 14, 18, .5); }
+form, .opcoes-corpo { padding: 20px 18px 16px; display: grid; gap: 4px; }
+form h3, .opcoes-corpo h3 { font-family: var(--f-titulo); font-weight: 800; font-size: 21px; margin: 0 0 6px; }
+label { font-weight: 700; font-size: 14px; margin-top: 8px; }
+label small { font-weight: 400; color: var(--suave); }
+input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha); border-radius: 10px; background: var(--fundo); font-size: 16px; }
+.nota { border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 14px; background: var(--aviso); }
+.nota button { margin: 8px 6px 0 0; border: 1px solid var(--linha); background: var(--cartao); border-radius: 8px; padding: 7px 10px; font-size: 14px; cursor: pointer; }
+.erro { color: var(--perigo); font-size: 14px; margin: 8px 0 0; }
+.botoes { display: flex; gap: 8px; margin-top: 14px; }
+.botoes > * { flex: 1; border-radius: 10px; padding: 12px; font-weight: 700; border: 0; cursor: pointer; text-align: center; text-decoration: none; }
+.principal { background: var(--acento); color: var(--acento-tinta); }
+.secundario { background: var(--fundo); border: 1px solid var(--linha) !important; }
+.remover { border: 0; background: none; color: var(--perigo); padding: 10px; margin-top: 4px; cursor: pointer; }
+.o-sub { color: var(--suave); margin: 0; }
+.o-numero { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 6px 0 4px; user-select: all; }
+.o-extra { color: var(--suave); font-size: 14px; margin: 0 0 6px; }
+.lista-acoes { display: grid; gap: 8px; margin-top: 8px; }
+.lista-acoes > * { border-radius: 12px; padding: 13px; font-weight: 700; text-align: center; text-decoration: none; border: 0; cursor: pointer; }
+.lista-acoes .zap { font-size: 16px; padding: 13px; }
+.lista-acoes .secundario { background: var(--acento-claro); border: 0 !important; }
+
+.toast { position: fixed; left: 50%; bottom: 84px; z-index: 4; transform: translateX(-50%); background: var(--tinta); color: var(--fundo);
+  border-radius: 10px; padding: 10px 16px; max-width: calc(100% - 32px); opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.on { opacity: 1; }
+@media (min-width: 820px) {
+  .cabeca { padding-block: 28px 10px; }
+  .marca img { height: 80px; }
+  .chips { flex-wrap: wrap; overflow: visible; }
+  #lista { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="cabeca">
+    <?!= logo() ?>
+    <div class="cabeca-texto">
+      <p class="selo">Villagio Campo Grande Residencial</p>
+      <h1>Prestadores de serviço</h1>
+      <p class="linha-fina" id="resumo">Indicações dos vizinhos, num lugar só.</p>
+    </div>
+  </header>
+  <div class="barra">
+    <input class="busca" id="busca" type="search" placeholder="Buscar: eletricista, salgado, Salomão…" autocomplete="off" aria-label="Buscar prestador">
+    <div class="chips" id="chips" role="toolbar" aria-label="Categorias"></div>
+  </div>
+  <main id="lista"><p class="vazio">Carregando a lista…</p></main>
+  <details class="historico" id="historico" hidden>
+    <summary>Últimas alterações</summary>
+    <ol id="historico-lista"></ol>
+  </details>
+  <p class="rodape"><span id="rodape"></span> Página criada por Patrícia Velozo Consultoria &amp; IA.</p>
+</div>
+<button class="novo" id="novo" type="button">+ Adicionar</button>
+
+<dialog id="opcoes" aria-labelledby="o-nome">
+  <div class="opcoes-corpo">
+    <p class="o-sub" id="o-servico"></p>
+    <h3 id="o-nome"></h3>
+    <p class="o-numero" id="o-numero"></p>
+    <p class="o-extra" id="o-extra"></p>
+    <div class="lista-acoes">
+      <a class="zap" id="o-zap" target="_blank" rel="noopener" href="https://wa.me/">Chamar no WhatsApp</a>
+      <button type="button" class="secundario" id="o-copiar">Copiar número</button>
+      <button type="button" class="secundario" id="o-corrigir">Corrigir ou remover</button>
+      <button type="button" class="secundario" id="o-fechar">Fechar</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dialogo" aria-labelledby="form-titulo">
+  <form id="form" novalidate>
+    <h3 id="form-titulo">Adicionar prestador</h3>
+    <label for="f-servico">Serviço</label>
+    <input id="f-servico" name="servico" list="f-servicos" placeholder="Ex.: Eletricista" maxlength="120">
+    <datalist id="f-servicos"></datalist>
+    <label for="f-nome">Nome</label>
+    <input id="f-nome" name="nome" placeholder="Pessoa ou empresa" maxlength="80">
+    <label for="f-tel">Telefone / WhatsApp</label>
+    <input id="f-tel" name="tel" type="tel" inputmode="tel" placeholder="27 99999-9999" maxlength="25">
+    <label for="f-cat">Categoria</label>
+    <select id="f-cat" name="cat"></select>
+    <label for="f-insta">Instagram <small>(opcional)</small></label>
+    <input id="f-insta" name="insta" placeholder="@perfil" maxlength="60">
+    <label for="f-obs">Observação <small>(opcional)</small></label>
+    <input id="f-obs" name="obs" placeholder="Ex.: por encomenda, atende 24h" maxlength="160">
+    <label for="f-indicado">Indicado por <small>(opcional, só a torre e o apartamento)</small></label>
+    <input id="f-indicado" name="indicado" placeholder="Ex.: Esmeralda 1001" maxlength="40">
+    <div id="campo-codigo" hidden>
+      <label for="f-codigo">Palavra do condomínio <small>(combinada no grupo)</small></label>
+      <input id="f-codigo" name="codigo" autocomplete="off">
+    </div>
+    <div class="nota" id="f-nota" hidden></div>
+    <p class="erro" id="f-erro" role="alert" hidden></p>
+    <div class="botoes">
+      <button type="button" class="secundario" id="f-cancelar">Cancelar</button>
+      <button type="submit" class="principal" id="f-salvar">Salvar</button>
+    </div>
+    <button type="button" class="remover" id="f-remover" hidden>Remover da lista</button>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var CACHE = "prestadores-villagio-v1", CHAVE_CODIGO = "prestadores-villagio-codigo";
+  var dados = { prestadores: [], categorias: [], historico: [], atualizada: "", pedeCodigo: false };
+  var estado = { filtro: "Todos", busca: "" };
+  var editando = null, aberto = null, confirmarRemocao = false, carregou = false;
+
+  function guardar(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function servidor(fn) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return new Promise(function (ok, falha) {
+      if (!(window.google && google.script && google.script.run)) return falha(new Error("Sem conexão com o servidor."));
+      var r = google.script.run.withSuccessHandler(ok).withFailureHandler(falha);
+      r[fn].apply(r, args);
+    });
+  }
+  function msgErro(e) { return String((e && e.message) || e || "").replace(/^Error:\s*/, ""); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function semAcento(s) { return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function formatarTel(t) {
+    t = String(t || "");
+    if (t.length === 11) return "(" + t.slice(0, 2) + ") " + t.slice(2, 7) + "-" + t.slice(7);
+    if (t.length === 10) return "(" + t.slice(0, 2) + ") " + t.slice(2, 6) + "-" + t.slice(6);
+    return t;
+  }
+  function dataCurta(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg; t.classList.add("on");
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { t.classList.remove("on"); }, 3000);
+  }
+  function porId(id) { return dados.prestadores.filter(function (p) { return p.id === id; })[0]; }
+  function extras(p) {
+    var x = [];
+    if (p.obs) x.push(p.obs);
+    if (p.insta) x.push("Instagram @" + p.insta);
+    if (p.indicado) x.push("Indicado por " + p.indicado);
+    return x.join(" · ");
+  }
+
+  function aplicar(d) {
+    dados = d;
+    carregou = true;
+    guardar(CACHE, JSON.stringify(d));
+    desenhar();
+  }
+
+  // ---------- lista ----------
+  function desenharChips() {
+    var cont = {};
+    dados.prestadores.forEach(function (p) { cont[p.cat] = (cont[p.cat] || 0) + 1; });
+    var cats = ["Todos"].concat(dados.categorias.filter(function (c) { return cont[c]; }));
+    if (cats.indexOf(estado.filtro) < 0) estado.filtro = "Todos";
+    $("chips").innerHTML = cats.map(function (c) {
+      var n = c === "Todos" ? dados.prestadores.length : cont[c];
+      return '<button type="button" class="chip" aria-pressed="' + (c === estado.filtro) + '" data-cat="' + esc(c) + '">' +
+        esc(c) + " <span>" + n + "</span></button>";
+    }).join("");
+  }
+
+  function desenharLista() {
+    if (!carregou) { $("lista").innerHTML = '<p class="vazio">Carregando a lista…</p>'; return; }
+    var termos = semAcento(estado.busca).split(/\s+/).filter(Boolean);
+    var buscaTel = estado.busca.replace(/\D/g, "");
+    var itens = dados.prestadores.filter(function (p) {
+      if (estado.filtro !== "Todos" && p.cat !== estado.filtro) return false;
+      var texto = semAcento([p.servico, p.nome, p.cat, p.obs, p.insta, p.indicado].join(" "));
+      return termos.every(function (t) { return texto.indexOf(t) >= 0 || (buscaTel.length >= 4 && p.tel.indexOf(buscaTel) >= 0); });
+    });
+    if (!itens.length) {
+      $("lista").innerHTML = '<p class="vazio">' + (dados.prestadores.length
+        ? "Ninguém encontrado com essa busca.<br>Conhece alguém bom? Toque em <b>+ Adicionar</b>."
+        : "A lista ainda está vazia. Toque em <b>+ Adicionar</b> para incluir o primeiro prestador.") + "</p>";
+      return;
+    }
+    var ordem = dados.categorias;
+    itens.sort(function (a, b) {
+      return (ordem.indexOf(a.cat) - ordem.indexOf(b.cat)) || a.servico.localeCompare(b.servico, "pt") ||
+        a.nome.localeCompare(b.nome, "pt");
+    });
+    // categoria > serviço > pessoas
+    var cats = [];
+    itens.forEach(function (p) {
+      var c = cats[cats.length - 1];
+      if (!c || c.nome !== p.cat) cats.push(c = { nome: p.cat, total: 0, grupos: [] });
+      var g = c.grupos[c.grupos.length - 1];
+      if (!g || semAcento(g.servico) !== semAcento(p.servico)) c.grupos.push(g = { servico: p.servico, pessoas: [] });
+      g.pessoas.push(p);
+      c.total++;
+    });
+    $("lista").innerHTML = cats.map(function (c) {
+      return '<section class="categoria"><h2>' + esc(c.nome) + " <small>" + c.total + "</small></h2>" +
+        '<div class="bloco">' + c.grupos.map(function (g) {
+          return '<div class="grupo"><h3>' + esc(g.servico) + "</h3>" + g.pessoas.map(linha).join("") + "</div>";
+        }).join("") + "</div></section>";
+    }).join("");
+  }
+
+  function linha(p) {
+    var x = extras(p);
+    return '<div class="pessoa"><div class="pessoa-info">' +
+      '<div class="nome">' + esc(p.nome) + "</div>" +
+      '<div class="numero">' + esc(formatarTel(p.tel)) + "</div>" +
+      (x ? '<div class="extra">' + esc(x) + "</div>" : "") + "</div>" +
+      '<a class="zap" target="_blank" rel="noopener" href="https://wa.me/55' + esc(p.tel) + '" aria-label="WhatsApp de ' + esc(p.nome) + '">WhatsApp</a>' +
+      '<button type="button" class="mais" data-id="' + esc(p.id) + '" aria-label="Mais opções para ' + esc(p.nome) + '">⋯</button></div>';
+  }
+
+  function desenharResto() {
+    var n = dados.prestadores.length;
+    $("resumo").textContent = carregou
+      ? n + (n === 1 ? " contato indicado" : " contatos indicados") + " pelos vizinhos. Qualquer um pode adicionar ou corrigir."
+      : "Indicações dos vizinhos, num lugar só.";
+    $("rodape").textContent = dados.atualizada ? "Lista atualizada em " + dataCurta(dados.atualizada) + "." : "";
+    $("historico").hidden = !dados.historico.length;
+    $("historico-lista").innerHTML = dados.historico.map(function (h) {
+      var desfazer = h.antes ? ' <button type="button" class="desfazer" data-hid="' + esc(h.hid) + '">' +
+        (h.acao === "removeu" ? "Restaurar" : "Desfazer") + "</button>" : "";
+      return "<li>" + esc(dataCurta(h.quando)) + ": " + esc(h.acao) + " " + esc(h.resumo) + desfazer + "</li>";
+    }).join("");
+  }
+
+  function desenhar() { desenharChips(); desenharLista(); desenharResto(); }
+
+  // ---------- opções de um contato ----------
+  function abrirOpcoes(p) {
+    aberto = p;
+    $("o-servico").textContent = p.servico;
+    $("o-nome").textContent = p.nome;
+    $("o-numero").textContent = formatarTel(p.tel);
+    $("o-extra").textContent = extras(p);
+    $("o-extra").hidden = !extras(p);
+    $("o-zap").href = "https://wa.me/55" + p.tel;
+    $("o-copiar").textContent = "Copiar número";
+    $("opcoes").showModal();
+  }
+
+  // ---------- formulário ----------
+  var CAMPOS = ["servico", "nome", "tel", "cat", "insta", "obs", "indicado"];
+
+  function abrirForm(p) {
+    editando = p || null; confirmarRemocao = false;
+    var f = $("form");
+    f.reset();
+    $("form-titulo").textContent = p ? "Corrigir contato" : "Adicionar prestador";
+    $("f-cat").innerHTML = dados.categorias.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("");
+    var servicos = {};
+    dados.prestadores.forEach(function (x) { servicos[x.servico] = 1; });
+    $("f-servicos").innerHTML = Object.keys(servicos).sort().map(function (s) {
+      return '<option value="' + esc(s) + '"></option>';
+    }).join("");
+    if (p) {
+      CAMPOS.forEach(function (c) { f.elements[c].value = p[c] || ""; });
+      f.elements.tel.value = formatarTel(p.tel);
+    } else {
+      f.elements.cat.value = estado.filtro !== "Todos" ? estado.filtro : "Outros serviços";
+    }
+    $("campo-codigo").hidden = !(dados.pedeCodigo && !ler(CHAVE_CODIGO));
+    $("f-remover").hidden = !p;
+    $("f-remover").textContent = "Remover da lista";
+    $("f-nota").hidden = true;
+    $("f-erro").hidden = true;
+    $("dialogo").showModal();
+  }
+
+  function erroForm(msg) { $("f-erro").textContent = msg; $("f-erro").hidden = !msg; }
+  function nota(html) { $("f-nota").innerHTML = html; $("f-nota").hidden = false; }
+  function ocupado(sim, texto) {
+    $("f-salvar").disabled = sim; $("f-remover").disabled = sim;
+    $("f-salvar").textContent = sim ? texto : "Salvar";
+  }
+
+  function enviar(op, mensagemOk) {
+    var codigo = $("f-codigo").value.trim() || ler(CHAVE_CODIGO) || "";
+    erroForm("");
+    ocupado(true, "Salvando…");
+    return servidor("salvar", op, codigo).then(function (r) {
+      ocupado(false);
+      if (r && r.repetido) {
+        var x = r.repetido;
+        nota("Esse telefone já está na lista: <b>" + esc(x.nome) + "</b> (" + esc(x.servico) + ").<br>" +
+          '<button type="button" id="n-abrir">Corrigir o que já existe</button><button type="button" id="n-seguir">Salvar mesmo assim</button>');
+        $("n-abrir").onclick = function () { $("dialogo").close(); abrirForm(x); };
+        $("n-seguir").onclick = function () { op.confirmarRepetido = true; enviar(op, mensagemOk); };
+        return;
+      }
+      if (codigo) guardar(CHAVE_CODIGO, codigo);
+      aplicar(r);
+      if ($("dialogo").open) $("dialogo").close();
+      toast(mensagemOk);
+    }).catch(function (e) {
+      ocupado(false);
+      var msg = msgErro(e);
+      if (/palavra do condom/i.test(msg)) { guardar(CHAVE_CODIGO, null); $("campo-codigo").hidden = false; }
+      if (!$("dialogo").open) return toast(msg || "Não foi possível salvar. Tente de novo.");
+      erroForm(msg || "Não foi possível salvar. Confira a internet e tente de novo.");
+      if (/removido por outra pessoa/i.test(msg)) atualizar();
+    });
+  }
+
+  function lerForm() {
+    var f = $("form"), v = {};
+    CAMPOS.forEach(function (c) { v[c] = f.elements[c].value.replace(/\s+/g, " ").trim(); });
+    var tel = v.tel.replace(/\D/g, "");
+    if (!v.servico) return { erro: "Escreva o serviço, por exemplo Eletricista." };
+    if (!v.nome) return { erro: "Escreva o nome da pessoa ou da empresa." };
+    if (tel.length < 8) return { erro: "Confira o telefone: use DDD e número, como 27 99999-9999." };
+    if (dados.pedeCodigo && !ler(CHAVE_CODIGO) && !$("f-codigo").value.trim()) return { erro: "Escreva a palavra do condomínio (combinada no grupo)." };
+    return { valor: v };
+  }
+
+  function atualizar() {
+    return servidor("listar").then(aplicar).catch(function () {
+      if (!carregou) {
+        $("lista").innerHTML = '<p class="vazio">Não consegui carregar a lista. Confira a internet e abra o link de novo.</p>';
+      } else {
+        toast("Sem internet: mostrando a última lista que você abriu.");
+      }
+    });
+  }
+
+  // ---------- eventos ----------
+  $("busca").addEventListener("input", function (e) { estado.busca = e.target.value; desenharLista(); });
+  $("chips").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip");
+    if (!b) return;
+    estado.filtro = b.getAttribute("data-cat");
+    desenharChips(); desenharLista();
+  });
+  $("lista").addEventListener("click", function (e) {
+    var b = e.target.closest(".mais");
+    if (b) abrirOpcoes(porId(b.getAttribute("data-id")));
+  });
+  $("o-fechar").addEventListener("click", function () { $("opcoes").close(); });
+  $("o-corrigir").addEventListener("click", function () { $("opcoes").close(); abrirForm(aberto); });
+  $("o-copiar").addEventListener("click", function () {
+    var b = $("o-copiar");
+    var manual = function () {
+      var sel = window.getSelection(), r = document.createRange();
+      r.selectNodeContents($("o-numero")); sel.removeAllRanges(); sel.addRange(r);
+      b.textContent = "Número selecionado: use Copiar do celular";
+    };
+    try { navigator.clipboard.writeText(aberto.tel).then(function () { b.textContent = "Copiado!"; }, manual); } catch (err) { manual(); }
+  });
+  $("historico-lista").addEventListener("click", function (e) {
+    var b = e.target.closest(".desfazer");
+    if (!b) return;
+    b.disabled = true;
+    enviar({ acao: "restaurar", hid: b.getAttribute("data-hid") }, "Pronto, voltou para a lista.");
+  });
+  $("novo").addEventListener("click", function () { abrirForm(null); });
+  $("f-cancelar").addEventListener("click", function () { $("dialogo").close(); });
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = lerForm();
+    if (r.erro) return erroForm(r.erro);
+    if (editando) {
+      r.valor.id = editando.id;
+      enviar({ acao: "corrigir", item: r.valor }, "Corrigido. Obrigado por ajudar!");
+    } else {
+      enviar({ acao: "adicionar", item: r.valor }, "Adicionado. Obrigado por ajudar!");
+    }
+  });
+  $("f-remover").addEventListener("click", function () {
+    if (!confirmarRemocao) {
+      confirmarRemocao = true;
+      $("f-remover").textContent = "Toque de novo para confirmar a remoção";
+      return;
+    }
+    enviar({ acao: "remover", id: editando.id }, "Removido. Dá para restaurar em Últimas alterações.");
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && carregou && !$("dialogo").open) atualizar();
+  });
+
+  // ---------- início ----------
+  var guardado = ler(CACHE);
+  if (guardado) { try { dados = JSON.parse(guardado); carregou = true; } catch (e) {} }
+  desenhar();
+  atualizar();
+})();
+</script>
+</body>
+</html>

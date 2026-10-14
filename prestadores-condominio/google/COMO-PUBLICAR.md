@@ -31,3 +31,8 @@ O link continua o mesmo, e os contatos salvos não se perdem.
 No `Code.gs`, troque `var CODIGO_ACESSO = '';` por uma palavra, por exemplo `var CODIGO_ACESSO = 'villagio';`,
 publique uma nova versão e avise a palavra no grupo. A página pede essa palavra uma vez antes de salvar.
 Qualquer remoção pode ser desfeita em **Últimas alterações** → **Restaurar**.
+
+## Para quem for mexer no visual
+
+O `Index.html` é gerado, em poucas linhas, a partir de `fonte/Index.fonte.html` (legível).
+Edite a fonte e rode `node fonte/montar.mjs` (precisa do esbuild) para gerar o `Index.html` de novo.
