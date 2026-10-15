@@ -38,6 +38,8 @@ function salvar(op, codigo) {
       i = acharPorId(String(op.item.id));
       if (i < 0) throw new Error('Esse contato foi removido por outra pessoa. A lista foi atualizada.');
       item.id = d.prestadores[i].id;
+      item.votos = d.prestadores[i].votos; // corrigir não apaga avaliações
+      item.coments = d.prestadores[i].coments;
       registrar_(d, agora, 'corrigiu', item, d.prestadores[i]);
       d.prestadores[i] = item;
     } else if (op.acao === 'remover') {
@@ -48,6 +50,17 @@ function salvar(op, codigo) {
       }
     } else if (op.acao === 'restaurar') {
       var h = d.historico.filter(function (x) { return x.hid === op.hid; })[0];
+      if (h && h.coment) { // comentário apagado volta para o prestador
+        i = acharPorId(h.pid);
+        if (i < 0) throw new Error('Esse contato não está mais na lista.');
+        var p = d.prestadores[i];
+        p.coments = [h.coment].concat((p.coments || []).filter(function (x) { return x.c !== h.coment.c; }));
+        h.coment = null;
+        registrar_(d, agora, 'restaurou comentário de', p, null);
+        d.atualizada = agora;
+        gravar_(d);
+        return listar();
+      }
       if (!h || !h.antes) throw new Error('Não encontrei essa alteração para desfazer.');
       i = acharPorId(h.antes.id);
       if (i >= 0) d.prestadores[i] = h.antes; else d.prestadores.push(h.antes);
@@ -56,6 +69,7 @@ function salvar(op, codigo) {
       throw new Error('Ação desconhecida.');
     }
     d.atualizada = agora;
+    caber_(d);
     gravar_(d);
   } finally {
     trava.releaseLock();

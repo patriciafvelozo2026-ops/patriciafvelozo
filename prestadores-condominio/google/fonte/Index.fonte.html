@@ -64,6 +64,12 @@ h1 { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(24px, 6.4v
 .nome { font-weight: 700; overflow-wrap: anywhere; }
 .numero { color: var(--suave); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .extra { color: var(--suave); font-size: 13px; overflow-wrap: anywhere; }
+.av { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 3px; font-size: 13px; color: var(--suave);
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+.av b { font-weight: 700; }
+.av .bom { color: var(--zap); }
+.av .ruim { color: var(--perigo); }
+.av .sem { font-style: italic; }
 .zap { flex: none; background: var(--zap); color: var(--zap-tinta); text-decoration: none; font-weight: 700;
   font-size: 14px; border-radius: 999px; padding: 9px 14px; }
 .mais { flex: none; width: 40px; height: 40px; border: 0; border-radius: 999px; background: none; color: var(--suave);
@@ -83,6 +89,28 @@ h1 { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(24px, 6.4v
 dialog { width: min(520px, calc(100% - 24px)); max-height: calc(100% - 24px); border: 0; padding: 0; border-radius: 18px;
   background: var(--cartao); color: var(--tinta); }
 dialog::backdrop { background: rgba(8, 14, 18, .5); }
+dialog { overflow: auto; }
+.avaliacao { border-top: 1px solid var(--linha); margin-top: 14px; padding-top: 12px; display: grid; gap: 8px; }
+.avaliacao h4 { margin: 0; font-size: 15px; }
+.placar { margin: 0; color: var(--suave); font-size: 14px; }
+.votar { display: flex; gap: 8px; }
+.votar button { flex: 1; border: 1px solid var(--linha); background: var(--fundo); border-radius: 12px; padding: 11px 8px;
+  font-weight: 700; cursor: pointer; }
+.votar button[aria-pressed="true"]#v-sim { background: var(--zap); border-color: var(--zap); color: var(--zap-tinta); }
+.votar button[aria-pressed="true"]#v-nao { background: var(--perigo); border-color: var(--perigo); color: var(--cartao); }
+.dica { margin: 0; font-size: 12px; color: var(--suave); }
+.comentarios { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.comentarios li { background: var(--fundo); border-radius: 10px; padding: 8px 10px; font-size: 14px; overflow-wrap: anywhere; }
+.comentarios .quem { display: flex; justify-content: space-between; gap: 8px; color: var(--suave); font-size: 12px; margin-bottom: 2px; }
+.apagar { border: 0; background: none; color: var(--suave); text-decoration: underline; font-size: 12px; padding: 0; cursor: pointer; }
+.novo-comentario { display: grid; gap: 6px; }
+.novo-comentario textarea { width: 100%; min-height: 64px; padding: 10px 12px; border: 1px solid var(--linha); border-radius: 10px;
+  background: var(--fundo); font: inherit; font-size: 16px; color: inherit; resize: vertical; }
+.novo-comentario .linha-envio { display: flex; gap: 8px; }
+.novo-comentario .linha-envio input { flex: 1; min-width: 0; }
+.novo-comentario .linha-envio button { flex: none; border: 0; border-radius: 10px; padding: 0 16px; font-weight: 700;
+  background: var(--acento); color: var(--acento-tinta); cursor: pointer; }
+.o-erro { color: var(--perigo); font-size: 14px; margin: 0; }
 form, .opcoes-corpo { padding: 20px 18px 16px; display: grid; gap: 4px; }
 form h3, .opcoes-corpo h3 { font-family: var(--f-titulo); font-weight: 800; font-size: 21px; margin: 0 0 6px; }
 label { font-weight: 700; font-size: 14px; margin-top: 8px; }
@@ -148,7 +176,28 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     <div class="lista-acoes">
       <a class="zap" id="o-zap" target="_blank" rel="noopener" href="https://wa.me/">Chamar no WhatsApp</a>
       <button type="button" class="secundario" id="o-copiar">Copiar número</button>
-      <button type="button" class="secundario" id="o-corrigir">Corrigir ou remover</button>
+    </div>
+    <section class="avaliacao" aria-labelledby="av-titulo">
+      <h4 id="av-titulo">Avaliação dos vizinhos</h4>
+      <p class="placar" id="o-placar"></p>
+      <div class="votar">
+        <button type="button" id="v-sim" aria-pressed="false">👍 Recomendo</button>
+        <button type="button" id="v-nao" aria-pressed="false">👎 Não recomendo</button>
+      </div>
+      <p class="dica">Um voto por celular. Toque de novo para tirar o seu voto.</p>
+      <ul class="comentarios" id="o-comentarios"></ul>
+      <div class="novo-comentario">
+        <label for="c-texto">Deixe um comentário <small>(opcional)</small></label>
+        <textarea id="c-texto" maxlength="200" placeholder="Ex.: pontual, preço justo, deixou tudo limpo"></textarea>
+        <div class="linha-envio">
+          <input id="c-apto" maxlength="30" placeholder="Seu apto (opcional)" aria-label="Seu apartamento, opcional">
+          <button type="button" id="c-enviar">Enviar</button>
+        </div>
+      </div>
+      <p class="o-erro" id="o-erro" role="alert" hidden></p>
+    </section>
+    <div class="lista-acoes">
+      <button type="button" class="secundario" id="o-corrigir">Corrigir ou remover contato</button>
       <button type="button" class="secundario" id="o-fechar">Fechar</button>
     </div>
   </div>
@@ -194,7 +243,12 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
   var CACHE = "prestadores-villagio-v1", CHAVE_CODIGO = "prestadores-villagio-codigo";
   var dados = { prestadores: [], categorias: [], historico: [], atualizada: "", pedeCodigo: false };
   var estado = { filtro: "Todos", busca: "" };
-  var editando = null, aberto = null, confirmarRemocao = false, carregou = false;
+  var editando = null, aberto = null, confirmarRemocao = false, carregou = false, apagando = null;
+  var aparelho = (function () {
+    var k = "prestadores-villagio-aparelho", a = ler(k);
+    if (!a || !/^[a-z0-9]{6,20}$/.test(a)) { a = Math.random().toString(36).slice(2, 8) + Date.now().toString(36); guardar(k, a); }
+    return a;
+  })();
 
   function guardar(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -230,6 +284,14 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     toast.t = setTimeout(function () { t.classList.remove("on"); }, 3000);
   }
   function porId(id) { return dados.prestadores.filter(function (p) { return p.id === id; })[0]; }
+  function placar(p) {
+    var r = { sim: 0, nao: 0, meu: 0, coments: (p.coments || []).length };
+    var v = p.votos || {};
+    for (var k in v) { if (v[k] === 1) r.sim++; else if (v[k] === -1) r.nao++; }
+    r.meu = v[aparelho] || 0;
+    r.saldo = r.sim - r.nao;
+    return r;
+  }
   function extras(p) {
     var x = [];
     if (p.obs) x.push(p.obs);
@@ -274,9 +336,11 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
       return;
     }
     var ordem = dados.categorias;
+    // dentro de cada serviço, os mais recomendados primeiro
     itens.sort(function (a, b) {
-      return (ordem.indexOf(a.cat) - ordem.indexOf(b.cat)) || a.servico.localeCompare(b.servico, "pt") ||
-        a.nome.localeCompare(b.nome, "pt");
+      var pa = placar(a), pb = placar(b);
+      return (ordem.indexOf(a.cat) - ordem.indexOf(b.cat)) || semAcento(a.servico).localeCompare(semAcento(b.servico), "pt") ||
+        (pb.saldo - pa.saldo) || (pb.sim - pa.sim) || a.nome.localeCompare(b.nome, "pt");
     });
     // categoria > serviço > pessoas
     var cats = [];
@@ -296,12 +360,22 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     }).join("");
   }
 
+  function resumoAv(s) {
+    if (!s.sim && !s.nao && !s.coments) return '<span class="sem">Ainda sem avaliação</span>';
+    var partes = [];
+    if (s.sim) partes.push('<span class="bom">👍 <b>' + s.sim + "</b> " + (s.sim === 1 ? "recomenda" : "recomendam") + "</span>");
+    if (s.nao) partes.push('<span class="ruim">👎 <b>' + s.nao + "</b> não " + (s.nao === 1 ? "recomenda" : "recomendam") + "</span>");
+    if (s.coments) partes.push("<span>💬 " + s.coments + (s.coments === 1 ? " comentário" : " comentários") + "</span>");
+    return partes.join("");
+  }
+
   function linha(p) {
     var x = extras(p);
     return '<div class="pessoa"><div class="pessoa-info">' +
       '<div class="nome">' + esc(p.nome) + "</div>" +
       '<div class="numero">' + esc(formatarTel(p.tel)) + "</div>" +
-      (x ? '<div class="extra">' + esc(x) + "</div>" : "") + "</div>" +
+      (x ? '<div class="extra">' + esc(x) + "</div>" : "") +
+      '<button type="button" class="av" data-id="' + esc(p.id) + '">' + resumoAv(placar(p)) + "</button></div>" +
       '<a class="zap" target="_blank" rel="noopener" href="https://wa.me/55' + esc(p.tel) + '" aria-label="WhatsApp de ' + esc(p.nome) + '">WhatsApp</a>' +
       '<button type="button" class="mais" data-id="' + esc(p.id) + '" aria-label="Mais opções para ' + esc(p.nome) + '">⋯</button></div>';
   }
@@ -314,8 +388,8 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     $("rodape").textContent = dados.atualizada ? "Lista atualizada em " + dataCurta(dados.atualizada) + "." : "";
     $("historico").hidden = !dados.historico.length;
     $("historico-lista").innerHTML = dados.historico.map(function (h) {
-      var desfazer = h.antes ? ' <button type="button" class="desfazer" data-hid="' + esc(h.hid) + '">' +
-        (h.acao === "removeu" ? "Restaurar" : "Desfazer") + "</button>" : "";
+      var desfazer = (h.antes || h.coment) ? ' <button type="button" class="desfazer" data-hid="' + esc(h.hid) + '">' +
+        (h.acao === "corrigiu" ? "Desfazer" : "Restaurar") + "</button>" : "";
       return "<li>" + esc(dataCurta(h.quando)) + ": " + esc(h.acao) + " " + esc(h.resumo) + desfazer + "</li>";
     }).join("");
   }
@@ -332,7 +406,52 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     $("o-extra").hidden = !extras(p);
     $("o-zap").href = "https://wa.me/55" + p.tel;
     $("o-copiar").textContent = "Copiar número";
-    $("opcoes").showModal();
+    $("c-texto").value = "";
+    $("o-erro").hidden = true;
+    apagando = null;
+    desenharAvaliacao();
+    if (!$("opcoes").open) $("opcoes").showModal();
+  }
+
+  function desenharAvaliacao() {
+    var s = placar(aberto);
+    $("o-placar").textContent = (s.sim || s.nao)
+      ? s.sim + (s.sim === 1 ? " vizinho recomenda" : " vizinhos recomendam") + " · " + s.nao + " não " + (s.nao === 1 ? "recomenda" : "recomendam")
+      : "Ninguém avaliou ainda. Já contratou? Conte para os vizinhos.";
+    $("v-sim").setAttribute("aria-pressed", s.meu === 1);
+    $("v-nao").setAttribute("aria-pressed", s.meu === -1);
+    $("o-comentarios").innerHTML = (aberto.coments || []).map(function (c) {
+      var voto = c.v === 1 ? "👍 " : c.v === -1 ? "👎 " : "";
+      return '<li><div class="quem"><span>' + voto + esc(dataCurta(c.q)) + (c.a ? " · " + esc(c.a) : "") + "</span>" +
+        '<button type="button" class="apagar" data-cid="' + esc(c.c) + '">' + (apagando === c.c ? "Toque de novo para apagar" : "apagar") +
+        "</button></div>" + esc(c.t) + "</li>";
+    }).join("");
+  }
+
+  function avaliacao(fn) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    var codigo = ler(CHAVE_CODIGO) || "";
+    $("o-erro").hidden = true;
+    return servidor.apply(null, [fn].concat(args, [codigo])).then(function (r) {
+      aplicar(r);
+      var p = porId(aberto.id);
+      if (!p) { $("opcoes").close(); return false; }
+      aberto = p;
+      apagando = null;
+      desenharAvaliacao();
+      return true;
+    }).catch(function (e) {
+      $("o-erro").textContent = msgErro(e) || "Não foi possível salvar. Confira a internet e tente de novo.";
+      $("o-erro").hidden = false;
+      return false;
+    });
+  }
+
+  function votar(v) {
+    var meu = placar(aberto).meu;
+    avaliacao("avaliar", aberto.id, meu === v ? 0 : v, aparelho).then(function (ok) {
+      if (ok) toast(meu === v ? "Voto retirado." : "Obrigado pela avaliação!");
+    });
   }
 
   // ---------- formulário ----------
@@ -428,8 +547,28 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     desenharChips(); desenharLista();
   });
   $("lista").addEventListener("click", function (e) {
-    var b = e.target.closest(".mais");
+    var b = e.target.closest(".mais, .av");
     if (b) abrirOpcoes(porId(b.getAttribute("data-id")));
+  });
+  $("v-sim").addEventListener("click", function () { votar(1); });
+  $("v-nao").addEventListener("click", function () { votar(-1); });
+  $("c-enviar").addEventListener("click", function () {
+    var t = $("c-texto").value.trim();
+    if (t.length < 3) { $("o-erro").textContent = "Escreva o comentário antes de enviar."; $("o-erro").hidden = false; return; }
+    $("c-enviar").disabled = true;
+    avaliacao("comentar", aberto.id, t, $("c-apto").value.trim(), aparelho).then(function (ok) {
+      $("c-enviar").disabled = false;
+      if (ok) { $("c-texto").value = ""; guardar("prestadores-villagio-apto", $("c-apto").value.trim()); toast("Comentário enviado. Obrigado!"); }
+    });
+  });
+  $("o-comentarios").addEventListener("click", function (e) {
+    var b = e.target.closest(".apagar");
+    if (!b) return;
+    var cid = b.getAttribute("data-cid");
+    if (apagando !== cid) { apagando = cid; desenharAvaliacao(); return; }
+    avaliacao("apagarComentario", aberto.id, cid).then(function (ok) {
+      if (ok) toast("Comentário apagado. Dá para restaurar em Últimas alterações.");
+    });
   });
   $("o-fechar").addEventListener("click", function () { $("opcoes").close(); });
   $("o-corrigir").addEventListener("click", function () { $("opcoes").close(); abrirForm(aberto); });
@@ -470,10 +609,11 @@ input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--linha);
     enviar({ acao: "remover", id: editando.id }, "Removido. Dá para restaurar em Últimas alterações.");
   });
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible" && carregou && !$("dialogo").open) atualizar();
+    if (document.visibilityState === "visible" && carregou && !$("dialogo").open && !$("opcoes").open) atualizar();
   });
 
   // ---------- início ----------
+  $("c-apto").value = ler("prestadores-villagio-apto") || "";
   var guardado = ler(CACHE);
   if (guardado) { try { dados = JSON.parse(guardado); carregou = true; } catch (e) {} }
   desenhar();

@@ -5,8 +5,8 @@ Faça uma vez só, de preferência no computador, logada na sua conta Google.
 1. Entre em https://script.google.com e clique em **Novo projeto**.
 2. Dê o nome **Prestadores Villagio** (clique em "Projeto sem título", no alto).
 3. No arquivo **Código.gs** que já aparece, apague tudo e cole o conteúdo de `Code.gs`.
-   Clique no **+** → **Script** e crie, do mesmo jeito, **Salvar**, **Apoio** e **Dados**, com o conteúdo de
-   `Salvar.gs`, `Apoio.gs` e `Dados.gs`.
+   Clique no **+** → **Script** e crie, do mesmo jeito, **Salvar**, **Apoio**, **Dados** e **Avaliar**, com o conteúdo de
+   `Salvar.gs`, `Apoio.gs`, `Dados.gs` e `Avaliar.gs`.
    A última linha de cada um diz "FIM DO ARQUIVO": se ela não aparecer, a cópia veio cortada.
 4. Clique no **+** ao lado de "Arquivos", escolha **HTML** e dê o nome **Index** (sem ".html").
    Apague o que vier e cole o conteúdo de `Index.html`.
