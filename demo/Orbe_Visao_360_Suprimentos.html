@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FLOW Demo Contratação</title>
+<title>Orbe · Visão 360 de Suprimentos</title>
 <style>
 :root{
   --navy:#0B2E59;--navy2:#123C70;--blue:#0072BC;--sky:#4FB3E8;--ice:#E6F3FB;--ice2:#F4F9FD;--mist:#C9E6F7;
@@ -20,15 +20,17 @@ input,select,textarea{font:inherit;color:var(--text)}
 
 /* ---------- Login ---------- */
 #login{position:fixed;inset:0;z-index:50;display:grid;grid-template-columns:1.1fr 1fr;background:var(--navy)}
-#login .l{padding:56px 6vw;color:#fff;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+#login .l{padding:0 4.5vw;color:#fff;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
 #login .l::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:var(--blue);right:-220px;top:-160px;opacity:.9}
 #login .l::before{content:"";position:absolute;width:300px;height:300px;border-radius:50%;background:var(--sky);right:-60px;bottom:-90px}
 #login .brand{font-size:15px;letter-spacing:.24em;color:var(--sky);font-weight:700;position:relative;z-index:1}
-#login h1{font-size:44px;line-height:1.1;margin:18px 0 14px;max-width:560px;position:relative;z-index:1}
+#login h1{font-size:48px;line-height:1.1;margin:18px 0 14px;max-width:560px;position:relative;z-index:1}
 #login .l p{color:#C8E5F7;font-size:18px;max-width:520px;margin:0;position:relative;z-index:1}
 #login .pts{margin-top:34px;display:grid;gap:10px;position:relative;z-index:1}
 #login .pts div{display:flex;gap:10px;align-items:center;color:#E3F2FC}
 #login .pts span{width:22px;height:22px;border-radius:50%;background:rgba(79,179,232,.25);display:grid;place-items:center;color:var(--sky);font-size:12px;font-weight:700;flex:none}
+#login .lin{position:relative;z-index:1;max-height:100%;overflow-y:auto;padding:32px 0}
+@media (max-height:780px){#login .lin{padding:16px 0}#login h1{font-size:38px;margin:10px 0}#login .l p{font-size:16px}#login .pts{margin-top:22px}}
 #login .r{background:var(--bg);display:grid;place-items:center;padding:24px}
 .loginCard{background:#fff;border-radius:16px;box-shadow:var(--sh);padding:34px;width:min(420px,100%)}
 .loginCard h2{margin:0 0 4px;color:var(--navy);font-size:24px}
@@ -236,32 +238,8 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}
 .solved input{accent-color:var(--ok);width:15px;height:15px}
 .kpi.click{cursor:pointer}.kpi.click:hover{outline:2px solid var(--mist)}
 @media (max-width:1000px){.lanes,.newp{grid-template-columns:1fr}}
-/* ---------- Orbe · Visão 360 ---------- */
+/* ---------- Inteligência de Suprimentos ---------- */
 :root{--orange:#F0A060;--orange2:#E8893F;--obg:#FBEEE4}
-.orbe{background:#102A47;border-radius:var(--r);padding:18px 20px;margin:0 0 18px;color:#fff;box-shadow:var(--sh)}
-.orbe .oh{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:12px}
-.orbe .oh b{font-size:19px}.orbe .os{color:#C8D6E6;font-size:13.5px}
-.orbe .olg{display:flex;gap:14px;font-size:13px;color:#DCE6F1;flex-wrap:wrap}.orbe .olg span{display:flex;align-items:center;gap:6px}
-.orbe .olg i{width:14px;height:14px;border-radius:4px;display:inline-block}
-.orbe .olg i.o-full{background:var(--orange)}.orbe .olg i.o-part{background:#102A47;border:1.5px dashed var(--orange)}.orbe .olg i.o-todo{background:#2C4A70}
-.orbe .ou{background:#1D5A9E;border-radius:40px 40px 10px 10px;padding:10px 14px 14px;margin-bottom:14px}
-.orbe .out{text-align:center;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
-.orbe .oug{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.orbe .om{background:#2A6CB4;border:1.5px solid transparent;border-radius:9px;color:#fff;text-align:left;padding:9px 11px;display:flex;gap:9px;align-items:flex-start}
-.orbe .om:hover{border-color:#fff}.orbe .om.hl{border-color:#F4D58D}
-.orbe .om b{display:block;font-size:14px}.orbe .om small{color:#D7E6F6;font-size:12.5px}.orbe .oi{font-size:16px}
-.orbe .ogrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.orbe .oph{color:var(--orange);font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border-bottom:1px solid #2C4A70;padding-bottom:5px;margin-bottom:7px}
-.orbe .ost{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;border-radius:7px;padding:7px 10px;margin-bottom:6px;font-weight:600;font-size:14px;border:1.5px solid transparent}
-.orbe .ost:hover{filter:brightness(1.08);outline:2px solid #fff}
-.orbe .ost .ok{font-size:12px;background:#fff;color:var(--ok);border-radius:10px;padding:0 6px;margin-left:6px}
-.o-full{background:var(--orange);color:#1E1A16}.o-part{background:transparent;color:#FBE3CF;border:1.5px dashed var(--orange)!important}.o-todo{background:#2C4A70;color:#DCE6F1}
-.orbe .ofoot{border-top:1px solid #2C4A70;margin-top:8px;padding-top:9px;font-size:13px;color:#C8D6E6}.orbe .ofoot b{color:#fff}.orbe .ofoot span{color:#8FA6C0}
-.obadge{display:inline-block;font-size:11px;letter-spacing:.04em;text-transform:none;font-weight:700;border-radius:20px;padding:2px 9px;margin-left:6px;vertical-align:1px}
-.obadge.o-full{background:var(--obg);color:#9A4F12;border:1px solid var(--orange)}.obadge.o-part{background:#fff;color:#9A4F12;border:1px dashed var(--orange2)!important}.obadge.o-todo{background:#E8EEF5;color:var(--navy)}
-.orbe .opipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:12px;border-top:1px solid #2C4A70}
-.orbe .opb{flex:1;min-width:200px;display:flex;gap:9px;align-items:flex-start;text-align:left;background:#163A63;border:1.5px solid #2C5A8C;border-radius:9px;color:#fff;padding:9px 11px}
-.orbe .opb:hover{border-color:#fff}.orbe .opb b{display:block;font-size:14px}.orbe .opb small{color:#C8D6E6;font-size:12.5px}.orbe .oa{color:var(--orange);font-weight:700;font-size:18px}
 .sihero{padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
 .sipipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sipipe a{display:flex;gap:7px;align-items:center;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;border-radius:24px;padding:8px 14px;font-size:14px}.sipipe a:hover{background:var(--blue)}.sipipe .oa{color:var(--orange2);font-weight:800;font-size:18px}
 .sinum{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px;scroll-margin-top:100px}.sinum span{width:30px;height:30px;border-radius:50%;background:var(--orange);color:#1E1A16;display:grid;place-items:center;font-size:15px}
@@ -271,8 +249,6 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}
 .sicard{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}.sicard .k{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9A4F12}.sicard .v{font-size:22px;font-weight:800;color:var(--navy);margin-top:2px}
 .sicard p{margin:8px 0 0;font-size:14px}.sicard ul.dots{margin:8px 0 0;padding-left:18px;font-size:14px}.sicard.al{background:var(--obg);border-color:#F3C9A4}
 .sicard .mk{position:absolute;top:-4px;width:4px;height:16px;background:var(--navy);border-radius:2px;transform:translateX(-2px)}
-@media (max-width:1000px){.orbe .oug,.orbe .ogrid{grid-template-columns:1fr 1fr}}
-@media (max-width:640px){.orbe .oug,.orbe .ogrid{grid-template-columns:1fr}}
 
 .ia-hero{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;align-items:center}
 .ia-sw{display:flex;align-items:center;gap:14px;background:var(--ice2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
@@ -304,21 +280,21 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
 
 <!-- ================= LOGIN ================= -->
 <section id="login">
-  <div class="l">
+  <div class="l"><div class="lin">
     <div class="smk"><img src="samarco-logo.png" alt="" onerror="this.style.display='none'"><span class="wm">SAMARCO</span></div>
-    <div class="brand">FLOW · SUPRIMENTOS · FASE A DO ORBE</div>
-    <h1>Contratação ponta a ponta, em uma única jornada</h1>
-    <p>Demonstração navegável da RC ao contrato, com equalização, negociação, aprovações e trilha de auditoria.</p>
+    <div class="brand">ORBE · SUPRIMENTOS</div>
+    <h1>Visão 360 de Suprimentos</h1>
+    <p>Da RC ao contrato, e do contrato à inteligência: a contratação inteira numa única jornada, com base de dados única e previsão de mercado com IA.</p>
     <div class="pts">
-      <div><span>1</span>Base única: cada dado tem origem, versão e responsável</div>
-      <div><span>2</span>Divergência vira pendência – nunca decisão automática</div>
-      <div><span>3</span>Saídas padronizadas: RH, visão executiva e auditoria</div>
-      <div><span>4</span>Cada processo alimenta o banco de dados, a predição de mercado e a inteligência de suprimentos</div>
+      <div><span>1</span>15 etapas: preparação, mercado, decisão e formalização</div>
+      <div><span>2</span>Base única: cada dado com origem, versão e responsável</div>
+      <div><span>3</span>Inteligência de fornecedores e previsão de preços, riscos e mercado</div>
+      <div><span>4</span>Integrado a SAP, Portal de Fornecedores, SharePoint, Outlook, plataforma jurídica, Serasa e ME</div>
     </div>
-  </div>
+  </div></div>
   <div class="r">
     <form class="loginCard" id="loginForm" autocomplete="off">
-      <h2>Entrar no FLOW</h2>
+      <h2>Entrar no Orbe</h2>
       <p class="sub">Acesso por matrícula e perfil (simulado)</p>
       <label class="lbl" for="mat">Matrícula</label>
       <input class="inp" id="mat" value="104582" inputmode="numeric">
@@ -337,20 +313,20 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
 <!-- ================= APP ================= -->
 <header class="top hidden" id="top">
   <div class="topIn">
-    <div class="logo">FLOW<span class="sam">SAMARCO</span><small>Contratação ponta a ponta</small></div>
+    <div class="logo">ORBE<span class="sam">SAMARCO</span><small>Visão 360 de Suprimentos</small></div>
     <div class="proc">
-      <span class="chip">CT-FLOW-2026-017</span>
+      <span class="chip">CT-ORBE-2026-017</span>
       <span class="chip">Uniformes industriais · Ubu/ES</span>
       <span class="chip demo">Demonstração · dados fictícios</span>
     </div>
     <div class="tabs" role="tablist">
       <button class="on" data-view="inicio">Início</button>
       <button data-view="jornada">Jornada</button>
-      <button data-view="conf">Conformidade <span id="confBadge"></span></button>
-      <button data-view="intel">🔎 Fornecedores</button>
-      <button data-view="painel">Painel gerencial</button>
+      <button data-view="intel" title="Inteligência de fornecedores">👥 Fornecedores</button>
+      <button data-view="ia" title="Previsão futura com IA: preços, riscos e mercado">💡 Previsão com IA</button>
+      <button data-view="painel">📊 Painel gerencial</button>
+      <button data-view="conf" title="Conformidade e auditoria">✅ Conformidade <span id="confBadge"></span></button>
       <button data-view="supint">🧠 Inteligência de Suprimentos</button>
-      <button data-view="ia">🤖 IA</button>
     </div>
     <div class="user"><div class="av" id="av">PV</div><div><div id="uname" style="color:#fff;font-weight:600">Patrícia Velozo</div><div id="urole">Comprador(a) · 104582</div></div></div>
   </div>
@@ -372,7 +348,7 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
   <section id="viewSupInt" class="dash hidden"></section>
 </div>
 
-<div id="mail" class="modal hidden"><div class="sheet" style="width:min(760px,100%)"><div class="sheetH"><b style="color:var(--navy)">Novo e-mail</b><span class="tag t-n">Outlook corporativo · integração futura</span><span style="margin-left:auto"></span><button class="btn ghost sm" id="mlClose">Cancelar</button></div>
+<div id="mail" class="modal hidden"><div class="sheet" style="width:min(760px,100%)"><div class="sheetH"><b style="color:var(--navy)">Novo e-mail</b><span class="tag t-n">Outlook corporativo · simulado</span><span style="margin-left:auto"></span><button class="btn ghost sm" id="mlClose">Cancelar</button></div>
 <div class="sheetB" style="padding:20px 24px">
  <div class="mrow"><label for="mlTo">Para</label><input class="inp" id="mlTo"></div>
  <div class="mrow"><label for="mlCc">Cc</label><input class="inp" id="mlCc"></div>
@@ -384,7 +360,7 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
 </div></div></div>
 <div id="eqView" class="hidden" style="position:fixed;inset:0;z-index:62;background:var(--bg);display:flex;flex-direction:column">
  <div style="background:var(--navy);color:#fff;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-  <b style="font-size:17px">🧠 Inteligência de equalização</b><span class="chip">CT-FLOW-2026-017</span><div class="tabs" id="eqRound" style="margin-left:0"></div>
+  <b style="font-size:17px">🧠 Inteligência de equalização</b><span class="chip">CT-ORBE-2026-017</span><div class="tabs" id="eqRound" style="margin-left:0"></div>
   <span id="eqInfo" style="font-size:13px;color:#C8E5F7"></span><span style="margin-left:auto"><button class="btn sec" id="eqClose">← Voltar à jornada</button></span></div>
  <div style="flex:1;overflow:auto"><div id="eqBody" style="max-width:1280px;margin:18px auto 40px;padding:0 24px"></div></div></div>
 <div id="pdfView" class="hidden" style="position:fixed;inset:0;z-index:65;background:#3E4C5E;display:flex;flex-direction:column">
@@ -407,7 +383,7 @@ const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const $ = id => document.getElementById(id);
 
 const RC = {
-  num:'RC-FLOW-10458231', objeto:'Gestão de uniformes industriais – Ubu/ES',
+  num:'RC-ORBE-10458231', objeto:'Gestão de uniformes industriais – Ubu/ES',
   requisitante:'Operações Ubu', centro:'Ubu/ES', valor:3350000, shouldCost:3820000, nivelSeg:2,
   itens:[
     {d:'Higienização uniforme padrão', q:12000, u:'un'},
@@ -436,7 +412,7 @@ const STEPS = [
  {ph:'Preparação', t:'Planejamento e cronograma', d:'Estratégia, responsáveis e prazos definidos juntos: cada decisão do plano já vira marco no cronograma.', sys:'SAP', mode:'Leitura / gravação', del:'Plano de contratação com cronograma integrado, responsáveis por marco e alertas de atraso.'},
  {ph:'Preparação', t:'Estratégia / Vendor List', d:'Composição da Vendor List para garantir competitividade.', sys:'Cadastro de fornecedores', mode:'Leitura', del:'Vendor List revisada com origem e justificativa de cada convidado.'},
  {ph:'Mercado', t:'Homologações', d:'Quadro único de homologações antes da carta-convite: cadastro, SST e irregularidade no Portal de Fornecedores e homologação de compliance feita no SAP.', sys:'Portal de Fornecedores', mode:'API / link seguro', del:'Status de homologação e pendências por fornecedor.'},
- {ph:'Mercado', t:'Carta-convite', d:'Documento padronizado e controle de destinatários e versões.', sys:'Outlook + SharePoint', mode:'Envio autorizado', del:'Carta-convite padrão, destinatários e data limite registrados.'},
+ {ph:'Mercado', t:'Carta-convite', d:'Documento padronizado e controle de destinatários e versões.', sys:'ME – Mercado Eletrônico + Outlook', mode:'Envio autorizado', del:'Carta-convite padrão, destinatários e data limite registrados.'},
  {ph:'Mercado', t:'Propostas comerciais', d:'Só os fornecedores aprovados na validação técnica enviam a proposta comercial – organizada por fornecedor, rodada e versão.', sys:'SharePoint', mode:'Repositório oficial', del:'Registro de versões, datas, anexos e condições comerciais de cada proposta.'},
  {ph:'Decisão', t:'Equalização', d:'Item base × PQ de cada fornecedor, linha a linha – com inteligência de equalização para PQs grandes.', sys:'Banco homologado', mode:'Persistência', del:'Equalização completa, linha a linha, com inteligência de equalização – e evolui com a colaboração da Samarco.'},
  {ph:'Decisão', t:'Negociação / BAFO', d:'Rodadas, contrapropostas e última oferta com histórico.', sys:'Outlook + repositório', mode:'Rastreabilidade', del:'Trilha de negociação e ganho calculado sobre bases comparáveis.'},
@@ -451,19 +427,6 @@ const STEPS = [
 ];
 const ORDER=[0,1,2,3,4,14,5,6,7,8,9,10,11,12,15]; // ordem das 15 etapas do Orbe
 const pos=i=>ORDER.indexOf(i);
-/* Orbe · Visão 360 de Suprimentos: o que o FLOW (Fase A) já faz em cada etapa */
-const ORBE={full:['Já no FLOW','o-full'], part:['Em parte','o-part'], todo:['A construir','o-todo']};
-const ORBE_ST={0:'part',1:'todo',2:'full',3:'part',4:'full',14:'part',5:'full',6:'full',7:'full',8:'part',9:'part',10:'part',11:'full',12:'part',15:'full'};
-const ORBE_INTEL=[['Inteligência de fornecedores','histórico de todos os processos','intel','👥'],['Previsão futura com IA','preços, riscos e mercado','supint:pred','💡'],['Painel gerencial','visão executiva em tempo real','painel','📊'],['Conformidade e auditoria','cada dado com origem','conf','✅']];
-const ORBE_SIS='SAP · Portal de Fornecedores · SharePoint · Outlook · Plataforma jurídica · Serasa · ME – Mercado Eletrônico';
-const orbeBadge=i=>{ const o=ORBE[ORBE_ST[i]]; return o?` <span class="obadge ${o[1]}" title="Orbe · Visão 360: situação desta etapa no FLOW (Fase A)">Orbe · ${o[0]}</span>`:''; };
-function orbeMap(){ const ph=['Preparação','Mercado','Decisão','Formalização'];
- return `<div class="orbe"><div class="oh"><div><b>ORBE · o sistema completo</b><div class="os">A jornada de Suprimentos que pretendemos entregar e, em laranja, o que o FLOW (Fase A) já faz.</div></div>
-  <div class="olg">${Object.values(ORBE).map(o=>`<span><i class="${o[1]}"></i>${o[0]}</span>`).join('')}</div></div>
-  <div class="ou"><div class="out">Guarda-chuva de inteligência</div><div class="oug">${ORBE_INTEL.map(m=>`<button class="om ${m[2].startsWith('supint')?'hl':''}" data-ov="${m[2]}"><span class="oi">${m[3]}</span><span><b>${m[0]}</b><small>${m[1]}</small></span></button>`).join('')}</div></div>
-  <div class="ogrid">${ph.map(p=>`<div><div class="oph">${p}</div>${ORDER.filter(i=>STEPS[i].ph===p).map(i=>`<button class="ost ${ORBE[ORBE_ST[i]][1]}" data-og="${i}" title="Abrir a etapa na jornada">${pos(i)+1} · ${esc(STEPS[i].t)}${S.done.has(i)?'<span class="ok">✓</span>':''}</button>`).join('')}</div>`).join('')}</div>
-  <div class="opipe">${[['🗄️','Banco de dados de Suprimentos','cada etapa grava na base única','db'],['📈','Predição de mercado','preços, índices e risco dos fornecedores','pred'],['🧠','Inteligência de Suprimentos','recomendações para o próximo processo','int']].map((x,k)=>`${k?'<span class="oa">→</span>':''}<button class="opb" data-osi="${x[3]}"><span class="oi">${x[0]}</span><span><b>${x[1]}</b><small>${x[2]}</small></span></button>`).join('')}<span class="obadge o-todo" style="margin:0 0 0 6px">A construir</span></div>
-  <div class="ofoot"><b>Integrado a</b> ${ORBE_SIS} <span>· 15 etapas · 4 módulos de inteligência · 7 sistemas</span></div></div>`; }
 const num=i=>String(pos(i)+1).padStart(2,'0');
 const nextOf=i=>ORDER[Math.min(ORDER.length-1,pos(i)+1)], prevOf=i=>ORDER[Math.max(0,pos(i)-1)];
 const sstReq=()=>(RC.nivelSeg||1)>1;
@@ -484,7 +447,7 @@ const big=()=>RC.valor>GOV.lim;
 const vltReqd=()=>big()||!!S.vltReq;
 const BASE={valor:RC.valor, sc:RC.shouldCost, rounds:JSON.parse(JSON.stringify(ROUNDS.data)), prices:JSON.parse(JSON.stringify(PRICES)), lc:3184760};
 function applyScenario(c){ const k=c===2?1.35:1; S.cen=c; S.k=k;
-  RC.num=c===2?'RC-FLOW-10461902':'RC-FLOW-10458231'; RC.valor=Math.round(BASE.valor*k/1000)*1000; RC.shouldCost=Math.round(BASE.sc*k/1000)*1000;
+  RC.num=c===2?'RC-ORBE-10461902':'RC-ORBE-10458231'; RC.valor=Math.round(BASE.valor*k/1000)*1000; RC.shouldCost=Math.round(BASE.sc*k/1000)*1000;
   Object.keys(BASE.rounds).forEach(n=>ROUNDS.data[n]=BASE.rounds[n].map(v=>Math.round(v*k/10)*10));
   BASE.prices.forEach((r,i)=>r.forEach((v,j)=>PRICES[i][j]=v===null?null:Math.round(v*k*100)/100));
   S.lastCall=ROUNDS.data['Atlas Têxtil'][3]; }
@@ -559,13 +522,13 @@ function renderWork(){
   const s=STEPS[S.step], i=S.step;
   const body = (W[i]||(()=>''))();
   $('work').innerHTML = `
-   <div class="eyebrow">${s.ph} · Etapa ${pos(i)+1} de ${ORDER.length}${aiBadge(i)}${orbeBadge(i)}</div>
+   <div class="eyebrow">${s.ph} · Etapa ${pos(i)+1} de ${ORDER.length}${aiBadge(i)}</div>
    <h2>${esc(s.t)}</h2>
    <p class="lead">${esc(s.d)}</p>
    <div class="prog"><div style="width:${(pos(i)+1)/ORDER.length*100}%"></div></div>
    <div class="meta">
-     <div class="box t"><h4>O que o FLOW entrega</h4><p>${esc(s.del)}</p></div>
-     <div class="box"><h4>Integração corporativa futura</h4><div class="sys"><b style="color:var(--navy)">${esc(s.sys)}</b>${tag(s.mode,'t-info')}${tag('Depende de autorização da TI','t-n')}</div></div>
+     <div class="box t"><h4>O que o Orbe entrega</h4><p>${esc(s.del)}</p></div>
+     <div class="box"><h4>Integração</h4><div class="sys"><b style="color:var(--navy)">${esc(s.sys)}</b>${tag(s.mode,'t-info')}${tag('Simulada na demonstração','t-n')}</div></div>
    </div>
    <div class="ws">${body}</div>
    <div class="navbtns">
@@ -584,7 +547,7 @@ const W=[], A=[];
 const resBox = (txt, cls='') => `<div class="res ${cls}"><div class="ic">${cls==='warn'?'!':cls==='info'?'i':'✓'}</div><div>${txt}</div></div>`;
 
 // ---------- Pasta do processo (SharePoint simulado) ----------
-const SP_ROOT='/sites/Suprimentos/Processos/CT-FLOW-2026-017';
+const SP_ROOT='/sites/Suprimentos/Processos/CT-ORBE-2026-017';
 const SP_DIRS=['01_RC_e_Planejamento','02_VLT','03_Convite','04_Propostas','05_Equalizacao','06_Negociacao','07_Analises','08_Juridico','09_RH_e_Aprovacoes'];
 const SP_FILES=[
  ['Atlas Têxtil','Proposta_Tecnica_Atlas.pdf','2,4 MB'],['Atlas Têxtil','Proposta_Comercial_Atlas.pdf','860 KB'],['Atlas Têxtil','PQ_Atlas_R1.xlsx','212 KB'],
@@ -598,7 +561,7 @@ let MAIL=null;
 function openMail(m){ MAIL=m;
   $('mlTo').value=m.to; $('mlCc').value=m.cc||''; $('mlSub').value=m.subject; $('mlBody').value=m.body;
   $('mlAtt').innerHTML=(m.att||[]).map(a=>`<span class="tag t-info" title="${esc(a.p||'')}">📎 ${esc(a.n)}</span>`).join(' ')||'<span class="empty">Sem anexos</span>';
-  $('mlSend').textContent=m.sendLabel||'Enviar pelo FLOW (simulado)'; $('mail').classList.remove('hidden'); }
+  $('mlSend').textContent=m.sendLabel||'Enviar pelo Orbe (simulado)'; $('mail').classList.remove('hidden'); }
 function closeMail(){ $('mail').classList.add('hidden'); }
 
 // 00 RC
@@ -689,13 +652,13 @@ W[2]=()=>{ const n=S.invited.size, st=S.vltSt;
   ${st===1?resBox('<b>Aguardando o gestor.</b> O e-mail leva a VLT e o link para aprovar no SAP. A carta-convite fica bloqueada até o retorno.','warn'):''}
   ${S.done.has(2)?(n<3?resBox('<b>Base insuficiente:</b> menos de 3 convidados. Pendência aberta para justificativa.','warn'):resBox(`<b>VLT ${vltReqd()?'aprovada pelo gestor no SAP':'registrada sem aprovação do gestor (processo até R$ 3,5 MM)'} com ${n} fornecedores.</b> Origem de cada convidado e aprovação registradas na trilha.`)):''}`; };
 function vltMail(){ const n=S.invited.size, list=[...S.invited].sort().map(k=>`  ${k+1}. ${VENDORS[k].n} – ${VENDORS[k].loc} (${VENDORS[k].orig})`).join('\n');
-  openMail({to:'marina.albuquerque@samarco.exemplo', cc:'suprimentos.ubu@samarco.exemplo', subject:`[FLOW] Aprovação de VLT – ${RC.num} – Uniformes industriais Ubu`,
-   att:[{n:'VLT_CT-FLOW-2026-017_v1.xlsx',p:SP_ROOT+'/02_VLT'},{n:'Justificativa_ampliacao_base.pdf',p:SP_ROOT+'/02_VLT'}],
+  openMail({to:'marina.albuquerque@samarco.exemplo', cc:'suprimentos.ubu@samarco.exemplo', subject:`[Orbe] Aprovação de VLT – ${RC.num} – Uniformes industriais Ubu`,
+   att:[{n:'VLT_CT-ORBE-2026-017_v1.xlsx',p:SP_ROOT+'/02_VLT'},{n:'Justificativa_ampliacao_base.pdf',p:SP_ROOT+'/02_VLT'}],
    body:`Olá, Marina,
 
 Solicito sua aprovação da Vendor List do processo abaixo para seguirmos com a carta-convite.
 
-Processo: CT-FLOW-2026-017 · ${RC.num}
+Processo: CT-ORBE-2026-017 · ${RC.num}
 Objeto: ${RC.objeto}
 Valor da RC: ${BRL(RC.valor)}
 Fornecedores convidados (${n}):
@@ -704,7 +667,7 @@ ${list}
 Justificativa: vendor list inicial de 3 fornecedores revisado para recompor a competitividade.
 
 Para aprovar no SAP: [link da aprovação da RC/VLT no SAP]
-Detalhes no FLOW: [link do processo]
+Detalhes no Orbe: [link do processo]
 
 Obrigada,
 ${S.user.n}`,
@@ -771,8 +734,8 @@ A[4]=()=>{ if($('bInv')) $('bInv').onclick=()=>{ S.sentInvite=true; log('Convite
 // 06 Propostas
 W[5]=()=>{ const fin=FINAL.map(k=>VENDORS[k].s).filter(x=>tpSt(x)==='Aprovada'), got=s=>S.files.filter(f=>f.v===s);
  if(!S.done.has(14)) return resBox('<b>Aguardando a validação técnica (etapa '+num(14)+').</b> A proposta comercial só é pedida aos fornecedores aprovados tecnicamente.','warn')+'<div class="actions"><button class="btn pri" id="bGoTec">Ir para Propostas técnicas</button></div>';
- return `<div class="box t" style="margin-bottom:16px"><h4>Quando os anexos entram no FLOW</h4>
-  <div class="flow" style="margin-top:6px">${[num(0)+' · pasta criada com a RC',num(4)+' · convite sai com anexos da pasta',num(14)+' · técnica validada',num(5)+' · FLOW lê as propostas comerciais','cada arquivo vira registro com versão e hash'].map((x,k)=>`<span class="n ${k===3?'on':'ok'}">${x}</span>${k<4?'<span class="a">›</span>':''}`).join('')}</div></div>
+ return `<div class="box t" style="margin-bottom:16px"><h4>Quando os anexos entram no Orbe</h4>
+  <div class="flow" style="margin-top:6px">${[num(0)+' · pasta criada com a RC',num(4)+' · convite sai com anexos da pasta',num(14)+' · técnica validada',num(5)+' · Orbe lê as propostas comerciais','cada arquivo vira registro com versão e hash'].map((x,k)=>`<span class="n ${k===3?'on':'ok'}">${x}</span>${k<4?'<span class="a">›</span>':''}`).join('')}</div></div>
  <div class="box" style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="color:var(--navy)">Seguem para a proposta comercial:</b> ${fin.map(x=>tag(x,'t-ok')).join(' ')} <span class="empty" style="font-style:normal">· aprovados na validação técnica</span></div>
  <div class="grid2">
   <div><h3>Pasta do processo no SharePoint</h3><div class="tree">${SP_ROOT.split('/').pop()}/<br>${SP_DIRS.map(d=>`&nbsp;&nbsp;├─ <span class="${d==='04_Propostas'?'on':''}">${d}/</span>${d==='04_Propostas'?`<br>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─ Tecnicas/<br>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└─ Comerciais/Rodada_1/ ${fin.map(f=>`<br>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ ${f.replace(' ','_')}/`).join('')}`:''}`).join('<br>')}</div></div>
@@ -823,7 +786,7 @@ W[6]=()=>{ const ns=['Atlas','Ciclo','Vértice'], R_=S.eqR, rl=rdList();
  ${nc&&!nc.ok?'<button class="btn sec" id="bNc">Tratar item não cotado</button>':''}
  ${dv&&!dv.ok?'<button class="btn sec" id="bDv">Validar total da PQ Ciclo</button>':''}</div>
  ${S.eqRun?`<div class="grid2" style="margin-top:14px">
-   <div class="box ${nc&&!nc.ok?'':'t'}"><h4>Regra · item não cotado</h4><p>Atlas não precificou <b>Reposições especiais</b>. O FLOW <b>não assume zero</b>: bloqueia o fechamento da rodada até tratar.</p></div>
+   <div class="box ${nc&&!nc.ok?'':'t'}"><h4>Regra · item não cotado</h4><p>Atlas não precificou <b>Reposições especiais</b>. O Orbe <b>não assume zero</b>: bloqueia o fechamento da rodada até tratar.</p></div>
    <div class="box ${dv&&!dv.ok?'':'t'}"><h4>Regra · total divergente</h4><p>PQ da Ciclo declara <b>${MM(ROUNDS.data['Ciclo Uniformes'][0]+20000*S.k)}</b>; soma dos itens dá <b>${MM(ROUNDS.data['Ciclo Uniformes'][0])}</b>. Os dois valores são preservados e viram pendência.</p></div></div>
    ${openPend().some(p=>p.step===6)?resBox('<b>Rodada bloqueada:</b> trate as pendências para liberar a negociação.','warn'):resBox('<b>Equalização concluída.</b> Base e PQs casam linha a linha – checkpoint do projeto atendido.')}`:''}`; };
 A[6]=()=>{ document.querySelectorAll('[data-rd]').forEach(b=>b.onclick=()=>{ S.eqR=+b.dataset.rd; render(); });
@@ -874,12 +837,12 @@ W[9]=()=>{ const rk=ranking(), w=S.weights;
  `}<div class="actions"><button class="btn pri" id="bAn">Consolidar análises</button></div>
  ${S.done.has(9)?resBox(`<b>Recomendação:</b> ${rk[0].v.n} – ${rk[0].tot.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})} pontos (critério ${w[0]}/${w[1]}).`):''}`; };
 function tecMail(){ const rec=Object.keys(S.tp).filter(x=>S.tp[x].st==='Recebida'); const att=rec.flatMap(x=>S.tp[x].files).map(f=>({n:f.n,p:SP_ROOT+'/04_Propostas/Tecnicas/'+f.v.replace(' ','_')}));
-  openMail({to:'rafael.monteiro@samarco.exemplo', cc:'marina.albuquerque@samarco.exemplo', subject:`[FLOW] Validação técnica – ${RC.num} – Uniformes industriais Ubu`, att:att.concat([{n:'Criterios_avaliacao_tecnica.xlsx',p:SP_ROOT+'/07_Analises'}]),
+  openMail({to:'rafael.monteiro@samarco.exemplo', cc:'marina.albuquerque@samarco.exemplo', subject:`[Orbe] Validação técnica – ${RC.num} – Uniformes industriais Ubu`, att:att.concat([{n:'Criterios_avaliacao_tecnica.xlsx',p:SP_ROOT+'/07_Analises'}]),
    body:`Olá, Rafael,
 
 Seguem as propostas técnicas para validação, proposta a proposta, com nota (0 a 10), conforme os critérios anexos.
 
-Processo: CT-FLOW-2026-017 · ${RC.num}
+Processo: CT-ORBE-2026-017 · ${RC.num}
 Objeto: ${RC.objeto}
 Proponentes: ${rec.join(', ')}
 
@@ -888,7 +851,7 @@ Por favor, informe para cada proposta:
   • Nota técnica e observações
 
 Prazo para retorno: 5 dias úteis.
-Responder pelo FLOW: [link do formulário de parecer]
+Responder pelo Orbe: [link do formulário de parecer]
 
 Obrigada,
 ${S.user.n}`,
@@ -930,7 +893,7 @@ W[10]=()=>{ const st=['Minuta enviada','Em análise na plataforma',S.jurPend?'Pe
  ${S.sig==='nao'?resBox('<b>Contrato sem assinatura</b> – formalização por pedido eletrônico. Registrado na trilha.','info'):''}`}`; };
 A[10]=()=>{ const set=(n,o)=>{ S.jurSrc={n,o}; log('Minuta selecionada', n+' · '+o); render(); };
   if($('jurUp')) $('jurUp').onchange=e=>{ const f=e.target.files[0]; if(f) set(f.name,'anexo do computador'); };
-  if($('jurSp')) $('jurSp').onclick=()=>set('Minuta_contratual_v1_CT-FLOW-2026-017.docx','SharePoint · 08_Juridico');
+  if($('jurSp')) $('jurSp').onclick=()=>set('Minuta_contratual_v1_CT-ORBE-2026-017.docx','SharePoint · 08_Juridico');
   if($('bJur')) $('bJur').onclick=()=>{ S.jur=1; addPend('jur','Minuta em análise no Jurídico',10); log('Minuta enviada ao Jurídico', S.jurSrc.n); render(); };
   if($('bJurA')) $('bJurA').onclick=()=>{ S.jur=2; log('Análise jurídica iniciada'); render(); };
   if($('bJurP')) $('bJurP').onclick=()=>{ S.jurPend=true; S.jur=2; log('Retorno do Jurídico: pendência de tratativa','Cláusula de multa por atraso'); render(); };
@@ -985,13 +948,13 @@ W[11]=()=>{ const ck=checks(), ok=ck.every(c=>c[1]), a=alcada(), t=ALC[S.alcMode
  <h3 style="margin-top:22px">Saídas geradas <span class="empty" style="font-weight:400">– montadas a partir dos dados do processo</span></h3>
  <div class="grid3">${[['rh','RH padrão Samarco','Formalização do processo'],['exec','Visão executiva','Liderança e comitê'],['aud','Visão de auditoria','Evidência e rastreabilidade']].map(d=>`<div class="box"><h4>${d[2]}</h4><p style="font-weight:700;color:var(--navy);margin-bottom:10px">${d[1]}</p><button class="btn ${apOk()?'pri':'sec'} sm" data-doc="${d[0]}">${apOk()?'Gerar PDF':'Gerar minuta (PDF)'}</button></div>`).join('')}</div>`; };
 function apMail(){ const a=alcada(), ap=APROV[a.func];
-  openMail({to:ap[1], cc:'marina.albuquerque@samarco.exemplo', subject:`[FLOW] Aprovação de RH${S.rhVer>1?' v'+S.rhVer+' (revisado)':''} – ${RC.num} – alçada ${a.code}`,
-   att:[{n:'RH_Padrao_CT-FLOW-2026-017.pdf',p:SP_ROOT+'/09_RH_e_Aprovacoes'},{n:'RH_Executivo_CT-FLOW-2026-017.pdf',p:SP_ROOT+'/09_RH_e_Aprovacoes'},{n:'RH_Controle_Auditoria_CT-FLOW-2026-017.pdf',p:SP_ROOT+'/09_RH_e_Aprovacoes'}],
+  openMail({to:ap[1], cc:'marina.albuquerque@samarco.exemplo', subject:`[Orbe] Aprovação de RH${S.rhVer>1?' v'+S.rhVer+' (revisado)':''} – ${RC.num} – alçada ${a.code}`,
+   att:[{n:'RH_Padrao_CT-ORBE-2026-017.pdf',p:SP_ROOT+'/09_RH_e_Aprovacoes'},{n:'RH_Executivo_CT-ORBE-2026-017.pdf',p:SP_ROOT+'/09_RH_e_Aprovacoes'},{n:'RH_Controle_Auditoria_CT-ORBE-2026-017.pdf',p:SP_ROOT+'/09_RH_e_Aprovacoes'}],
    body:`Prezados,
 
 Encaminho o RH${S.rhVer>1?' revisado (versão '+S.rhVer+')':''} do processo abaixo para aprovação na alçada ${a.code} – ${a.func}.${S.rhVer>1?'\n\nAjustes feitos conforme sua solicitação: '+S.rhRev[S.rhRev.length-1].ajuste:''}
 
-Processo: CT-FLOW-2026-017 · ${RC.num}
+Processo: CT-ORBE-2026-017 · ${RC.num}
 Objeto: ${RC.objeto}
 Fornecedor recomendado: ${winner().v.n}
 Valor: ${BRL(S.lastCall)} (≈ ${USD(a.usd)})
@@ -999,7 +962,7 @@ Cost Avoidance: ${PCT((ROUNDS.data['Atlas Têxtil'][0]-S.lastCall)/ROUNDS.data['
 Conformidade ao procedimento: ${conf().ok} regras conformes, ${conf().fora} desvio(s).
 
 Para aprovar: [link do fluxo de aprovação]
-Detalhes no FLOW: [link do processo]
+Detalhes no Orbe: [link do processo]
 
 Atenciosamente,
 ${S.user.n}`, sendLabel:'Enviar para aprovação', onSend:()=>{ S.apSt=Math.max(S.apSt,1); addPend('rhAp','RH aguardando aprovação na alçada '+a.code,11); }}); }
@@ -1030,29 +993,29 @@ const SUP = {
   forte:['Melhor preço unitário em higienização (–3% vs mediana das rodadas)','Responde a esclarecimentos em até 24 h','Aceita pagamento em 30 DDL quando há volume garantido','Equipe técnica estável no site de Ubu há 4 anos'],
   aten:['Preço de jaqueta retardante a chama acima da mediana (+2,8%)','Deixou item sem preço na 1ª rodada – exigir PQ completa','2 ocorrências de atraso na reposição emergencial em 2025'],
   reu:{tipo:'Last Call',post:'Colaborativa, com foco em volume',conc:['Redução de R$ 0,24 MM entre a 2ª rodada e o Last Call','Pagamento de 45 para 30 DDL','Mobilização sem custo adicional'],res:'Abriu a negociação defendendo o preço da jaqueta FR, mas cedeu quando apresentamos a mediana da rodada. Pediu garantia de volume mínimo de coleta para fechar 30 DDL.',prazo:'Retorno em 1 dia útil',dur:'1h10'},
-  hist:[['CT-FLOW-2026-017','2026','Uniformes industriais – Ubu','Vencedor'],['CT-2025-044','2025','Higienização de EPIs – Germano','Vencedor'],['CT-2025-012','2025','Lavanderia industrial – Ubu','2º lugar'],['CT-2024-087','2024','Uniformes – Mariana','Vencedor']],
+  hist:[['CT-ORBE-2026-017','2026','Uniformes industriais – Ubu','Vencedor'],['CT-2025-044','2025','Higienização de EPIs – Germano','Vencedor'],['CT-2025-012','2025','Lavanderia industrial – Ubu','2º lugar'],['CT-2024-087','2024','Uniformes – Mariana','Vencedor']],
   dica:['Começar pela jaqueta FR com a mediana da rodada em mãos','Usar volume mínimo de coleta como moeda de troca','Pedir PQ completa no convite para evitar item sem preço']},
  'Ciclo Uniformes':{sap:'910002',cnpj:'23.456.789/0001-01',cat:'Uniformes e higienização industrial',part:9,vit:4,red:9.8,aval:8.9,ind:[['Prazo de entrega no SLA',95],['Conformidade documental',99],['Ocorrências tratadas no prazo',91]],
   forte:['Maior nota técnica do processo (9,1)','Melhor desempenho em SLA da categoria (95%)','Estrutura própria de lavanderia em Serra/ES'],
   aten:['Total da PQ divergente da soma dos itens (já tratado)','Pouca flexibilidade de preço após a 2ª rodada','Exige reajuste anual pelo IPCA sem negociação'],
   reu:{tipo:'Last Call',post:'Firme em preço, flexível em prazo',conc:['Redução de R$ 0,10 MM entre a 2ª rodada e o Last Call','Prazo de mobilização reduzido de 30 para 15 dias'],res:'Manteve o preço defendendo a qualidade técnica. Ofereceu reduzir o prazo de mobilização em vez de baixar o preço.',prazo:'Retorno em 2 dias úteis',dur:'50 min'},
-  hist:[['CT-FLOW-2026-017','2026','Uniformes industriais – Ubu','2º lugar'],['CT-2025-061','2025','Uniformes – Germano','Vencedor'],['CT-2024-033','2024','Higienização de EPIs – Ubu','Vencedor']],
+  hist:[['CT-ORBE-2026-017','2026','Uniformes industriais – Ubu','2º lugar'],['CT-2025-061','2025','Uniformes – Germano','Vencedor'],['CT-2024-033','2024','Higienização de EPIs – Ubu','Vencedor']],
   dica:['Negociar condição comercial (prazo, mobilização) mais que preço','Valorizar a nota técnica se o critério técnico tiver peso maior']},
  'Vértice Lavanderia':{sap:'910003',cnpj:'34.567.890/0001-12',cat:'Lavanderia técnica',part:5,vit:1,red:11.1,aval:7.4,ind:[['Prazo de entrega no SLA',84],['Conformidade documental',88],['Ocorrências tratadas no prazo',72]],
   forte:['Preço competitivo em reposição emergencial','Atende rapidamente demandas pontuais'],
   aten:['Liquidez corrente abaixo de 1,0 e 2 ocorrências no Serasa','Desempenho de SLA abaixo da média da categoria','Maior valor final entre os finalistas'],
   reu:{tipo:'Last Call',post:'Reativa, pouco preparada',conc:['Redução de R$ 0,12 MM no Last Call'],res:'Pediu mais prazo para revisar a planilha e não trouxe contraproposta para os itens de maior peso.',prazo:'Retorno em 3 dias úteis',dur:'40 min'},
-  hist:[['CT-FLOW-2026-017','2026','Uniformes industriais – Ubu','3º lugar'],['CT-2025-090','2025','Lavanderia de EPIs – Mariana','Vencedor']],
+  hist:[['CT-ORBE-2026-017','2026','Uniformes industriais – Ubu','3º lugar'],['CT-2025-090','2025','Lavanderia de EPIs – Mariana','Vencedor']],
   dica:['Exigir garantia contratual se for considerada em processos futuros','Acompanhar a situação financeira antes de convidar']},
  'NorteSul':{sap:'910004',cnpj:'45.678.901/0001-23',cat:'Gestão têxtil',part:2,vit:0,red:null,aval:null,ind:[['Conformidade documental',61]],
   forte:['Proximidade logística de Vitória/ES'],aten:['Cadastro com pendência documental no Portal','Não enviou proposta neste processo'],
-  reu:null,hist:[['CT-FLOW-2026-017','2026','Uniformes industriais – Ubu','Não enviou'],['CT-2025-102','2025','Uniformes – Ubu','Desclassificado']],dica:['Regularizar o cadastro antes de um novo convite']},
+  reu:null,hist:[['CT-ORBE-2026-017','2026','Uniformes industriais – Ubu','Não enviou'],['CT-2025-102','2025','Uniformes – Ubu','Desclassificado']],dica:['Regularizar o cadastro antes de um novo convite']},
  'Brava':{sap:'910005',cnpj:'56.789.012/0001-34',cat:'Serviços integrados',part:3,vit:0,red:null,aval:null,ind:[['Conformidade documental',90]],
   forte:['Cadastro e SST conformes','Boa capilaridade no sul do ES'],aten:['Reprovado tecnicamente neste processo (escopo de higienização)'],
-  reu:null,hist:[['CT-FLOW-2026-017','2026','Uniformes industriais – Ubu','Reprovado técnico']],dica:['Convidar apenas para escopos de facilities, não de higienização técnica']},
+  reu:null,hist:[['CT-ORBE-2026-017','2026','Uniformes industriais – Ubu','Reprovado técnico']],dica:['Convidar apenas para escopos de facilities, não de higienização técnica']},
  'Prime':{sap:'910006',cnpj:'67.890.123/0001-45',cat:'Higienização industrial',part:2,vit:0,red:null,aval:null,ind:[['Conformidade documental',93]],
   forte:['Especialização em higienização industrial'],aten:['Declinou o convite (capacidade instalada)','Tributária em revisão no Portal'],
-  reu:null,hist:[['CT-FLOW-2026-017','2026','Uniformes industriais – Ubu','Declinou']],dica:['Confirmar capacidade antes de convidar para contratos acima de R$ 3 MM']}
+  reu:null,hist:[['CT-ORBE-2026-017','2026','Uniformes industriais – Ubu','Declinou']],dica:['Confirmar capacidade antes de convidar para contratos acima de R$ 3 MM']}
 };
 S.intel={tab:'busca', q:'', sel:null};
 const supName = s => (VENDORS.find(v=>v.s===s)||SUP[s]||{n:s}).n||s;
@@ -1073,7 +1036,7 @@ function supCard(s){ const d=SUP[s], v=VENDORS.find(x=>x.s===s)||{loc:d.loc,orig
  <h3 style="margin-top:20px">Como se comportou na última reunião</h3>
  ${r?`<div class="box">
    <div class="grid4" style="margin-bottom:12px">
-    <div><div class="lbl" style="margin:0">Reunião</div><b style="color:var(--navy)">${r.tipo} · CT-FLOW-2026-017</b></div>
+    <div><div class="lbl" style="margin:0">Reunião</div><b style="color:var(--navy)">${r.tipo} · CT-ORBE-2026-017</b></div>
     <div><div class="lbl" style="margin:0">Postura</div><b style="color:var(--navy)">${r.post}</b></div>
     <div><div class="lbl" style="margin:0">Resultado</div><b style="color:var(--navy)">${MM(rd[2])} → ${MM(lc)}</b></div>
     <div><div class="lbl" style="margin:0">Tempo de resposta</div><b style="color:var(--navy)">${r.prazo} · ${r.dur}</b></div></div>
@@ -1086,7 +1049,7 @@ function supCard(s){ const d=SUP[s], v=VENDORS.find(x=>x.s===s)||{loc:d.loc,orig
   <div class="box"><h4>Para a próxima negociação</h4><ul style="margin:6px 0 0;padding-left:18px">${d.dica.map(x=>`<li style="margin-bottom:4px">${x}</li>`).join('')}</ul></div></div>
  <h3 style="margin-top:20px">Histórico com a Samarco</h3>
  <table class="tb"><thead><tr><th>Processo</th><th>Ano</th><th>Objeto</th><th class="c">Resultado</th></tr></thead><tbody>${d.hist.map(h=>`<tr><td><b>${h[0]}</b></td><td>${h[1]}</td><td>${h[2]}</td><td class="c">${tag(h[3],h[3]==='Vencedor'?'t-ok':/lugar/.test(h[3])?'t-info':'t-n')}</td></tr>`).join('')}</tbody></table>
- <div class="empty" style="margin-top:10px">Fontes: atas de negociação e trilha do FLOW, avaliação de desempenho, SAP (contratos e ZMM010) e Portal de Fornecedores. Dados fictícios.</div>`; }
+ <div class="empty" style="margin-top:10px">Fontes: atas de negociação e trilha do Orbe, avaliação de desempenho, SAP (contratos e ZMM010) e Portal de Fornecedores. Dados fictícios.</div>`; }
 
 W[13]=()=>{ const I=S.intel, q=I.q.trim().toLowerCase();
  const all=Object.keys(SUP), res=q?all.filter(s=>[s,supName(s),SUP[s].sap,SUP[s].cnpj,SUP[s].cat,(SUP[s].an||[]).join(' ')].join(' ').toLowerCase().includes(q)):all;
@@ -1309,12 +1272,12 @@ function pdfCtx(){ const sw=S.weights; S.weights=[40,60]; const rk=ranking(); S.
     rounds:Object.fromEntries(Object.entries(ROUNDS.data).map(([k,a])=>[k, k==='Atlas Têxtil'?[a[0],a[1],a[2],fin]:a]))}; }
 function apDates(){ return S.log.filter(l=>l.a==='Aprovação registrada').slice().reverse().map(l=>l.h); }
 
-function docRH(X){ const K='Relatório de Homologação · RH Padrão', T='CT-FLOW-2026-017 · '+X.w.v.n;
+function docRH(X){ const K='Relatório de Homologação · RH Padrão', T='CT-ORBE-2026-017 · '+X.w.v.n;
  const inv=[...S.invited].sort(); const ap=apDates(), al=alcada(), apN=[['Elaborado · N0',S.plan.resp,X.hoje],['Aprovação · '+al.code+' · '+al.func,APROV[al.func][0],ap[0]?ap[0].split(',')[0]:null],['Gestor do contrato',S.plan.gestor,'ciente']];
  const p1=[K,T,`<div><div class="eyebrow">Gerência Geral de Suprimentos</div><h1>Relatório de Homologação de<br>Contratação / Aquisição</h1><p class="lead">${esc(RC.objeto)}</p></div>
  <div class="grid g4">${kp('Valor contratado',MM(X.fin),BRL(X.fin),'dark')}${kp('Custo evitado',PCT(X.ca),MM(X.ini-X.fin))}${kp('Vigência','24 meses','nov/2026 a out/2028')}${kp('Processo',esc(S.plan.estr),'3 proponentes finalistas')}</div>
  <div><h2>Dados da contratação</h2><div class="fields">
-  ${fld('Contrato / Pedido de compra',S.contract?'CT-FLOW-2026-017 · SAP '+S.contract:'CT-FLOW-2026-017',2)}${fld('Gerência','Suprimentos / Operações',2)}
+  ${fld('Contrato / Pedido de compra',S.contract?'CT-ORBE-2026-017 · SAP '+S.contract:'CT-ORBE-2026-017',2)}${fld('Gerência','Suprimentos / Operações',2)}
   ${fld('Fornecedor',X.w.v.n,2)}${fld('Data do documento',X.hoje,2)}
   ${fld('Objeto','Prestação de serviços de fornecimento, higienização, manutenção, reposição e gestão de uniformes industriais para as operações de Ubu/ES.',4)}
   ${fld('Valor da requisição de compra',BRL(RC.valor),2)}${fld('Nº da RC',RC.num,2)}
@@ -1322,7 +1285,7 @@ function docRH(X){ const K='Relatório de Homologação · RH Padrão', T='CT-FL
   ${fld('Prazo de vigência','nov/2026 a out/2028')}${fld('Prazo','24 meses')}${fld('Condição de pagamento','30 DDL')}${fld('Regime',esc(S.plan.regime))}
   ${fld('Reajuste','IPCA')}${fld('Data-base','out/2026')}${fld('Rescisão sem ônus','30 dias')}${fld('Multa','10%')}
   ${fld('Classificação do processo',esc(S.plan.estr))}${fld('Unidade','Ubu/ES')}${fld('Gerência requisitante','Operações Ubu')}${fld('Gestor do contrato',S.plan.gestor)}
-  ${fld('Responsável pelo processo',S.plan.resp)}${fld('RFQ','RFQ-FLOW-10458231')}${fld('Formalização','Documento de Compra Eletrônico + Contrato Assinado',2)}
+  ${fld('Responsável pelo processo',S.plan.resp)}${fld('RFQ','RFQ-ORBE-10458231')}${fld('Formalização','Documento de Compra Eletrônico + Contrato Assinado',2)}
   ${fld('Arquivamento',SP_ROOT,4)}</div></div>
  <div><h2>Aprovação por alçada <span class="muted" style="font-size:7.5pt;font-weight:500">· ${USD(al.usd)} · nova tabela de alçadas</span></h2><div class="grid g3">${apN.map((a,i)=>`<div class="sig"><b>${a[0]}</b><div class="muted">${a[1]}</div><div>${i===1?(a[2]?'Aprovado em '+a[2]:'<span class="muted">Pendente</span>'):i===0?'Em '+a[2]:'Ciente'}</div></div>`).join('')}</div></div>`,'Formulário · RH padrão'];
  const finRow=k=>{ const s=VENDORS[k].s; if(!finDone()) return 'Não aplicável'; if(!FINAL.includes(k)) return '—'; const c=finCalc(s); return c.risco==='Baixo'?'Aprovado':'Revisar'; };
@@ -1359,7 +1322,7 @@ function docExec(X){ const K='Relatório executivo de homologação', T='Gestão
  const chip=t=>`<span class="pill" style="background:rgba(255,255,255,.14);color:#fff;font-size:6.6pt;padding:1mm 3mm;margin-right:1.6mm">${t}</span>`;
  const p1=[K,T,`<div class="callout" style="padding:6mm"><div class="kl">Contratação / Aquisição</div><div style="font-size:19pt;font-weight:800;margin-top:1.5mm;line-height:1.15">Gestão de Uniformes Industriais – Ubu</div>
  <p style="font-size:8.8pt">Prestação de serviços de fornecimento, higienização, manutenção, reposição e gestão de uniformes industriais para as operações de Ubu/ES.</p>
- <div style="margin-top:4mm">${chip('CT-FLOW-2026-017')}${chip(RC.num)}${chip('Processo '+S.plan.estr.toLowerCase())}${chip(S.plan.regime)}</div></div>
+ <div style="margin-top:4mm">${chip('CT-ORBE-2026-017')}${chip(RC.num)}${chip('Processo '+S.plan.estr.toLowerCase())}${chip(S.plan.regime)}</div></div>
  <div><h2>Resumo principal</h2><div class="grid g4">${kp('Fornecedor recomendado',X.w.v.s,'Pontuação '+N2(X.w.tot,1)+' (40/60)','dark')}${kp('Valor final',MM(X.fin),BRL(X.fin))}${kp('Cost Avoidance',PCT(X.ca),MM(X.ini-X.fin))}${kp('Alçada de aprovação',alcada().code,alcada().func)}</div></div>
  <div class="fields">${fld('Data do documento',X.hoje)}${fld('Unidade','Ubu/ES')}${fld('Gestor do contrato',S.plan.gestor)}${fld('Responsável',S.plan.resp)}
  ${fld('Gerência requisitante','Operações Ubu')}${fld('Reajuste','IPCA · out/26')}${fld('Pagamento','30 DDL')}${fld('Rescisão / multa','30 dias · 10%')}</div>
@@ -1396,11 +1359,11 @@ const PD = {
  prazo:['ACH','Prazo abaixo do mínimo','O rito completo exige pelo menos 30 dias.','Prazo planejado abaixo de 30 dias.','Rodadas e jurídico comprimidos.','Cronograma aprovado.','Ajustar o prazo ou justificar a urgência.'],
  vlt:['ACH','Base com menos de 3 fornecedores','A VLT deve ter pelo menos 3 convidados.','Menos de 3 fornecedores marcados.','Baixa competitividade.','VLT aprovada.','Ampliar a base ou justificar.']
 };
-function docAud(X){ const K='RH · Visão de Controle e Auditoria', T='CT-FLOW-2026-017 · '+X.w.v.n, c=X.c;
+function docAud(X){ const K='RH · Visão de Controle e Auditoria', T='CT-ORBE-2026-017 · '+X.w.v.n, c=X.c;
  const status = c.fora?'COM DESVIOS':(c.pend||openPend().length)?'EM ANDAMENTO':'CONFORME';
  const pages=[];
  pages.push([K,T,`<div><div class="eyebrow">01 · Gerência Geral de Suprimentos</div><h1>RH – Visão de Controle e Auditoria</h1><p class="lead">Conformidade ao procedimento, evidências e rastreabilidade do processo de contratação.</p></div>
- <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:3mm"><div class="card"><h3>Processo</h3><table><tbody>${[['Contrato','CT-FLOW-2026-017'+(S.contract?' · SAP '+S.contract:'')],['Alçada',alcada().code+' · '+alcada().func+' · '+USD(alcada().usd)],['RC / RFQ',RC.num],['Fornecedor',X.w.v.n],['Objeto','Uniformes industriais – Ubu'],['Emissão',X.hoje+' · '+esc(S.user.n)],['Gestor',S.plan.gestor],['Responsável',S.plan.resp]].map(r=>`<tr><td class="muted" style="padding:1.2mm 0;font-size:6.8pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;width:26mm;border-bottom:.6pt solid var(--line)">${r[0]}</td><td class="b" style="color:var(--navy);border-bottom:.6pt solid var(--line)">${r[1]}</td></tr>`).join('')}</tbody></table></div>
+ <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:3mm"><div class="card"><h3>Processo</h3><table><tbody>${[['Contrato','CT-ORBE-2026-017'+(S.contract?' · SAP '+S.contract:'')],['Alçada',alcada().code+' · '+alcada().func+' · '+USD(alcada().usd)],['RC / RFQ',RC.num],['Fornecedor',X.w.v.n],['Objeto','Uniformes industriais – Ubu'],['Emissão',X.hoje+' · '+esc(S.user.n)],['Gestor',S.plan.gestor],['Responsável',S.plan.resp]].map(r=>`<tr><td class="muted" style="padding:1.2mm 0;font-size:6.8pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;width:26mm;border-bottom:.6pt solid var(--line)">${r[0]}</td><td class="b" style="color:var(--navy);border-bottom:.6pt solid var(--line)">${r[1]}</td></tr>`).join('')}</tbody></table></div>
  <div class="callout" style="display:flex;flex-direction:column;${status==='COM DESVIOS'?'background:#7A1F18':''}"><div class="kl">Resultado da checagem</div><div style="font-size:17pt;font-weight:800;margin-top:2mm">${status}</div><p>${c.ok} regras conformes · ${c.fora} fora do procedimento · ${c.att} ponto(s) de atenção · ${c.pend} pendente(s) · ${c.na} não aplicável(is).</p><div style="margin-top:auto;padding-top:3mm">${pp(openPend().length+' pendência(s) aberta(s)')}</div></div></div>
  <div class="grid g4">${kp('Valor final',MM(X.fin),'Last Call')}${kp('Cost Avoidance',PCT(X.ca),MM(X.ini-X.fin))}${kp('Conformidade',c.ok+' / '+(c.r.length-c.na),'regras aplicáveis','dark')}${kp('Trilha',String(S.log.length),'registros')}</div>
  <div><h2>Checklist de consistência</h2><table class="t"><tbody>${checks().map(k=>`<tr><td>${k[0]}</td><td class="c" style="width:30mm">${pp(k[1]?'Conforme':'Pendente')}</td></tr>`).join('')}</tbody></table></div>
@@ -1437,7 +1400,7 @@ function docAud(X){ const K='RH · Visão de Controle e Auditoria', T='CT-FLOW-2
 const DOCS={rh:['RH padrão Samarco','RH_Padrao_Samarco',docRH],exec:['Visão executiva','RH_Executivo',docExec],aud:['Visão de controle e auditoria','RH_Controle_Auditoria',docAud]};
 function buildPdfHtml(kind){ const X=pdfCtx(), pages=DOCS[kind][2](X), N=pages.length;
   const html=pages.map((p,i)=>`<section class="page ${p[4]||''}">${X.final?'':'<div class="wm">MINUTA</div>'}<div class="hdr"><div><div class="k">${p[0]}</div><div class="t">${p[1]}</div></div><div><div class="brand">SAMARCO</div><div class="sub">Gerência Geral de Suprimentos</div></div></div><div class="pbody">${p[2]}</div><div class="ftr"><div><span class="tag">Dados fictícios</span>${p[3]}${X.final?'':' · minuta – processo em andamento'}</div><div class="pg">${String(i+1).padStart(2,'0')} / ${String(N).padStart(2,'0')}</div></div></section>`).join('');
-  return {html:`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${DOCS[kind][1]}_CT-FLOW-2026-017</title><style>${PDF_CSS}</style></head><body>${html}</body></html>`, N, final:X.final}; }
+  return {html:`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${DOCS[kind][1]}_CT-ORBE-2026-017</title><style>${PDF_CSS}</style></head><body>${html}</body></html>`, N, final:X.final}; }
 let PDF_KIND='rh';
 function openPdf(kind){ PDF_KIND=kind; const b=buildPdfHtml(kind);
   $('pdfTabs').innerHTML=Object.entries(DOCS).map(([k,d])=>`<button class="${k===kind?'on':''}" data-pk="${k}">${d[0]}</button>`).join('');
@@ -1508,7 +1471,7 @@ function eqOpen(){ S.eqi.round=eqRoundDef(); $('eqView').classList.remove('hidde
 function eqClose(){ $('eqView').classList.add('hidden'); document.body.style.overflow=''; }
 function csv(name, rows){ const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"'; const nf=v=>typeof v==='number'?v.toLocaleString('pt-BR',{maximumFractionDigits:2}):v;
   const blob=new Blob(['﻿'+rows.map(r=>r.map(x=>q(nf(x))).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name+'_CT-FLOW-2026-017.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name+'_CT-ORBE-2026-017.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   log('Exportação da equalização', name+'.csv · '+(rows.length-1)+' linhas'); renderSide(); toast(name+' exportado (CSV)'); }
 
 function paretoSVG(D){ const W_=760,H_=250,P={l:84,r:46,t:14,b:70}, ls=D.lines.filter(l=>l.val[D.win]!==null).sort((a,b)=>b.val[D.win]-a.val[D.win]), n=ls.length, bw=(W_-P.l-P.r)/n, mx=ls[0].val[D.win];
@@ -1620,7 +1583,7 @@ function eqExport(k, D){ const w=D.win, lb=ROUNDS.labels[D.r];
  if(k==='todos') return csv('Todos_os_Dados',[[...H,'Valor RC',...EQS.flatMap(s=>[s+' R$/un',s+' total']),'Melhor fornecedor','Gap '+w],...D.lines.map(l=>[l.i+1,l.g,l.d,l.un,l.q,l.rcU,l.rc,...EQS.flatMap(s=>[l.p[s]??'não cotado',l.val[s]??'']),l.best,l.val[w]!=null&&l.best!==w?l.val[w]-l.min:0])]);
 }
 
-function docEq(X){ const D=pqData(S.eqi.round??eqRoundDef()), w=D.win, K='Inteligência de equalização', T='CT-FLOW-2026-017 · '+ROUNDS.labels[D.r];
+function docEq(X){ const D=pqData(S.eqi.round??eqRoundDef()), w=D.win, K='Inteligência de equalização', T='CT-ORBE-2026-017 · '+ROUNDS.labels[D.r];
  const bars=EQS.map(s=>`<div class="row"><div class="lbl">${s}</div><div class="trk"><div class="fl2 ${s===w?'hi':''}" style="width:${D.tot[s]/Math.max(...EQS.map(x=>D.tot[x]),RC.valor)*100}%"></div></div><div class="val">${N2(D.tot[s]/1e6)}</div></div>`).join('');
  const p1=[K,T,`<div><div class="eyebrow">Relatório de equalização</div><h1>Resumo executivo da equalização</h1><p class="lead">PQ_${RC.num} · ${ROUNDS.labels[D.r]} · ${D.raw} linhas lidas, ${D.valid} válidas, ${D.groups.length} macroitens.</p></div>
   <div class="grid g4">${kp('Melhor oferta global',MM(D.tot[w]),w,'dark')}${kp('Valor da RC',MM(RC.valor),RC.num)}${kp('Economia potencial',MM(D.eco),PCT(D.eco/RC.valor)+' vs RC')}${kp('Melhor preço/linha',MM(D.cherry),'alvo de negociação')}</div>
@@ -1643,7 +1606,7 @@ function renderPainel(){
   const rk=ranking(), done=S.done.size, ini=ROUNDS.data['Atlas Têxtil'][0];
   const phases=['Preparação','Mercado','Decisão','Formalização'].map(p=>{ const idx=STEPS.map((s,i)=>s.ph===p?i:-1).filter(i=>i>=0&&ORDER.includes(i)); return [p, idx.filter(i=>S.done.has(i)).length, idx.length]; });
   $('viewPainel').innerHTML = `
-  <div class="panel"><h3>Jornada do processo CT-FLOW-2026-017</h3>
+  <div class="panel"><h3>Jornada do processo CT-ORBE-2026-017</h3>
    <div class="journey">${ORDER.map(i=>`<div class="${S.done.has(i)?'ok':i===S.step?'cur':''}" title="${esc(STEPS[i].t)}">${num(i)}</div>`).join('')}</div>
    <div class="legend"><span><i style="background:var(--blue)"></i>Concluída</span><span><i style="background:var(--navy)"></i>Atual</span><span><i style="background:var(--ice)"></i>Pendente</span></div>
    <div class="grid4" style="margin-top:16px">${phases.map(p=>`<div><div style="display:flex;justify-content:space-between;font-size:13.5px"><b style="color:var(--navy)">${p[0]}</b><span class="num">${p[1]}/${p[2]}</span></div><div class="bar" style="margin-top:6px"><i style="width:${p[1]/p[2]*100}%"></i></div></div>`).join('')}</div>
@@ -1711,7 +1674,7 @@ function renderIA(){
   <div class="panel"><div class="ia-hero">
     <div><div class="eyebrow">Quadrante IA · preparado para receber inteligência artificial</div>
      <h2 style="margin:4px 0 6px">IA parametrizada, desligada até a diretriz da TI</h2>
-     <p class="lead" style="margin:0">O FLOW já nasce com os pontos de IA mapeados em cada etapa. Quando a TI homologar o provedor e a diretriz de uso, basta ligar caso a caso – sem refazer o sistema. A IA <b>sugere</b>; quem decide é sempre a pessoa.</p></div>
+     <p class="lead" style="margin:0">O Orbe já nasce com os pontos de IA mapeados em cada etapa. Quando a TI homologar o provedor e a diretriz de uso, basta ligar caso a caso – sem refazer o sistema. A IA <b>sugere</b>; quem decide é sempre a pessoa.</p></div>
     <div style="display:grid;gap:10px">
      <div class="grid2"><div class="stat"><div class="k">Pontos mapeados</div><div class="v num">${AI_CASES.length}</div></div>
       <div class="stat ${ativos?'dk':''}"><div class="k">Em piloto</div><div class="v num">${ativos}</div></div></div>
@@ -1719,7 +1682,7 @@ function renderIA(){
       <div><b style="color:var(--navy)">${A_.on?'IA habilitada no ambiente (simulação)':'IA desligada no ambiente'}</b><div class="empty" style="font-style:normal;margin:2px 0 0">${A_.prov==='tbd'?'Para habilitar, escolha o provedor homologado em Parâmetros.':A_.on?'Agora ligue os casos de uso que vão para o piloto.':'Provedor definido – pode habilitar para o piloto.'}</div></div></div>
     </div></div></div>
 
-  <div class="panel"><h3 style="margin-top:0">Onde a IA entra no FLOW</h3>
+  <div class="panel"><h3 style="margin-top:0">Onde a IA entra no Orbe</h3>
    <p class="empty" style="font-style:normal;margin:-4px 0 12px">Clique em uma linha para ver como a sugestão aparece para o comprador. ${A_.on?'':'Os interruptores liberam quando a IA for habilitada no ambiente.'}</p>
    <div style="overflow:auto"><table class="ia"><thead><tr><th style="width:24%">Onde</th><th style="width:19%">Caso de uso</th><th>O que a IA lê</th><th>O que entrega</th><th style="width:90px">Onda</th><th style="width:150px">Status</th></tr></thead><tbody>
    ${AI_CASES.map(c=>`<tr data-iac="${c.id}" class="${c.id===A_.sel?'sel':''}">
@@ -1748,30 +1711,30 @@ function renderIA(){
      ${[['rc','RC e escopo'],['prop','Propostas técnicas e comerciais'],['hist','Histórico de fornecedores e negociações'],['min','Minutas contratuais']].map(([k,v])=>`<label><input type="checkbox" data-iad="${k}" ${A_.dados[k]?'checked':''}> ${v}</label>`).join('')}
      <label style="color:var(--muted)"><input type="checkbox" disabled> Dados pessoais (CPF, salários, contatos) – <b>sempre mascarados</b></label></div>
    </div>
-   <div class="panel"><h3 style="margin-top:0">Regras de uso da IA no FLOW</h3>
+   <div class="panel"><h3 style="margin-top:0">Regras de uso da IA no Orbe</h3>
     <ul class="ia-g" style="padding-left:18px;margin:0;font-size:14px">
      <li><b>IA sugere, a pessoa decide:</b> nenhuma aprovação, envio de e-mail ou gravação no SAP é feita pela IA.</li>
      <li><b>Sempre identificada:</b> toda sugestão aparece com o selo “Sugerido por IA” e o nível de confiança.</li>
      <li><b>Trilha completa:</b> pergunta, resposta, versão do modelo e quem aceitou ficam na auditoria.</li>
      <li><b>Dados no ambiente Samarco:</b> só provedor homologado pela TI; dados pessoais mascarados; sem uso para treinar modelos externos.</li>
      <li><b>Liga e desliga por caso:</b> cada ponto entra em piloto separadamente e pode ser desligado na hora.</li>
-     <li><b>Sem IA, o FLOW funciona igual:</b> se o serviço cair, o processo segue manual, sem perda.</li></ul>
+     <li><b>Sem IA, o Orbe funciona igual:</b> se o serviço cair, o processo segue manual, sem perda.</li></ul>
     <label class="lbl" style="margin-top:16px">Prontidão</label>
     <div class="ia-ready">
-     <div style="background:var(--okbg);color:#164F35"><b>Pronto no FLOW</b><ul><li>Pontos de IA em 9 etapas + busca e conformidade</li><li>Campo de origem IA / pessoa</li><li>Registro na trilha</li><li>Liga/desliga e parâmetros</li></ul></div>
+     <div style="background:var(--okbg);color:#164F35"><b>Pronto no Orbe</b><ul><li>Pontos de IA em 9 etapas + busca e conformidade</li><li>Campo de origem IA / pessoa</li><li>Registro na trilha</li><li>Liga/desliga e parâmetros</li></ul></div>
      <div style="background:var(--warnbg);color:#5E3D00"><b>Depende da TI</b><ul><li>Diretriz de uso de IA</li><li>Provedor e modelo homologados</li><li>Classificação dos dados</li><li>Ambiente e credenciais</li></ul></div></div>
    </div>
   </div>
 
   <div class="panel"><h3 style="margin-top:0">Para a TI: como o sistema recebe a IA</h3>
    <div class="grid2" style="align-items:start">
-    <div style="font-size:14px;line-height:1.55">Cada etapa expõe um <b>ponto de extensão</b> padrão. O FLOW envia o contexto da etapa, o serviço de IA devolve uma sugestão estruturada e o FLOW mostra para a pessoa aceitar, ajustar ou descartar. Trocar de provedor é trocar a configuração – as telas e as regras não mudam.
-     <ol style="margin:10px 0 0;padding-left:18px"><li>FLOW monta o contexto permitido (só os dados liberados acima).</li><li>Serviço de IA homologado responde.</li><li>Sugestão abaixo da confiança mínima é descartada.</li><li>Pessoa decide; tudo vai para a trilha.</li></ol></div>
+    <div style="font-size:14px;line-height:1.55">Cada etapa expõe um <b>ponto de extensão</b> padrão. O Orbe envia o contexto da etapa, o serviço de IA devolve uma sugestão estruturada e o Orbe mostra para a pessoa aceitar, ajustar ou descartar. Trocar de provedor é trocar a configuração – as telas e as regras não mudam.
+     <ol style="margin:10px 0 0;padding-left:18px"><li>Orbe monta o contexto permitido (só os dados liberados acima).</li><li>Serviço de IA homologado responde.</li><li>Sugestão abaixo da confiança mínima é descartada.</li><li>Pessoa decide; tudo vai para a trilha.</li></ol></div>
     <div class="ia-code">POST /ia/sugestao
 {
   "caso": "${sel.id}",
   "etapa": "${esc(sel.st===null?sel.where:STEPS[sel.st].t)}",
-  "processo": "CT-FLOW-2026-017",
+  "processo": "CT-ORBE-2026-017",
   "dados_permitidos": [${Object.keys(A_.dados).filter(k=>A_.dados[k]).map(k=>'"'+k+'"').join(', ')}]
 }
 → {
@@ -1781,6 +1744,7 @@ function renderIA(){
   "modelo": "${A_.prov==='tbd'?'a-definir':'homologado-ti'}",
   "requer_aceite": true
 }</div></div></div>`;
+  $('viewIA').insertAdjacentHTML('afterbegin', predPanel());
 
   $('iaProv').onchange=e=>{ S.ai.prov=e.target.value; if(S.ai.prov==='tbd' && S.ai.on){ S.ai.on=false; aiLog('IA desligada no ambiente','Provedor voltou para “a definir”'); } aiLog('Provedor de IA alterado', AI_PROV[S.ai.prov]); renderIA(); };
   $('iaConf').onchange=e=>{ S.ai.conf=+e.target.value; aiLog('Confiança mínima alterada', S.ai.conf+'%'); renderIA(); };
@@ -1800,7 +1764,7 @@ function setView(v){ S.view=v; document.querySelectorAll('[data-view]').forEach(
    ========================================================= */
 function openDoc(kind){
   const w=winner(), ini=ROUNDS.data['Atlas Têxtil'][0], titles={rh:'RH padrão Samarco',exec:'Visão executiva',aud:'Visão de controle e auditoria'};
-  const head=`<div class="dh"><div><div style="font-size:11px;letter-spacing:.12em;color:var(--blue);font-weight:800">GERÊNCIA GERAL DE SUPRIMENTOS</div><h1>${titles[kind]}</h1><div class="empty" style="font-style:normal">CT-FLOW-2026-017 · ${RC.num} · emitido em ${new Date().toLocaleDateString('pt-BR')} por ${esc(S.user.n)}</div></div><div class="br">SAMARCO</div></div>`;
+  const head=`<div class="dh"><div><div style="font-size:11px;letter-spacing:.12em;color:var(--blue);font-weight:800">GERÊNCIA GERAL DE SUPRIMENTOS</div><h1>${titles[kind]}</h1><div class="empty" style="font-style:normal">CT-ORBE-2026-017 · ${RC.num} · emitido em ${new Date().toLocaleDateString('pt-BR')} por ${esc(S.user.n)}</div></div><div class="br">SAMARCO</div></div>`;
   let b='';
   if(kind==='rh') b=`<div class="ff">
    <div class="w2"><small>Fornecedor</small>${w.v.n}</div><div class="w2"><small>Valor total contratado</small><b>${BRL(S.lastCall)}</b></div>
@@ -1838,7 +1802,7 @@ function exportLog(){
   const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
   const rows=[['Data/hora','Usuário','Etapa','Ação','Detalhe'],...S.log.slice().reverse().map(l=>[l.h,l.u,l.e,l.a,l.d])];
   const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='FLOW_Trilha_Auditoria_Demonstracao.csv'; document.body.appendChild(a); a.click(); a.remove();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Orbe_Trilha_Auditoria_Demonstracao.csv'; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000); toast('Trilha exportada em CSV');
 }
 
@@ -1943,7 +1907,7 @@ const encDefault=()=>`Prezado(a),
 
 Informamos a conclusão do processo de contratação referente ao objeto mencionado abaixo.
 
-Processo: CT-FLOW-2026-017 · ${RC.num}
+Processo: CT-ORBE-2026-017 · ${RC.num}
 Objeto: ${RC.objeto}
 Contrato/Pedido: ${S.contract||'—'} · Fornecedor: ${winner().v.n}
 
@@ -1992,8 +1956,8 @@ A[15]=()=>{
   $('encTxt').oninput=e=>{ S.encTxt=e.target.value; };
   $('eMail').onclick=()=>{ const d=encDest().filter(x=>S.encTo[x[0]]); if(!d.length){ toast('Marque ao menos um destinatário'); return; }
     const docs=ENC_DOCS.filter(x=>S.encDocs[x[0]]);
-    openMail({to:d.map(x=>x[3]).join('; '), cc:'suprimentos.ubu@samarco.exemplo', subject:`[FLOW] Conclusão do processo de contratação – CT-FLOW-2026-017 – ${RC.objeto}`,
-      att:[...docs.map(x=>({n:x[1],p:SP_ROOT+'/10_Contrato'})),{n:'Handover_Novas_Contratacoes_CT-FLOW-2026-017.pdf',p:SP_ROOT+'/10_Contrato'}],
+    openMail({to:d.map(x=>x[3]).join('; '), cc:'suprimentos.ubu@samarco.exemplo', subject:`[Orbe] Conclusão do processo de contratação – CT-ORBE-2026-017 – ${RC.objeto}`,
+      att:[...docs.map(x=>({n:x[1],p:SP_ROOT+'/10_Contrato'})),{n:'Handover_Novas_Contratacoes_CT-ORBE-2026-017.pdf',p:SP_ROOT+'/10_Contrato'}],
       body:(S.encTxt||encDefault())+'\n\nDocumentos anexados:\n'+docs.map(x=>'☑ '+x[1]).join('\n'), sendLabel:'Enviar formalização',
       onSend:()=>{ S.enc.sent=true; log('Formalização final enviada', d.map(x=>x[1]).join(', ')+' · '+docs.length+' documento(s) + handover'); }}); };
   $('eEnd').onclick=()=>{ if(!S.contract){ toast('Crie o contrato no SAP antes de encerrar'); return; }
@@ -2001,11 +1965,11 @@ A[15]=()=>{
     complete('Processo encerrado'); S.status='finalizado'; S.home='finalizados'; log('Processo encerrado', 'Contrato '+S.contract+' · movido para Contratos finalizados');
     S.dbAt=now(); log('Processo gravado no banco de dados de Suprimentos', dbRecs().reduce((a,r)=>a+r[1],0)+' registros · predição da categoria recalibrada'); toast('Processo gravado na base – Inteligência de Suprimentos gerada'); openSupInt('int'); };
   $('eCancel').onclick=()=>{ const m=prompt('Motivo do cancelamento (obrigatório):',''); if(m===null) return; if(m.trim().length<5){ toast('Descreva o motivo do cancelamento'); return; }
-    if(!confirm('Cancelar o processo CT-FLOW-2026-017? Ele vai para a esteira Contratos cancelados.')) return;
+    if(!confirm('Cancelar o processo CT-ORBE-2026-017? Ele vai para a esteira Contratos cancelados.')) return;
     S.status='cancelado'; S.cancelMotivo=m.trim(); S.home='cancelados'; log('Processo cancelado', S.cancelMotivo); toast('Processo movido para Contratos cancelados'); setView('inicio'); render(); };
 };
 
-function docHand(X){ const K='Handover · Novas contratações', T='CT-FLOW-2026-017 · '+X.w.v.n, H=S.hand, yn=v=>v;
+function docHand(X){ const K='Handover · Novas contratações', T='CT-ORBE-2026-017 · '+X.w.v.n, H=S.hand, yn=v=>v;
  const row=(a,b,c,d)=>`<tr><td class="b" style="width:24%">${a}</td><td style="width:26%">${b}</td>${c!==undefined?`<td class="b" style="width:24%">${c}</td><td>${d}</td>`:'<td colspan="2"></td>'}</tr>`;
  const sec=t=>`<tr><td colspan="4" style="background:var(--navy);color:#fff;font-size:7pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase">${t}</td></tr>`;
  const docs=ENC_DOCS.map(d=>`<div style="padding:.6mm 0">${S.encDocs[d[0]]?'☑':'☐'} ${d[1]}</div>`).join('');
@@ -2035,34 +1999,30 @@ Object.assign(PD,{
    V14 · INÍCIO – esteiras de contratos
    ========================================================= */
 const OTHERS={
- andamento:[['CT-FLOW-2026-015','Manutenção de correias transportadoras – Germano','Lucas Andrade','Equalização',0.45],['CT-FLOW-2026-019','Transporte de pessoal – Ubu','Renata Siqueira','Carta-convite',0.3]],
- finalizados:[['CT-FLOW-2026-009','Destinação de resíduos – Germano','Renata Siqueira','Contrato 4600004702 · Vale Verde Ambiental'],['CT-FLOW-2026-006','Montagem de chutes – Ubu','Lucas Andrade','Contrato 4600004688 · Ferrocor Montagens'],['CT-FLOW-2026-003','Transporte de turno – Ubu','Lucas Andrade','Contrato 4600004651 · TransCapixaba']],
- cancelados:[['CT-FLOW-2026-011','Locação de geradores – Ubu','Patrícia Velozo','Aberto por engano – demanda atendida por contrato vigente']]};
+ andamento:[['CT-ORBE-2026-015','Manutenção de correias transportadoras – Germano','Lucas Andrade','Equalização',0.45],['CT-ORBE-2026-019','Transporte de pessoal – Ubu','Renata Siqueira','Carta-convite',0.3]],
+ finalizados:[['CT-ORBE-2026-009','Destinação de resíduos – Germano','Renata Siqueira','Contrato 4600004702 · Vale Verde Ambiental'],['CT-ORBE-2026-006','Montagem de chutes – Ubu','Lucas Andrade','Contrato 4600004688 · Ferrocor Montagens'],['CT-ORBE-2026-003','Transporte de turno – Ubu','Lucas Andrade','Contrato 4600004651 · TransCapixaba']],
+ cancelados:[['CT-ORBE-2026-011','Locação de geradores – Ubu','Patrícia Velozo','Aberto por engano – demanda atendida por contrato vigente']]};
 function renderHome(){ const st=S.status, mine={andamento:st==='andamento',finalizados:st==='finalizado',cancelados:st==='cancelado'};
  const cur=STEPS[S.step].t, pr=S.done.size/ORDER.length;
- const live=k=>mine[k]?`<button class="pc live" data-open="1"><div style="display:flex;justify-content:space-between;gap:8px"><span class="t1">CT-FLOW-2026-017</span>${tag(k==='andamento'?(S.rc?'Etapa '+num(S.step)+' · '+cur:'Não iniciado'):k==='finalizados'?'Finalizado':'Cancelado',k==='cancelados'?'t-bad':k==='finalizados'?'t-ok':'t-info')}</div>
+ const live=k=>mine[k]?`<button class="pc live" data-open="1"><div style="display:flex;justify-content:space-between;gap:8px"><span class="t1">CT-ORBE-2026-017</span>${tag(k==='andamento'?(S.rc?'Etapa '+num(S.step)+' · '+cur:'Não iniciado'):k==='finalizados'?'Finalizado':'Cancelado',k==='cancelados'?'t-bad':k==='finalizados'?'t-ok':'t-info')}</div>
    <div class="t2">${esc(RC.objeto)} · ${esc(S.user.n)}</div>
    ${k==='andamento'?`<div class="bar" style="margin-top:8px"><i style="width:${pr*100}%"></i></div><div class="t2">${S.done.size} de ${ORDER.length} etapas · ${openPend().length} pendência(s)</div>`:k==='finalizados'?`<div class="t2">Contrato ${S.contract} · ${esc(winner().v.s)}</div>`:`<div class="t2">Motivo: ${esc(S.cancelMotivo||'')}</div>`}</button>`:'';
  const other=(k,o)=>`<button class="pc" data-other="${o[0]}"><div style="display:flex;justify-content:space-between;gap:8px"><span class="t1">${o[0]}</span>${k==='andamento'?tag(o[3],'t-n'):k==='finalizados'?tag('Finalizado','t-ok'):tag('Cancelado','t-bad')}</div><div class="t2">${o[1]} · ${o[2]}</div>${k==='andamento'?`<div class="bar" style="margin-top:8px"><i style="width:${o[4]*100}%"></i></div>`:`<div class="t2">${o[3]}</div>`}</button>`;
  const lane=(k,t,ic)=>{ const n=OTHERS[k].length+(mine[k]?1:0); return `<div class="lane" style="${S.home===k?'outline:2px solid var(--mist)':''}"><h3><span>${ic} ${t}</span><span class="tag ${k==='cancelados'?'t-bad':k==='finalizados'?'t-ok':'t-info'}">${n}</span></h3>${live(k)}${OTHERS[k].map(o=>other(k,o)).join('')}</div>`; };
  $('viewInicio').innerHTML=`
  <div class="panel"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px">
-   <div><div class="eyebrow">Olá, ${esc(S.user.n.split(' ')[0])}</div><h2 style="margin:2px 0 0">Iniciar um novo processo</h2><div class="empty" style="font-style:normal">Traga a pasta com a RC, o escopo e a planilha-base – o FLOW monta o processo a partir dela.</div></div></div>
+   <div><div class="eyebrow">Olá, ${esc(S.user.n.split(' ')[0])}</div><h2 style="margin:2px 0 0">Iniciar um novo processo</h2><div class="empty" style="font-style:normal">Traga a pasta com a RC, o escopo e a planilha-base – o Orbe monta o processo a partir dela.</div></div></div>
   <div class="newp">
    <label class="opt"><span class="ic">📎</span><span><b style="color:var(--navy);font-size:16px">Subir pasta ou anexos do computador</b><div class="empty" style="font-style:normal">RC, escopo técnico, planilha-base (PQ), minuta</div></span><input type="file" id="hUp" multiple hidden></label>
    <button class="opt" id="hSp"><span class="ic">🗂️</span><span><b style="color:var(--navy);font-size:16px">Buscar pasta no SharePoint</b><div class="empty" style="font-style:normal">/sites/Suprimentos/Processos</div></span></button>
   </div>
-  ${S.startSrc&&S.status==='andamento'?`<div style="margin-top:12px">${resBox('<b>Documentos iniciais carregados</b> ('+esc(S.startSrc)+'). Processo CT-FLOW-2026-017 aberto em <b>Em andamento</b>.')}</div>`:''}</div>
- ${orbeMap()}
+  ${S.startSrc&&S.status==='andamento'?`<div style="margin-top:12px">${resBox('<b>Documentos iniciais carregados</b> ('+esc(S.startSrc)+'). Processo CT-ORBE-2026-017 aberto em <b>Em andamento</b>.')}</div>`:''}</div>
  <div class="lanes">${lane('andamento','Contratos em andamento','⏳')}${lane('finalizados','Contratos finalizados','✅')}${lane('cancelados','Contratos cancelados','⛔')}</div>
- <div class="empty" style="font-style:normal">Os outros processos das esteiras são ilustrativos. O processo navegável da demonstração é o <b>CT-FLOW-2026-017</b>.</div>`;
+ <div class="empty" style="font-style:normal">Os outros processos das esteiras são ilustrativos. O processo navegável da demonstração é o <b>CT-ORBE-2026-017</b>.</div>`;
  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ setView('jornada'); render(); });
- document.querySelectorAll('[data-og]').forEach(b=>b.onclick=()=>go(+b.dataset.og));
- document.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{ const [v,a]=b.dataset.ov.split(':'); if(v==='supint') return openSupInt(a); setView(v); render(); window.scrollTo({top:0,behavior:'smooth'}); });
- document.querySelectorAll('[data-osi]').forEach(b=>b.onclick=()=>openSupInt(b.dataset.osi));
- document.querySelectorAll('[data-other]').forEach(b=>b.onclick=()=>toast(b.dataset.other+' é ilustrativo – abra o CT-FLOW-2026-017'));
+ document.querySelectorAll('[data-other]').forEach(b=>b.onclick=()=>toast(b.dataset.other+' é ilustrativo – abra o CT-ORBE-2026-017'));
  const start=(src)=>{ if(S.status!=='andamento'){ toast('Reinicie a demonstração para abrir um novo processo'); return; }
-   if(S.rc){ toast('Na demonstração, o processo CT-FLOW-2026-017 já está aberto'); setView('jornada'); render(); return; }
+   if(S.rc){ toast('Na demonstração, o processo CT-ORBE-2026-017 já está aberto'); setView('jornada'); render(); return; }
    S.startSrc=src; log('Documentos iniciais do processo carregados', src); S.step=0; setView('jornada'); render(); toast('Processo aberto – consulte a RC para começar'); };
  $('hSp').onclick=()=>start('SharePoint · '+SP_ROOT+' · RC, escopo técnico v2, planilha-base v3, minuta v1');
  $('hUp').onchange=e=>{ const f=[...e.target.files]; if(!f.length) return; start('computador · '+f.length+' arquivo(s): '+f.slice(0,3).map(x=>x.name).join(', ')+(f.length>3?'…':'')); };
@@ -2073,7 +2033,7 @@ function renderHome(){ const st=S.status, mine={andamento:st==='andamento',final
    Dados e modelo fictícios, só para demonstração
    ========================================================= */
 const CAT='Lavanderia e uniformes industriais';
-const DB_ENT=[['Requisições de compra (RC)','SAP',14820,'diária'],['Processos, etapas e prazos','FLOW',1284,'em tempo real'],['Fornecedores e homologações','Portal de Fornecedores',3912,'diária'],['Propostas, rodadas e preços unitários','SharePoint + FLOW',186430,'a cada proposta'],['Negociações e comunicações','Outlook',9870,'a cada rodada'],['Contratos, aditivos e saldos (ZMM010)','SAP',2460,'diária'],['Minutas e pareceres','Plataforma jurídica',1120,'a cada parecer'],['Risco financeiro dos fornecedores','Serasa',3912,'mensal'],['Cotações de mercado','ME – Mercado Eletrônico',41300,'diária'],['Índices externos (IPCA, IGP-M, algodão, diesel)','IBGE · FGV · CEPEA · ANP',60,'mensal']];
+const DB_ENT=[['Requisições de compra (RC)','SAP',14820,'diária'],['Processos, etapas e prazos','Orbe',1284,'em tempo real'],['Fornecedores e homologações','Portal de Fornecedores',3912,'diária'],['Propostas, rodadas e preços unitários','SharePoint + Orbe',186430,'a cada proposta'],['Negociações e comunicações','Outlook',9870,'a cada rodada'],['Contratos, aditivos e saldos (ZMM010)','SAP',2460,'diária'],['Minutas e pareceres','Plataforma jurídica',1120,'a cada parecer'],['Risco financeiro dos fornecedores','Serasa',3912,'mensal'],['Cotações de mercado','ME – Mercado Eletrônico',41300,'diária'],['Índices externos (IPCA, IGP-M, algodão, diesel)','IBGE · FGV · CEPEA · ANP',60,'mensal']];
 function dbRecs(){ const d=i=>S.done.has(i); return [['RC, itens e valor',d(0)?1+RC.itens.length:0,0],['Plano e cronograma',d(1)?1:0,1],['Vendor List com origem',d(2)?S.invited.size:0,2],['Homologações por fornecedor',d(3)?S.invited.size*4:0,3],['Propostas técnicas e pareceres',d(14)?Object.keys(S.tp).length:0,14],['Propostas comerciais (versão e hash)',d(5)?S.files.length:0,5],['Preços unitários por rodada',d(6)?FINAL.length*RC.itens.length*(S.rdOpen+(d(7)?1:0)):0,6],['Negociação e Last Call',d(7)?4:0,7],['Análise financeira e tributária',d(8)?FINAL.length:0,8],['Ponderação e ranking',d(9)?FINAL.length:0,9],['Minuta e parecer jurídico',d(10)?2:0,10],['RH e aprovação na alçada',d(11)?1+S.rhRev.length:0,11],['Contrato SAP',d(12)?1:0,12],['Encerramento e handover',d(15)?2:0,15]]; }
 const PRED=(()=>{ const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'], h=[], f=[]; let v=100;
   for(let i=0;i<24;i++){ const m=(10+i)%12; v*=1+0.0028+(m===2?0.021:0)+Math.sin(i*1.7)*0.0035; h.push({l:ms[m]+'/'+String(24+Math.floor((10+i)/12)).slice(-2),v}); }
@@ -2098,25 +2058,8 @@ function predSVG(){ const W=760,H=250,L=44,R=12,T=14,B=30, all=[...PRED.h,...PRE
    <circle cx="${x(hN-1)}" cy="${y(PRED.now)}" r="4" fill="#0B2E59"/><text x="${x(hN-1)-6}" y="${y(PRED.now)-9}" text-anchor="end" font-size="12" font-weight="700" fill="#0B2E59">hoje ${N2(PRED.now,1)}</text>
    <circle cx="${x(n-1)}" cy="${y(last.v)}" r="4" fill="#E8893F"/><text x="${x(n-1)-4}" y="${y(last.hi)-6}" text-anchor="end" font-size="12" font-weight="700" fill="#9A4F12">${N2(last.v,1)}</text>
    ${lab}</svg>`; }
-function openSupInt(a){ setView('supint'); render(); if(a){ const el=$('si-'+a); if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),60); } }
-function renderSupInt(){ const k=S.k||1, fin=S.status==='finalizado', recs=dbRecs(), nRec=recs.reduce((a,r)=>a+r[1],0);
-  const lo=3.12e6*k, hi=3.30e6*k, lc=S.lastCall, prev=3.245e6*k, posF=Math.max(0,Math.min(1,(lc-lo)/(hi-lo)));
-  const dTot=DB_ENT.reduce((a,e)=>a+e[2],0), wAvg=DRIVERS.reduce((a,d)=>a+d[1]*d[2],0)/100;
-  const step=(n,t,id)=>`<div class="sinum" id="si-${id}"><span>${n}</span>${t}</div>`;
-  $('viewSupInt').innerHTML=`
-  <div class="panel sihero"><div><div class="eyebrow">Orbe · da base de dados à decisão</div><h2 style="margin:4px 0 6px">Inteligência de Suprimentos</h2>
-   <div class="empty" style="font-style:normal;max-width:720px">Cada processo grava seus dados no banco de dados de Suprimentos. A base, somada aos índices de mercado, alimenta a predição de preços e riscos e, no fim, gera a inteligência que orienta a próxima contratação. Categoria do exemplo: <b>${CAT}</b>.</div></div>
-   <div class="sipipe">${[['🗄️','Banco de dados','db'],['📈','Predição de mercado','pred'],['🧠','Inteligência','int']].map((x,i)=>`${i?'<span class="oa">→</span>':''}<a href="#" data-si="${x[2]}"><span>${x[0]}</span>${x[1]}</a>`).join('')}</div></div>
-  ${resBox(fin?`<b>CT-FLOW-2026-017 incorporado à base</b> em ${esc(S.dbAt||now())}: ${nRec} registros gravados, predição da categoria recalibrada e inteligência atualizada abaixo.`:`<b>CT-FLOW-2026-017 em andamento:</b> ${nRec} registro(s) já capturados nas etapas concluídas. Ao encerrar o processo (etapa ${num(15)}), ele entra na base e recalibra a predição da categoria.`,fin?'':'info')}
-
-  <div class="panel">${step(1,'Banco de dados de Suprimentos','db')}
-   <div class="grid4" style="margin-bottom:16px"><div class="stat dk"><div class="k">Registros na base</div><div class="v num">${(dTot/1000).toLocaleString('pt-BR',{maximumFractionDigits:0})} mil</div></div><div class="stat"><div class="k">Processos históricos</div><div class="v num">${(1284+(fin?1:0)).toLocaleString('pt-BR')}</div></div><div class="stat"><div class="k">Fornecedores</div><div class="v num">3.912</div></div><div class="stat"><div class="k">Histórico</div><div class="v num">5 anos</div></div></div>
-   <div class="dgrid"><div><h3>Base única: cada dado com origem</h3><div style="overflow-x:auto"><table class="tb"><thead><tr><th>Conjunto de dados</th><th>Origem</th><th class="r">Registros</th><th>Atualização</th></tr></thead><tbody>
-    ${DB_ENT.map(e=>`<tr><td><b style="color:var(--navy)">${e[0]}</b></td><td>${e[1]}</td><td class="r num">${e[2].toLocaleString('pt-BR')}${e[2]===60?' meses':''}</td><td>${e[3]}</td></tr>`).join('')}</tbody></table></div></div>
-    <div><h3>O que este processo grava na base</h3><div class="sirec">${recs.map(r=>`<div class="${r[1]?'ok':''}"><span>${r[1]?'✓':'·'}</span><b>${r[0]}</b><i>${r[1]?r[1]+' reg.':'etapa '+num(r[2])}</i></div>`).join('')}</div>
-     <div class="empty" style="font-style:normal;margin-top:8px">${fin?'Gravado de forma definitiva no encerramento, com trilha de auditoria.':'Capturado etapa a etapa; gravação definitiva no encerramento.'}</div></div></div></div>
-
-  <div class="panel">${step(2,'Predição de mercado','pred')}
+function predPanel(){ const wAvg=DRIVERS.reduce((a,d)=>a+d[1]*d[2],0)/100;
+ return `  <div class="panel"><div class="eyebrow">Previsão futura com IA · preços, riscos e mercado</div><h2 style="margin:4px 0 14px">Previsão de mercado – ${CAT}</h2>
    <div class="dgrid"><div><h3>Índice de preço da categoria <span class="empty" style="font-weight:400">– base 100 = nov/24 · histórico de 24 meses e previsão de 12 meses</span></h3>${predSVG()}
      <div class="legend" style="margin-top:4px"><span><i style="background:#0B2E59"></i>Realizado</span><span><i style="background:#E8893F"></i>Previsto</span><span><i style="background:#F0A060;opacity:.4"></i>Faixa de confiança de 80%</span></div></div>
     <div><div class="grid2" style="margin-bottom:12px"><div class="stat dk"><div class="k">Variação prevista 12 meses</div><div class="v num">+${PCT(PRED.var12)}</div></div><div class="stat"><div class="k">Erro do modelo (backtest)</div><div class="v num">3,2%</div></div></div>
@@ -2125,7 +2068,28 @@ function renderSupInt(){ const k=S.k||1, fin=S.status==='finalizado', recs=dbRec
    <div class="dgrid ia2" style="margin-top:16px"><div><h3>Direcionadores de custo</h3><table class="tb"><thead><tr><th>Direcionador</th><th class="r">Peso</th><th class="r">12 meses</th><th>Fonte</th></tr></thead><tbody>
      ${DRIVERS.map(d=>`<tr><td>${d[0]}</td><td class="r num">${d[1]}%</td><td class="r num" style="color:${d[2]<0?'var(--ok)':'var(--warn)'};font-weight:700">${d[2]>0?'+':''}${N2(d[2],1)}%</td><td class="empty" style="font-style:normal">${d[3]}</td></tr>`).join('')}</tbody></table></div>
     <div><h3>Risco previsto dos fornecedores <span class="empty" style="font-weight:400">– 12 meses</span></h3><table class="tb"><thead><tr><th>Fornecedor</th><th class="c">Risco</th><th class="r">Prob. estresse</th><th>Por quê</th></tr></thead><tbody>
-     ${SUP_RISK().map(r=>`<tr><td><b>${r[0]}</b></td><td class="c">${riskTag(r[1])}</td><td class="r num">${r[2]}%</td><td style="font-size:13.5px">${r[3]}</td></tr>`).join('')}</tbody></table></div></div></div>
+     ${SUP_RISK().map(r=>`<tr><td><b>${r[0]}</b></td><td class="c">${riskTag(r[1])}</td><td class="r num">${r[2]}%</td><td style="font-size:13.5px">${r[3]}</td></tr>`).join('')}</tbody></table></div></div></div>`; }
+function openSupInt(a){ setView('supint'); render(); if(a){ const el=$('si-'+a); if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),60); } }
+function renderSupInt(){ const k=S.k||1, fin=S.status==='finalizado', recs=dbRecs(), nRec=recs.reduce((a,r)=>a+r[1],0);
+  const lo=3.12e6*k, hi=3.30e6*k, lc=S.lastCall, prev=3.245e6*k, posF=Math.max(0,Math.min(1,(lc-lo)/(hi-lo)));
+  const dTot=DB_ENT.reduce((a,e)=>a+e[2],0), wAvg=DRIVERS.reduce((a,d)=>a+d[1]*d[2],0)/100;
+  const step=(n,t,id)=>`<div class="sinum" id="si-${id}"><span>${n}</span>${t}</div>`;
+  $('viewSupInt').innerHTML=`
+  <div class="panel sihero"><div><div class="eyebrow">Orbe · da base de dados à decisão</div><h2 style="margin:4px 0 6px">Inteligência de Suprimentos</h2>
+   <div class="empty" style="font-style:normal;max-width:720px">Cada processo grava seus dados no banco de dados de Suprimentos. A base, somada aos índices de mercado, alimenta a previsão de preços e riscos com IA e, no fim, gera a inteligência que orienta a próxima contratação. Categoria do exemplo: <b>${CAT}</b>.</div></div>
+   <div class="sipipe">${[['🗄️','Banco de dados','db'],['📈','Previsão de mercado','pred'],['🧠','Inteligência','int']].map((x,i)=>`${i?'<span class="oa">→</span>':''}<a href="#" data-si="${x[2]}"><span>${x[0]}</span>${x[1]}</a>`).join('')}</div></div>
+  ${resBox(fin?`<b>CT-ORBE-2026-017 incorporado à base</b> em ${esc(S.dbAt||now())}: ${nRec} registros gravados, previsão da categoria recalibrada e inteligência atualizada abaixo.`:`<b>CT-ORBE-2026-017 em andamento:</b> ${nRec} registro(s) já capturados nas etapas concluídas. Ao encerrar o processo (etapa ${num(15)}), ele entra na base e recalibra a previsão da categoria.`,fin?'':'info')}
+
+  <div class="panel">${step(1,'Banco de dados de Suprimentos','db')}
+   <div class="grid4" style="margin-bottom:16px"><div class="stat dk"><div class="k">Registros na base</div><div class="v num">${(dTot/1000).toLocaleString('pt-BR',{maximumFractionDigits:0})} mil</div></div><div class="stat"><div class="k">Processos históricos</div><div class="v num">${(1284+(fin?1:0)).toLocaleString('pt-BR')}</div></div><div class="stat"><div class="k">Fornecedores</div><div class="v num">3.912</div></div><div class="stat"><div class="k">Histórico</div><div class="v num">5 anos</div></div></div>
+   <div class="dgrid"><div><h3>Base única: cada dado com origem</h3><div style="overflow-x:auto"><table class="tb"><thead><tr><th>Conjunto de dados</th><th>Origem</th><th class="r">Registros</th><th>Atualização</th></tr></thead><tbody>
+    ${DB_ENT.map(e=>`<tr><td><b style="color:var(--navy)">${e[0]}</b></td><td>${e[1]}</td><td class="r num">${e[2].toLocaleString('pt-BR')}${e[2]===60?' meses':''}</td><td>${e[3]}</td></tr>`).join('')}</tbody></table></div></div>
+    <div><h3>O que este processo grava na base</h3><div class="sirec">${recs.map(r=>`<div class="${r[1]?'ok':''}"><span>${r[1]?'✓':'·'}</span><b>${r[0]}</b><i>${r[1]?r[1]+' reg.':'etapa '+num(r[2])}</i></div>`).join('')}</div>
+     <div class="empty" style="font-style:normal;margin-top:8px">${fin?'Gravado de forma definitiva no encerramento, com trilha de auditoria.':'Capturado etapa a etapa; gravação definitiva no encerramento.'}</div></div></div></div>
+
+  <div class="panel">${step(2,'Previsão de mercado','pred')}
+   <div class="grid4"><div class="stat dk"><div class="k">Preço da categoria em 12 meses</div><div class="v num">+${PCT(PRED.var12)}</div></div><div class="stat"><div class="k">Melhor janela</div><div class="v">antes de mar/27</div></div><div class="stat"><div class="k">Fornecedor em alerta</div><div class="v">Vértice</div></div><div class="stat"><div class="k">Erro do modelo</div><div class="v num">3,2%</div></div></div>
+   <div class="actions"><button class="btn sec" id="siPred">Ver a previsão completa em 💡 Previsão com IA →</button></div></div>
 
   <div class="panel siint">${step(3,'Inteligência de Suprimentos gerada','int')}
    <div class="grid3">
@@ -2137,9 +2101,10 @@ function renderSupInt(){ const k=S.k||1, fin=S.status==='finalizado', recs=dbRec
    <div class="grid3" style="margin-top:12px">
     <div class="sicard al"><div class="k">⚠ Alerta de mercado</div><p>Reajuste da convenção coletiva previsto em <b>março/2027: +6,2%</b>. Contratos com data-base nesse mês ficam mais caros.</p></div>
     <div class="sicard al"><div class="k">📅 Oportunidade</div><p><b>4 contratos da categoria vencem em 2027</b> (R$ ${N2(11.8*k,1)} MM). Agrupar em um único processo pode gerar <b>R$ ${N2(1.4*k,1)} MM</b> de saving.</p></div>
-    <div class="sicard al"><div class="k">🔁 Aprendizado deste processo</div><p>${fin?`Previsto × realizado registrado: a predição da categoria foi recalibrada com o CT-FLOW-2026-017 (${S.invited.size} convidados, ${S.rdOpen+1} rodadas, ${PCT((ROUNDS.data['Atlas Têxtil'][0]-lc)/ROUNDS.data['Atlas Têxtil'][0])} de cost avoidance).`:'Disponível ao encerrar o processo: o resultado real entra na base e ajusta a predição.'}</p></div>
+    <div class="sicard al"><div class="k">🔁 Aprendizado deste processo</div><p>${fin?`Previsto × realizado registrado: a predição da categoria foi recalibrada com o CT-ORBE-2026-017 (${S.invited.size} convidados, ${S.rdOpen+1} rodadas, ${PCT((ROUNDS.data['Atlas Têxtil'][0]-lc)/ROUNDS.data['Atlas Têxtil'][0])} de cost avoidance).`:'Disponível ao encerrar o processo: o resultado real entra na base e ajusta a predição.'}</p></div>
    </div>
    <div class="actions"><button class="btn pri" id="siUse">Usar no próximo processo</button><span class="empty">A inteligência aparece na Vendor List (etapa ${num(2)}) e na Negociação (etapa ${num(7)}) dos próximos processos da categoria. Dados e modelo fictícios.</span></div></div>`;
+  $('siPred').onclick=()=>{ setView('ia'); render(); };
   document.querySelectorAll('[data-si]').forEach(a=>a.onclick=e=>{ e.preventDefault(); $('si-'+a.dataset.si).scrollIntoView({behavior:'smooth',block:'start'}); });
   $('siUse').onclick=()=>{ log('Inteligência de Suprimentos aplicada', CAT+' · faixa '+MM(lo)+' a '+MM(hi)); toast('Inteligência salva para os próximos processos da categoria'); };
 }
@@ -2151,7 +2116,7 @@ const USERS={Comprador:{n:'Patrícia Velozo',ini:'PV',role:'Comprador(a)'},Gesto
 $('loginForm').onsubmit=e=>{ e.preventDefault(); const m=$('mat').value.trim(); if(!/^\d{4,8}$/.test(m)){ toast('Informe uma matrícula numérica'); return; }
   const u=USERS[$('perfil').value]; S.user={...u,mat:m}; $('av').textContent=u.ini; $('uname').textContent=u.n; $('urole').textContent=u.role+' · '+m;
   $('login').classList.add('hidden'); $('top').classList.remove('hidden'); $('app').classList.remove('hidden');
-  S.log.unshift({h:now(),u:u.n,e:'—',a:'Acesso ao FLOW',d:'Matrícula '+m+' · perfil '+u.role}); setView('inicio'); render(); };
+  S.log.unshift({h:now(),u:u.n,e:'—',a:'Acesso ao Orbe',d:'Matrícula '+m+' · perfil '+u.role}); setView('inicio'); render(); };
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));
 document.addEventListener('keydown',e=>{ if($('login').classList.contains('hidden')&&S.view==='jornada'&&S.status==='andamento'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)&&$('modal').classList.contains('hidden')&&$('mail').classList.contains('hidden')&&$('pdfView').classList.contains('hidden')&&$('eqView').classList.contains('hidden')){ if(e.key==='ArrowRight') go(nextOf(S.step)); if(e.key==='ArrowLeft') go(prevOf(S.step)); } if(e.key==='Escape'){ $('modal').classList.add('hidden'); closeMail(); if(!$('pdfView').classList.contains('hidden')) closePdf(); else eqClose(); } });
 </script>

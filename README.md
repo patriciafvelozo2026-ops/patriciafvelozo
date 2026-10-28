@@ -93,10 +93,10 @@ npm run test:e2e    # navegador (Chromium) sem rede, do upload ao RH
 | `exemplo/` | Processo fictício completo (pasta e .zip) |
 | `docs/` | Guia de uso e nota para a Segurança da Informação |
 
-## Demonstração ponta a ponta (Orbe)
+## Orbe · Visão 360 de Suprimentos (demonstração)
 
-`demo/FLOW_Demo_Ponta_a_Ponta_V21.html` é a demonstração navegável da RC ao contrato, alinhada ao
-**Orbe · Visão 360 de Suprimentos**: as 15 etapas seguem a ordem do Orbe (Preparação, Mercado,
-Decisão, Formalização) e a tela Início mostra o mapa do Orbe com o que o FLOW (Fase A) já faz.
-A aba **Inteligência de Suprimentos** fecha o ciclo: banco de dados de Suprimentos → predição de
-mercado → inteligência para o próximo processo. Ao encerrar, o processo é gravado na base e abre essa tela.
+`demo/Orbe_Visao_360_Suprimentos.html` é a demonstração navegável do Orbe, da RC ao contrato e do
+contrato à inteligência. As 15 etapas seguem a ordem do Orbe (Preparação, Mercado, Decisão,
+Formalização) e as abas são os módulos do Orbe: Fornecedores, Previsão com IA, Painel gerencial,
+Conformidade e Inteligência de Suprimentos (banco de dados → previsão de mercado → inteligência).
+Ao encerrar, o processo é gravado na base e abre a Inteligência de Suprimentos. Dados fictícios.
