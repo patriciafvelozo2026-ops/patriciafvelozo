@@ -98,3 +98,5 @@ npm run test:e2e    # navegador (Chromium) sem rede, do upload ao RH
 `demo/FLOW_Demo_Ponta_a_Ponta_V21.html` é a demonstração navegável da RC ao contrato, alinhada ao
 **Orbe · Visão 360 de Suprimentos**: as 15 etapas seguem a ordem do Orbe (Preparação, Mercado,
 Decisão, Formalização) e a tela Início mostra o mapa do Orbe com o que o FLOW (Fase A) já faz.
+A aba **Inteligência de Suprimentos** fecha o ciclo: banco de dados de Suprimentos → predição de
+mercado → inteligência para o próximo processo. Ao encerrar, o processo é gravado na base e abre essa tela.

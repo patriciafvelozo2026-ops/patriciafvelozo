@@ -51,16 +51,17 @@ input,select,textarea{font:inherit;color:var(--text)}
 
 /* ---------- Topo ---------- */
 header.top{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20}
-.topIn{max-width:1440px;margin:auto;padding:12px 24px;display:flex;align-items:center;gap:18px}
+.topIn{max-width:1440px;margin:auto;padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .logo{font-weight:800;font-size:22px;letter-spacing:.04em}
 .logo small{font-weight:400;color:#9FD3F2;font-size:14px;letter-spacing:0;margin-left:8px}
 .proc{display:flex;gap:8px;flex-wrap:wrap}
 .chip{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 11px;font-size:12.5px;color:#DCEFFB;white-space:nowrap}
 .chip.demo{background:var(--warnbg);color:var(--warn);font-weight:700}
-.tabs{margin-left:auto;display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:3px}
-.logo{white-space:nowrap}.tabs button{white-space:nowrap;border:0;background:transparent;color:#C8E5F7;padding:7px 14px;border-radius:8px;font-weight:600;font-size:14px}
+.tabs{margin-left:auto;display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:3px;max-width:100%;overflow-x:auto}
+.logo{white-space:nowrap}.tabs button{white-space:nowrap;border:0;background:transparent;color:#C8E5F7;padding:7px 10px;border-radius:8px;font-weight:600;font-size:13.5px}
 .tabs button.on{background:#fff;color:var(--navy)}
 .user{display:flex;align-items:center;gap:9px;font-size:13px;color:#DCEFFB}
+@media (max-width:1560px){.user>div:last-child{display:none}.proc{flex-direction:column;align-items:flex-start;gap:4px}}
 .av{width:32px;height:32px;border-radius:50%;background:var(--sky);color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:13px}
 
 /* ---------- KPIs ---------- */
@@ -258,6 +259,18 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}
 .orbe .ofoot{border-top:1px solid #2C4A70;margin-top:8px;padding-top:9px;font-size:13px;color:#C8D6E6}.orbe .ofoot b{color:#fff}.orbe .ofoot span{color:#8FA6C0}
 .obadge{display:inline-block;font-size:11px;letter-spacing:.04em;text-transform:none;font-weight:700;border-radius:20px;padding:2px 9px;margin-left:6px;vertical-align:1px}
 .obadge.o-full{background:var(--obg);color:#9A4F12;border:1px solid var(--orange)}.obadge.o-part{background:#fff;color:#9A4F12;border:1px dashed var(--orange2)!important}.obadge.o-todo{background:#E8EEF5;color:var(--navy)}
+.orbe .opipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:12px;border-top:1px solid #2C4A70}
+.orbe .opb{flex:1;min-width:200px;display:flex;gap:9px;align-items:flex-start;text-align:left;background:#163A63;border:1.5px solid #2C5A8C;border-radius:9px;color:#fff;padding:9px 11px}
+.orbe .opb:hover{border-color:#fff}.orbe .opb b{display:block;font-size:14px}.orbe .opb small{color:#C8D6E6;font-size:12.5px}.orbe .oa{color:var(--orange);font-weight:700;font-size:18px}
+.sihero{padding:20px 22px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.sipipe{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.sipipe a{display:flex;gap:7px;align-items:center;background:var(--navy);color:#fff;text-decoration:none;font-weight:700;border-radius:24px;padding:8px 14px;font-size:14px}.sipipe a:hover{background:var(--blue)}.sipipe .oa{color:var(--orange2);font-weight:800;font-size:18px}
+.sinum{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;color:var(--navy);margin-bottom:16px;scroll-margin-top:100px}.sinum span{width:30px;height:30px;border-radius:50%;background:var(--orange);color:#1E1A16;display:grid;place-items:center;font-size:15px}
+.sirec{display:grid;gap:4px}.sirec div{display:grid;grid-template-columns:20px 1fr auto;gap:6px;align-items:center;font-size:13.5px;padding:5px 8px;border-radius:7px;background:var(--ice2);color:var(--muted)}.sirec div b{font-weight:600}.sirec div i{font-style:normal;font-size:12.5px}
+.sirec div.ok{background:var(--okbg);color:var(--ok)}.sirec div.ok b{color:var(--navy)}
+.siint{background:linear-gradient(180deg,#FFF7F0,#fff 40%)}
+.sicard{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}.sicard .k{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9A4F12}.sicard .v{font-size:22px;font-weight:800;color:var(--navy);margin-top:2px}
+.sicard p{margin:8px 0 0;font-size:14px}.sicard ul.dots{margin:8px 0 0;padding-left:18px;font-size:14px}.sicard.al{background:var(--obg);border-color:#F3C9A4}
+.sicard .mk{position:absolute;top:-4px;width:4px;height:16px;background:var(--navy);border-radius:2px;transform:translateX(-2px)}
 @media (max-width:1000px){.orbe .oug,.orbe .ogrid{grid-template-columns:1fr 1fr}}
 @media (max-width:640px){.orbe .oug,.orbe .ogrid{grid-template-columns:1fr}}
 
@@ -300,6 +313,7 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
       <div><span>1</span>Base única: cada dado tem origem, versão e responsável</div>
       <div><span>2</span>Divergência vira pendência – nunca decisão automática</div>
       <div><span>3</span>Saídas padronizadas: RH, visão executiva e auditoria</div>
+      <div><span>4</span>Cada processo alimenta o banco de dados, a predição de mercado e a inteligência de suprimentos</div>
     </div>
   </div>
   <div class="r">
@@ -333,8 +347,9 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
       <button class="on" data-view="inicio">Início</button>
       <button data-view="jornada">Jornada</button>
       <button data-view="conf">Conformidade <span id="confBadge"></span></button>
-      <button data-view="intel">🔎 Inteligência de fornecedores</button>
+      <button data-view="intel">🔎 Fornecedores</button>
       <button data-view="painel">Painel gerencial</button>
+      <button data-view="supint">🧠 Inteligência de Suprimentos</button>
       <button data-view="ia">🤖 IA</button>
     </div>
     <div class="user"><div class="av" id="av">PV</div><div><div id="uname" style="color:#fff;font-weight:600">Patrícia Velozo</div><div id="urole">Comprador(a) · 104582</div></div></div>
@@ -354,6 +369,7 @@ table.ia tr[data-iac]:hover td{background:var(--ice2)}
   <section id="viewIntel" class="dash hidden"></section>
   <section id="viewPainel" class="dash hidden"></section>
   <section id="viewIA" class="dash hidden"></section>
+  <section id="viewSupInt" class="dash hidden"></section>
 </div>
 
 <div id="mail" class="modal hidden"><div class="sheet" style="width:min(760px,100%)"><div class="sheetH"><b style="color:var(--navy)">Novo e-mail</b><span class="tag t-n">Outlook corporativo · integração futura</span><span style="margin-left:auto"></span><button class="btn ghost sm" id="mlClose">Cancelar</button></div>
@@ -438,14 +454,15 @@ const pos=i=>ORDER.indexOf(i);
 /* Orbe · Visão 360 de Suprimentos: o que o FLOW (Fase A) já faz em cada etapa */
 const ORBE={full:['Já no FLOW','o-full'], part:['Em parte','o-part'], todo:['A construir','o-todo']};
 const ORBE_ST={0:'part',1:'todo',2:'full',3:'part',4:'full',14:'part',5:'full',6:'full',7:'full',8:'part',9:'part',10:'part',11:'full',12:'part',15:'full'};
-const ORBE_INTEL=[['Inteligência de fornecedores','histórico de todos os processos','intel','👥'],['Previsão futura com IA','preços, riscos e mercado','ia','💡'],['Painel gerencial','visão executiva em tempo real','painel','📊'],['Conformidade e auditoria','cada dado com origem','conf','✅']];
+const ORBE_INTEL=[['Inteligência de fornecedores','histórico de todos os processos','intel','👥'],['Previsão futura com IA','preços, riscos e mercado','supint:pred','💡'],['Painel gerencial','visão executiva em tempo real','painel','📊'],['Conformidade e auditoria','cada dado com origem','conf','✅']];
 const ORBE_SIS='SAP · Portal de Fornecedores · SharePoint · Outlook · Plataforma jurídica · Serasa · ME – Mercado Eletrônico';
 const orbeBadge=i=>{ const o=ORBE[ORBE_ST[i]]; return o?` <span class="obadge ${o[1]}" title="Orbe · Visão 360: situação desta etapa no FLOW (Fase A)">Orbe · ${o[0]}</span>`:''; };
 function orbeMap(){ const ph=['Preparação','Mercado','Decisão','Formalização'];
  return `<div class="orbe"><div class="oh"><div><b>ORBE · o sistema completo</b><div class="os">A jornada de Suprimentos que pretendemos entregar e, em laranja, o que o FLOW (Fase A) já faz.</div></div>
   <div class="olg">${Object.values(ORBE).map(o=>`<span><i class="${o[1]}"></i>${o[0]}</span>`).join('')}</div></div>
-  <div class="ou"><div class="out">Guarda-chuva de inteligência</div><div class="oug">${ORBE_INTEL.map(m=>`<button class="om ${m[2]==='ia'?'hl':''}" data-ov="${m[2]}"><span class="oi">${m[3]}</span><span><b>${m[0]}</b><small>${m[1]}</small></span></button>`).join('')}</div></div>
+  <div class="ou"><div class="out">Guarda-chuva de inteligência</div><div class="oug">${ORBE_INTEL.map(m=>`<button class="om ${m[2].startsWith('supint')?'hl':''}" data-ov="${m[2]}"><span class="oi">${m[3]}</span><span><b>${m[0]}</b><small>${m[1]}</small></span></button>`).join('')}</div></div>
   <div class="ogrid">${ph.map(p=>`<div><div class="oph">${p}</div>${ORDER.filter(i=>STEPS[i].ph===p).map(i=>`<button class="ost ${ORBE[ORBE_ST[i]][1]}" data-og="${i}" title="Abrir a etapa na jornada">${pos(i)+1} · ${esc(STEPS[i].t)}${S.done.has(i)?'<span class="ok">✓</span>':''}</button>`).join('')}</div>`).join('')}</div>
+  <div class="opipe">${[['🗄️','Banco de dados de Suprimentos','cada etapa grava na base única','db'],['📈','Predição de mercado','preços, índices e risco dos fornecedores','pred'],['🧠','Inteligência de Suprimentos','recomendações para o próximo processo','int']].map((x,k)=>`${k?'<span class="oa">→</span>':''}<button class="opb" data-osi="${x[3]}"><span class="oi">${x[0]}</span><span><b>${x[1]}</b><small>${x[2]}</small></span></button>`).join('')}<span class="obadge o-todo" style="margin:0 0 0 6px">A construir</span></div>
   <div class="ofoot"><b>Integrado a</b> ${ORBE_SIS} <span>· 15 etapas · 4 módulos de inteligência · 7 sistemas</span></div></div>`; }
 const num=i=>String(pos(i)+1).padStart(2,'0');
 const nextOf=i=>ORDER[Math.min(ORDER.length-1,pos(i)+1)], prevOf=i=>ORDER[Math.max(0,pos(i)-1)];
@@ -536,7 +553,7 @@ function renderSide(){ if(!$('confCard')) return;
   $('log').innerHTML = S.log.length ? S.log.map(l=>`<div class="lg"><div class="h">${esc(l.h)} · ${esc(l.u)}</div><b>${esc(l.a)}</b> — ${esc(l.e)}${l.d?'<div>'+esc(l.d)+'</div>':''}</div>`).join('') : '<div class="empty">As ações executadas aparecem aqui, com usuário e horário.</div>';
 }
 function go(i){ S.step=Math.max(0,Math.min(STEPS.length-1,i)); if(S.view!=='jornada') setView('jornada'); render(); window.scrollTo({top:0,behavior:'smooth'}); }
-function render(){ renderKpis(); renderNav(); renderWork(); renderSide(); if(S.view==='painel') renderPainel(); if(S.view==='conf') renderConf(); if(S.view==='inicio') renderHome(); if(S.view==='intel') renderIntel(); if(S.view==='ia') renderIA(); const cf=conf(); $('confBadge').innerHTML=cf.fora?`<span style="background:#A3332B;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">${cf.fora}</span>`:''; }
+function render(){ renderKpis(); renderNav(); renderWork(); renderSide(); if(S.view==='painel') renderPainel(); if(S.view==='conf') renderConf(); if(S.view==='inicio') renderHome(); if(S.view==='intel') renderIntel(); if(S.view==='ia') renderIA(); if(S.view==='supint') renderSupInt(); const cf=conf(); $('confBadge').innerHTML=cf.fora?`<span style="background:#A3332B;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px">${cf.fora}</span>`:''; }
 
 function renderWork(){
   const s=STEPS[S.step], i=S.step;
@@ -1775,7 +1792,7 @@ function renderIA(){
 }
 
 function setView(v){ S.view=v; document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
-  $('viewInicio').classList.toggle('hidden',v!=='inicio'); $('viewIntel').classList.toggle('hidden',v!=='intel'); $('kpis').classList.toggle('hidden',v==='inicio'||v==='intel'||v==='ia'); if(v==='intel') renderIntel(); if(v==='inicio') renderHome();
+  $('viewInicio').classList.toggle('hidden',v!=='inicio'); $('viewIntel').classList.toggle('hidden',v!=='intel'); $('kpis').classList.toggle('hidden',v==='inicio'||v==='intel'||v==='ia'||v==='supint'); $('viewSupInt').classList.toggle('hidden',v!=='supint'); if(v==='supint') renderSupInt(); if(v==='intel') renderIntel(); if(v==='inicio') renderHome();
   $('viewJornada').classList.toggle('hidden',v!=='jornada'); $('viewPainel').classList.toggle('hidden',v!=='painel'); $('viewIA').classList.toggle('hidden',v!=='ia'); if(v==='ia') renderIA(); $('viewConf').classList.toggle('hidden',v!=='conf'); if(v==='painel') renderPainel(); if(v==='conf') renderConf(); window.scrollTo({top:0}); }
 
 /* =========================================================
@@ -1942,7 +1959,7 @@ Suprimentos – Samarco`;
 const selF=(id,l,opts)=>`<div class="fld"><label class="lbl" for="h_${id}" style="margin-top:0">${l}</label><select class="inp" id="h_${id}" data-hd="${id}" ${S.status!=='andamento'?'disabled':''}>${opts.map(o=>`<option ${S.hand[id]===o?'selected':''}>${o}</option>`).join('')}</select></div>`;
 
 W[15]=()=>{ const closed=S.status!=='andamento', yn=['Sim','Não'];
- if(S.status==='finalizado') return resBox(`<b>Processo encerrado.</b> Contrato ${S.contract} com ${winner().v.n} – movido para a esteira <b>Contratos finalizados</b>.`)+'<div class="actions"><button class="btn pri" id="eHome">Ver esteiras de contratos</button><button class="btn sec" data-encpdf="1">Handover (PDF)</button></div>';
+ if(S.status==='finalizado') return resBox(`<b>Processo encerrado.</b> Contrato ${S.contract} com ${winner().v.n} – movido para a esteira <b>Contratos finalizados</b> e gravado no banco de dados de Suprimentos.`)+'<div class="actions"><button class="btn pri" id="eSup">🧠 Ver a Inteligência de Suprimentos gerada</button><button class="btn sec" id="eHome">Ver esteiras de contratos</button><button class="btn sec" data-encpdf="1">Handover (PDF)</button></div>';
  if(S.status==='cancelado') return resBox(`<b>Processo cancelado.</b> Motivo: ${esc(S.cancelMotivo)}. Movido para a esteira <b>Contratos cancelados</b>.`,'warn')+'<div class="actions"><button class="btn pri" id="eHome">Ver esteiras de contratos</button></div>';
  return `${S.contract?'':resBox('<b>Contrato ainda não criado no SAP</b> (etapa '+num(12)+'). Você pode preparar a formalização, mas só encerra depois do contrato – ou cancele o processo abaixo.','info')}
  <h3>1. Formalização final às áreas e ao fornecedor</h3>
@@ -1959,12 +1976,14 @@ W[15]=()=>{ const closed=S.status!=='andamento', yn=['Sim','Não'];
  <div class="actions" style="margin-top:0"><button class="btn pri" id="eMail">✉ Enviar formalização final (e-mail)</button>
   <button class="btn dark" id="eEnd" ${S.contract?'':'disabled'}>Encerrar processo → Contratos finalizados</button>
   ${S.enc.sent?tag('Formalização enviada','t-ok'):''}</div>
+ <div class="box t" style="margin-top:12px;font-size:14px">🧠 <b>No encerramento, o processo vira inteligência:</b> RC, Vendor List, propostas e rodadas, preços unitários, negociação, pareceres e contrato são gravados no <b>banco de dados de Suprimentos</b>, recalibram a <b>predição de mercado</b> da categoria e geram a <b>Inteligência de Suprimentos</b> para os próximos processos.</div>
  <div class="box" style="margin-top:22px;border-color:#E7B9B4;background:#FFF8F7;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
   <div style="flex:1;min-width:260px"><b style="color:var(--bad)">Cancelar processo</b><div class="empty" style="font-style:normal">Use quando o processo foi aberto por engano ou a demanda deixou de existir. Ele vai para a esteira <b>Contratos cancelados</b>, com o motivo registrado na trilha.</div></div>
   <button class="btn danger" id="eCancel">Cancelar processo</button></div>`; };
 
 A[15]=()=>{
   if($('eHome')) $('eHome').onclick=()=>setView('inicio');
+  if($('eSup')) $('eSup').onclick=()=>openSupInt('int');
   document.querySelectorAll('[data-encpdf]').forEach(b=>b.onclick=()=>{ if(!S.contract&&!confirm('O contrato ainda não foi criado no SAP. Gerar o handover como minuta?')) return; S.enc.pdf=true; openPdf('hand'); });
   if(S.status!=='andamento') return;
   document.querySelectorAll('[data-et]').forEach(c=>c.onchange=()=>{ S.encTo[c.dataset.et]=c.checked; });
@@ -1979,7 +1998,8 @@ A[15]=()=>{
       onSend:()=>{ S.enc.sent=true; log('Formalização final enviada', d.map(x=>x[1]).join(', ')+' · '+docs.length+' documento(s) + handover'); }}); };
   $('eEnd').onclick=()=>{ if(!S.contract){ toast('Crie o contrato no SAP antes de encerrar'); return; }
     if(!S.enc.sent&&!confirm('A formalização final ainda não foi enviada. Encerrar mesmo assim?')) return;
-    complete('Processo encerrado'); S.status='finalizado'; S.home='finalizados'; log('Processo encerrado', 'Contrato '+S.contract+' · movido para Contratos finalizados'); toast('Processo movido para Contratos finalizados'); setView('inicio'); render(); };
+    complete('Processo encerrado'); S.status='finalizado'; S.home='finalizados'; log('Processo encerrado', 'Contrato '+S.contract+' · movido para Contratos finalizados');
+    S.dbAt=now(); log('Processo gravado no banco de dados de Suprimentos', dbRecs().reduce((a,r)=>a+r[1],0)+' registros · predição da categoria recalibrada'); toast('Processo gravado na base – Inteligência de Suprimentos gerada'); openSupInt('int'); };
   $('eCancel').onclick=()=>{ const m=prompt('Motivo do cancelamento (obrigatório):',''); if(m===null) return; if(m.trim().length<5){ toast('Descreva o motivo do cancelamento'); return; }
     if(!confirm('Cancelar o processo CT-FLOW-2026-017? Ele vai para a esteira Contratos cancelados.')) return;
     S.status='cancelado'; S.cancelMotivo=m.trim(); S.home='cancelados'; log('Processo cancelado', S.cancelMotivo); toast('Processo movido para Contratos cancelados'); setView('inicio'); render(); };
@@ -2038,13 +2058,90 @@ function renderHome(){ const st=S.status, mine={andamento:st==='andamento',final
  <div class="empty" style="font-style:normal">Os outros processos das esteiras são ilustrativos. O processo navegável da demonstração é o <b>CT-FLOW-2026-017</b>.</div>`;
  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{ setView('jornada'); render(); });
  document.querySelectorAll('[data-og]').forEach(b=>b.onclick=()=>go(+b.dataset.og));
- document.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{ setView(b.dataset.ov); render(); window.scrollTo({top:0,behavior:'smooth'}); });
+ document.querySelectorAll('[data-ov]').forEach(b=>b.onclick=()=>{ const [v,a]=b.dataset.ov.split(':'); if(v==='supint') return openSupInt(a); setView(v); render(); window.scrollTo({top:0,behavior:'smooth'}); });
+ document.querySelectorAll('[data-osi]').forEach(b=>b.onclick=()=>openSupInt(b.dataset.osi));
  document.querySelectorAll('[data-other]').forEach(b=>b.onclick=()=>toast(b.dataset.other+' é ilustrativo – abra o CT-FLOW-2026-017'));
  const start=(src)=>{ if(S.status!=='andamento'){ toast('Reinicie a demonstração para abrir um novo processo'); return; }
    if(S.rc){ toast('Na demonstração, o processo CT-FLOW-2026-017 já está aberto'); setView('jornada'); render(); return; }
    S.startSrc=src; log('Documentos iniciais do processo carregados', src); S.step=0; setView('jornada'); render(); toast('Processo aberto – consulte a RC para começar'); };
  $('hSp').onclick=()=>start('SharePoint · '+SP_ROOT+' · RC, escopo técnico v2, planilha-base v3, minuta v1');
  $('hUp').onchange=e=>{ const f=[...e.target.files]; if(!f.length) return; start('computador · '+f.length+' arquivo(s): '+f.slice(0,3).map(x=>x.name).join(', ')+(f.length>3?'…':'')); };
+}
+
+/* =========================================================
+   INTELIGÊNCIA DE SUPRIMENTOS (Orbe): banco de dados → predição de mercado → inteligência
+   Dados e modelo fictícios, só para demonstração
+   ========================================================= */
+const CAT='Lavanderia e uniformes industriais';
+const DB_ENT=[['Requisições de compra (RC)','SAP',14820,'diária'],['Processos, etapas e prazos','FLOW',1284,'em tempo real'],['Fornecedores e homologações','Portal de Fornecedores',3912,'diária'],['Propostas, rodadas e preços unitários','SharePoint + FLOW',186430,'a cada proposta'],['Negociações e comunicações','Outlook',9870,'a cada rodada'],['Contratos, aditivos e saldos (ZMM010)','SAP',2460,'diária'],['Minutas e pareceres','Plataforma jurídica',1120,'a cada parecer'],['Risco financeiro dos fornecedores','Serasa',3912,'mensal'],['Cotações de mercado','ME – Mercado Eletrônico',41300,'diária'],['Índices externos (IPCA, IGP-M, algodão, diesel)','IBGE · FGV · CEPEA · ANP',60,'mensal']];
+function dbRecs(){ const d=i=>S.done.has(i); return [['RC, itens e valor',d(0)?1+RC.itens.length:0,0],['Plano e cronograma',d(1)?1:0,1],['Vendor List com origem',d(2)?S.invited.size:0,2],['Homologações por fornecedor',d(3)?S.invited.size*4:0,3],['Propostas técnicas e pareceres',d(14)?Object.keys(S.tp).length:0,14],['Propostas comerciais (versão e hash)',d(5)?S.files.length:0,5],['Preços unitários por rodada',d(6)?FINAL.length*RC.itens.length*(S.rdOpen+(d(7)?1:0)):0,6],['Negociação e Last Call',d(7)?4:0,7],['Análise financeira e tributária',d(8)?FINAL.length:0,8],['Ponderação e ranking',d(9)?FINAL.length:0,9],['Minuta e parecer jurídico',d(10)?2:0,10],['RH e aprovação na alçada',d(11)?1+S.rhRev.length:0,11],['Contrato SAP',d(12)?1:0,12],['Encerramento e handover',d(15)?2:0,15]]; }
+const PRED=(()=>{ const ms=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'], h=[], f=[]; let v=100;
+  for(let i=0;i<24;i++){ const m=(10+i)%12; v*=1+0.0028+(m===2?0.021:0)+Math.sin(i*1.7)*0.0035; h.push({l:ms[m]+'/'+String(24+Math.floor((10+i)/12)).slice(-2),v}); }
+  let u=v; for(let i=1;i<=12;i++){ const m=(9+i)%12; u*=1+0.00185+(m===2?0.020:0); const b=0.8+i*0.32; f.push({l:ms[m]+'/'+String(26+Math.floor((9+i)/12)).slice(-2),v:u,lo:u*(1-b/100),hi:u*(1+b/100)}); }
+  return {h,f,now:v,y1:u,var12:u/v-1}; })();
+const DRIVERS=[['Mão de obra (convenção coletiva ES)',46,6.2,'Sindicato · data-base em março'],['Tecido: algodão e poliéster',22,3.1,'CEPEA/ESALQ · ICE'],['Energia e água da lavanderia',12,4.0,'ANEEL · concessionária'],['Diesel (coleta e entrega)',8,-1.5,'ANP'],['Químicos de lavagem',7,2.4,'Cotações ME'],['Outros custos',5,4.1,'IPCA · IBGE']];
+const SUP_RISK=()=>{ const f=s=>finCalc(s); return [['Atlas Têxtil','Baixo',8,`Dependência de ${PCT(f('Atlas Têxtil').dep)} hoje; prevista em 9,0% com a carteira de 2027`],['Ciclo Uniformes','Baixo',5,`Liquidez ${N2(f('Ciclo Uniformes').liq)} e dependência de ${PCT(f('Ciclo Uniformes').dep)}`],['Vértice Lavanderia','Alto',34,`Hoje ${f('Vértice Lavanderia').risco.toLowerCase()} (liquidez ${N2(f('Vértice Lavanderia').liq)} e ${f('Vértice Lavanderia').serasa} ocorrências no Serasa); tendência de piora`]]; };
+function predSVG(){ const W=760,H=250,L=44,R=12,T=14,B=30, all=[...PRED.h,...PRED.f], n=all.length;
+  const ys=[...PRED.h.map(p=>p.v),...PRED.f.map(p=>p.hi),...PRED.f.map(p=>p.lo)], mn=Math.floor(Math.min(...ys)/2)*2-1, mx=Math.ceil(Math.max(...ys)/2)*2+1;
+  const x=i=>L+i*(W-L-R)/(n-1), y=v=>T+(mx-v)/(mx-mn)*(H-T-B), hN=PRED.h.length;
+  const line=(arr,o,k)=>arr.map((p,i)=>(i?'L':'M')+x(i+o).toFixed(1)+' '+y(p[k]).toFixed(1)).join(' ');
+  const band='M'+PRED.f.map((p,i)=>x(i+hN).toFixed(1)+' '+y(p.hi).toFixed(1)).join(' L')+' L'+PRED.f.slice().reverse().map((p,i)=>x(n-1-i).toFixed(1)+' '+y(p.lo).toFixed(1)).join(' L')+' Z';
+  const grid=[]; for(let g=Math.ceil(mn/4)*4; g<=mx; g+=4) grid.push(`<line x1="${L}" x2="${W-R}" y1="${y(g)}" y2="${y(g)}" stroke="#D6E5F1"/><text x="${L-6}" y="${y(g)+4}" text-anchor="end" font-size="11" fill="#5B6B7F">${g}</text>`);
+  const lab=all.map((p,i)=>i%3===0?`<text x="${x(i)}" y="${H-10}" text-anchor="middle" font-size="11" fill="#5B6B7F">${p.l}</text>`:'').join('');
+  const last=PRED.f[PRED.f.length-1];
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Índice de preço da categoria: histórico de 24 meses e previsão de 12 meses">${grid.join('')}
+   <rect x="${x(hN-1)}" y="${T}" width="${W-R-x(hN-1)}" height="${H-T-B}" fill="#FBEEE4" opacity=".55"/>
+   <text x="${x(hN-1)+6}" y="${T+13}" font-size="11" font-weight="700" fill="#9A4F12">PREVISÃO</text>
+   <path d="${band}" fill="#F0A060" opacity=".28"/>
+   <path d="${line(PRED.h,0,'v')}" fill="none" stroke="#0B2E59" stroke-width="2.4"/>
+   <path d="M${x(hN-1)} ${y(PRED.now)} ${line(PRED.f,hN,'v').replace('M','L')}" fill="none" stroke="#E8893F" stroke-width="2.4" stroke-dasharray="6 4"/>
+   <circle cx="${x(hN-1)}" cy="${y(PRED.now)}" r="4" fill="#0B2E59"/><text x="${x(hN-1)-6}" y="${y(PRED.now)-9}" text-anchor="end" font-size="12" font-weight="700" fill="#0B2E59">hoje ${N2(PRED.now,1)}</text>
+   <circle cx="${x(n-1)}" cy="${y(last.v)}" r="4" fill="#E8893F"/><text x="${x(n-1)-4}" y="${y(last.hi)-6}" text-anchor="end" font-size="12" font-weight="700" fill="#9A4F12">${N2(last.v,1)}</text>
+   ${lab}</svg>`; }
+function openSupInt(a){ setView('supint'); render(); if(a){ const el=$('si-'+a); if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),60); } }
+function renderSupInt(){ const k=S.k||1, fin=S.status==='finalizado', recs=dbRecs(), nRec=recs.reduce((a,r)=>a+r[1],0);
+  const lo=3.12e6*k, hi=3.30e6*k, lc=S.lastCall, prev=3.245e6*k, posF=Math.max(0,Math.min(1,(lc-lo)/(hi-lo)));
+  const dTot=DB_ENT.reduce((a,e)=>a+e[2],0), wAvg=DRIVERS.reduce((a,d)=>a+d[1]*d[2],0)/100;
+  const step=(n,t,id)=>`<div class="sinum" id="si-${id}"><span>${n}</span>${t}</div>`;
+  $('viewSupInt').innerHTML=`
+  <div class="panel sihero"><div><div class="eyebrow">Orbe · da base de dados à decisão</div><h2 style="margin:4px 0 6px">Inteligência de Suprimentos</h2>
+   <div class="empty" style="font-style:normal;max-width:720px">Cada processo grava seus dados no banco de dados de Suprimentos. A base, somada aos índices de mercado, alimenta a predição de preços e riscos e, no fim, gera a inteligência que orienta a próxima contratação. Categoria do exemplo: <b>${CAT}</b>.</div></div>
+   <div class="sipipe">${[['🗄️','Banco de dados','db'],['📈','Predição de mercado','pred'],['🧠','Inteligência','int']].map((x,i)=>`${i?'<span class="oa">→</span>':''}<a href="#" data-si="${x[2]}"><span>${x[0]}</span>${x[1]}</a>`).join('')}</div></div>
+  ${resBox(fin?`<b>CT-FLOW-2026-017 incorporado à base</b> em ${esc(S.dbAt||now())}: ${nRec} registros gravados, predição da categoria recalibrada e inteligência atualizada abaixo.`:`<b>CT-FLOW-2026-017 em andamento:</b> ${nRec} registro(s) já capturados nas etapas concluídas. Ao encerrar o processo (etapa ${num(15)}), ele entra na base e recalibra a predição da categoria.`,fin?'':'info')}
+
+  <div class="panel">${step(1,'Banco de dados de Suprimentos','db')}
+   <div class="grid4" style="margin-bottom:16px"><div class="stat dk"><div class="k">Registros na base</div><div class="v num">${(dTot/1000).toLocaleString('pt-BR',{maximumFractionDigits:0})} mil</div></div><div class="stat"><div class="k">Processos históricos</div><div class="v num">${(1284+(fin?1:0)).toLocaleString('pt-BR')}</div></div><div class="stat"><div class="k">Fornecedores</div><div class="v num">3.912</div></div><div class="stat"><div class="k">Histórico</div><div class="v num">5 anos</div></div></div>
+   <div class="dgrid"><div><h3>Base única: cada dado com origem</h3><div style="overflow-x:auto"><table class="tb"><thead><tr><th>Conjunto de dados</th><th>Origem</th><th class="r">Registros</th><th>Atualização</th></tr></thead><tbody>
+    ${DB_ENT.map(e=>`<tr><td><b style="color:var(--navy)">${e[0]}</b></td><td>${e[1]}</td><td class="r num">${e[2].toLocaleString('pt-BR')}${e[2]===60?' meses':''}</td><td>${e[3]}</td></tr>`).join('')}</tbody></table></div></div>
+    <div><h3>O que este processo grava na base</h3><div class="sirec">${recs.map(r=>`<div class="${r[1]?'ok':''}"><span>${r[1]?'✓':'·'}</span><b>${r[0]}</b><i>${r[1]?r[1]+' reg.':'etapa '+num(r[2])}</i></div>`).join('')}</div>
+     <div class="empty" style="font-style:normal;margin-top:8px">${fin?'Gravado de forma definitiva no encerramento, com trilha de auditoria.':'Capturado etapa a etapa; gravação definitiva no encerramento.'}</div></div></div></div>
+
+  <div class="panel">${step(2,'Predição de mercado','pred')}
+   <div class="dgrid"><div><h3>Índice de preço da categoria <span class="empty" style="font-weight:400">– base 100 = nov/24 · histórico de 24 meses e previsão de 12 meses</span></h3>${predSVG()}
+     <div class="legend" style="margin-top:4px"><span><i style="background:#0B2E59"></i>Realizado</span><span><i style="background:#E8893F"></i>Previsto</span><span><i style="background:#F0A060;opacity:.4"></i>Faixa de confiança de 80%</span></div></div>
+    <div><div class="grid2" style="margin-bottom:12px"><div class="stat dk"><div class="k">Variação prevista 12 meses</div><div class="v num">+${PCT(PRED.var12)}</div></div><div class="stat"><div class="k">Erro do modelo (backtest)</div><div class="v num">3,2%</div></div></div>
+     <div class="box t" style="font-size:14px"><b>Melhor janela de contratação:</b> fechar antes de <b>março/2027</b>, data-base da convenção coletiva (mão de obra = 46% do custo). Depois dela, a previsão sobe cerca de 2 p.p.</div>
+     <div class="box" style="font-size:14px;margin-top:10px"><b>Composição do custo (média ponderada):</b> +${N2(wAvg,1)}% em 12 meses pelos direcionadores ao lado.</div></div></div>
+   <div class="dgrid ia2" style="margin-top:16px"><div><h3>Direcionadores de custo</h3><table class="tb"><thead><tr><th>Direcionador</th><th class="r">Peso</th><th class="r">12 meses</th><th>Fonte</th></tr></thead><tbody>
+     ${DRIVERS.map(d=>`<tr><td>${d[0]}</td><td class="r num">${d[1]}%</td><td class="r num" style="color:${d[2]<0?'var(--ok)':'var(--warn)'};font-weight:700">${d[2]>0?'+':''}${N2(d[2],1)}%</td><td class="empty" style="font-style:normal">${d[3]}</td></tr>`).join('')}</tbody></table></div>
+    <div><h3>Risco previsto dos fornecedores <span class="empty" style="font-weight:400">– 12 meses</span></h3><table class="tb"><thead><tr><th>Fornecedor</th><th class="c">Risco</th><th class="r">Prob. estresse</th><th>Por quê</th></tr></thead><tbody>
+     ${SUP_RISK().map(r=>`<tr><td><b>${r[0]}</b></td><td class="c">${riskTag(r[1])}</td><td class="r num">${r[2]}%</td><td style="font-size:13.5px">${r[3]}</td></tr>`).join('')}</tbody></table></div></div></div>
+
+  <div class="panel siint">${step(3,'Inteligência de Suprimentos gerada','int')}
+   <div class="grid3">
+    <div class="sicard"><div class="k">Faixa justa de mercado</div><div class="v num">${MM(lo).replace(' MM','')}–${MM(hi).replace('R$ ','')}</div><div class="bar" style="margin:8px 0 4px;position:relative;overflow:visible"><i style="width:100%;background:linear-gradient(90deg,#1F7A50,#F0A060)"></i>${S.done.has(7)?`<b class="mk" style="left:${posF*100}%"></b>`:''}</div>
+     <p>${S.done.has(7)?`Last Call de <b>${MM(lc)}</b> no percentil ${Math.round(posF*100)} da faixa e ${PCT(Math.abs(prev-lc)/prev)} ${lc<prev?'abaixo':'acima'} do preço previsto (${MM(prev)}).`:`Preço previsto para este escopo: <b>${MM(prev)}</b>. Use como alvo da negociação (etapa ${num(7)}).`}</p></div>
+    <div class="sicard"><div class="k">Convidar no próximo processo</div><ul class="dots"><li><b>Ciclo Uniformes</b> – melhor nota técnica da categoria (9,1)</li><li><b>Atlas Têxtil</b> – venceu ${fin?'2':'1'} dos últimos 4 processos</li><li><b>Lavtec Serra</b> – novo entrante, 3 cotações vencedoras no ME em 2026</li></ul><p>Evitar: <b>Vértice</b> sem garantia financeira (risco previsto alto).</p></div>
+    <div class="sicard"><div class="k">Alavancas que mais funcionaram</div><table style="width:100%;font-size:14px"><tbody>${[['Last Call',6.9],['Revisão da frequência de coleta',3.4],['Pagamento consolidado 30 DDL',2.1],['Agrupar Ubu + Germano',4.8]].map(a=>`<tr><td style="padding:3px 0">${a[0]}</td><td class="num" style="text-align:right;font-weight:700;color:var(--ok)">−${N2(a[1],1)}%</td></tr>`).join('')}</tbody></table><p>Ganho médio na categoria, com base em ${fin?'42':'41'} negociações.</p></div>
+   </div>
+   <div class="grid3" style="margin-top:12px">
+    <div class="sicard al"><div class="k">⚠ Alerta de mercado</div><p>Reajuste da convenção coletiva previsto em <b>março/2027: +6,2%</b>. Contratos com data-base nesse mês ficam mais caros.</p></div>
+    <div class="sicard al"><div class="k">📅 Oportunidade</div><p><b>4 contratos da categoria vencem em 2027</b> (R$ ${N2(11.8*k,1)} MM). Agrupar em um único processo pode gerar <b>R$ ${N2(1.4*k,1)} MM</b> de saving.</p></div>
+    <div class="sicard al"><div class="k">🔁 Aprendizado deste processo</div><p>${fin?`Previsto × realizado registrado: a predição da categoria foi recalibrada com o CT-FLOW-2026-017 (${S.invited.size} convidados, ${S.rdOpen+1} rodadas, ${PCT((ROUNDS.data['Atlas Têxtil'][0]-lc)/ROUNDS.data['Atlas Têxtil'][0])} de cost avoidance).`:'Disponível ao encerrar o processo: o resultado real entra na base e ajusta a predição.'}</p></div>
+   </div>
+   <div class="actions"><button class="btn pri" id="siUse">Usar no próximo processo</button><span class="empty">A inteligência aparece na Vendor List (etapa ${num(2)}) e na Negociação (etapa ${num(7)}) dos próximos processos da categoria. Dados e modelo fictícios.</span></div></div>`;
+  document.querySelectorAll('[data-si]').forEach(a=>a.onclick=e=>{ e.preventDefault(); $('si-'+a.dataset.si).scrollIntoView({behavior:'smooth',block:'start'}); });
+  $('siUse').onclick=()=>{ log('Inteligência de Suprimentos aplicada', CAT+' · faixa '+MM(lo)+' a '+MM(hi)); toast('Inteligência salva para os próximos processos da categoria'); };
 }
 
 /* =========================================================
