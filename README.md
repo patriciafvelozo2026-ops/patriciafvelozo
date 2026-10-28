@@ -92,3 +92,9 @@ npm run test:e2e    # navegador (Chromium) sem rede, do upload ao RH
 | `tools/` | Build, modelo de RH provisório e gerador do processo fictício |
 | `exemplo/` | Processo fictício completo (pasta e .zip) |
 | `docs/` | Guia de uso e nota para a Segurança da Informação |
+
+## Demonstração ponta a ponta (Orbe)
+
+`demo/FLOW_Demo_Ponta_a_Ponta_V21.html` é a demonstração navegável da RC ao contrato, alinhada ao
+**Orbe · Visão 360 de Suprimentos**: as 15 etapas seguem a ordem do Orbe (Preparação, Mercado,
+Decisão, Formalização) e a tela Início mostra o mapa do Orbe com o que o FLOW (Fase A) já faz.
